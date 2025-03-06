@@ -7,22 +7,21 @@ from sklearn.linear_model import Ridge
 from utils import get_lorenz, get_lorenz_attractor, plot_lorenz_attractor_with_error
 
 # Try running with the following line:
-# python forecast_mackeyglass.py --test_trials=10 --use_test --rho 1. --inp_scaling 1 --leaky 0.9 --regul 1e-6 --lag 1 --n_hid 100 --solver svd
-
+# python3 lorenz.py --test_trials=10 --use_test --rho 1.0 --leaky 0.1 --regul 0.05 --n_hid 512 --inp_scaling 0.8
 
 parser = argparse.ArgumentParser(description='training parameters')
 
 parser.add_argument('--n_hid', type=int, default=256,
-                    help='hidden size of recurrent net')
+                    help='hidden size of recurrent net') # 512 might be a better value but is significantly slower
 parser.add_argument('--cpu', action="store_true")
 parser.add_argument('--inp_scaling', type=float, default=1.,
-                    help='ESN input scaling')
+                    help='ESN input scaling') # 0.5 seems to be a good value
 parser.add_argument('--rho', type=float, default=0.99,
-                    help='ESN spectral radius')
+                    help='ESN spectral radius') # doesn't change the result, at least for the lorenz attractor
 parser.add_argument('--leaky', type=float, default=1.0,
-                    help='ESN leakage')
+                    help='ESN leakage') # 0.1 seems to be the best value
 parser.add_argument('--regul', type=float, default=0.0,
-                    help='Ridge regularisation parameter')
+                    help='Ridge regularisation parameter') # around 0.1 and 0.05 seems to be the best value
 parser.add_argument('--lag', type=int, default=1)
 parser.add_argument('--use_test', action="store_true")
 parser.add_argument('--show_result', type=bool, default=False)
@@ -77,7 +76,7 @@ for guess in range(args.test_trials):
         activations = activations[washout:]
         activations = scaler.transform(activations)
         predictions = classifier.predict(activations)
-        plot_lorenz_attractor_with_error(predictions, target, title)
+        #plot_lorenz_attractor_with_error(predictions, target, title)
         # print(f"---------- Predictions: {predictions}\n\n")
         # print(f"---------- Target: {target}\n\n\n\n\n\n")
         # calculate nrmse
