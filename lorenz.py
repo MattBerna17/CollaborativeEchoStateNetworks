@@ -49,7 +49,7 @@ main_folder = 'result'
 
 device = torch.device("cuda") if torch.cuda.is_available() and not args.cpu else torch.device("cpu")
 print("Using device ", device)
-n_inp = 1
+n_inp = 3
 n_out = 1
 washout = 200
 lag = args.lag
@@ -71,11 +71,11 @@ for guess in range(args.test_trials):
 
     @torch.no_grad()
     def test_esn(dataset, target, classifier, scaler):
-        dataset = dataset.reshape(1, -1, 1).to(device)
-        target = target.reshape(-1, 1).numpy()
+        dataset = dataset.unsqueeze(0).reshape(1, -1, 3).to(device)
+        target = target.reshape(-1, 3).numpy()
         activations = model(dataset)[0].cpu().numpy()
-        activations = activations[:, washout:]
         activations = activations.reshape(-1, args.n_hid)
+        activations = activations[washout:]
         activations = scaler.transform(activations)
         predictions = classifier.predict(activations)
         preds.append(predictions)
@@ -88,26 +88,28 @@ for guess in range(args.test_trials):
         nrmse = rmse / (norm + 1e-9)
         return nrmse
 
-    dataset = train_dataset.reshape(1, -1, 1).to(device)
-    target = train_target.reshape(-1, 1).numpy()
     # print("\n\n\n----------------------------")
     # print("[MAIN] before call")
     # print("----------------------------\n\n\n")
     # print(f"\n\nTrain dataset: {(dataset.shape)}\nTarget: {(target.shape)}")
     
-    # print("\n\n")
-    # print(train_dataset.shape)
+    print("\n\n")
+    print(train_dataset.shape)
     # print(f"train dataset: {train_dataset}")
     # print(f"train target: {train_target}\n")
     # print(f"valid dataset: {valid_dataset}")
     # print(f"valid target: {valid_target}\n")
     # print(f"test dataset: {test_dataset}")
     # print(f"test target: {test_target}\n\n\n")
+    dataset = train_dataset.unsqueeze(0).reshape(1, -1, 3).to(device)
+    target = train_target.reshape(-1, 3).numpy()
     print(f"train dataset: {dataset.shape}")
     print(f"train target: {target.shape}")
     activations = model(dataset)[0].cpu().numpy()
-    activations = activations[:, 3*washout:] # why????
+    print(f"activations: {activations.shape}")
     activations = activations.reshape(-1, args.n_hid)
+    activations = activations[washout:] # why????
+    # activations = activations.reshape(-1, args.n_hid)
     print(f"activations: {activations.shape}")
     scaler = preprocessing.StandardScaler().fit(activations)
     activations = scaler.transform(activations)

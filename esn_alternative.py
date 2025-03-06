@@ -157,8 +157,8 @@ class ReservoirCell(torch.nn.Module):
         :return: ht, ht
         """
         # print("[RESERVOIR CELL] forward method call\n")
-        print(f"xt: {xt.shape}")
-        print(f"h_prev: {h_prev.shape}")
+        # print(f"xt: {xt.shape}")
+        # print(f"h_prev: {h_prev.shape}")
         input_part = torch.mm(xt, self.kernel)
         state_part = torch.mm(h_prev, self.recurrent_kernel)
         # !!!!!!!!!!!!! add feedback term from neighbour reservoir cells

@@ -547,3 +547,18 @@ n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag
  ##################################################################### 
 Mean NRMSE 1.2334582805633545,    std 0.0008759997180101001
  ##################################################################### 
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 3, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 0.18491, test: 0.23807
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 3, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 12.07866, test: 1.07563
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 3, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 0.85595, test: 0.37813
+**************
+
+
+ ##################################################################### 
+Mean NRMSE 0.5639432022968928,    std 0.3663071889449486
+ ##################################################################### 
