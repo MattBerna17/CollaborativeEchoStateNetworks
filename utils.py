@@ -7,6 +7,8 @@ import torchvision.transforms as transforms
 from torch import nn
 from esn import spectral_norm_scaling
 import pandas as pd
+from mpl_toolkits import mplot3d
+import matplotlib.pyplot as plt
 
 
 def count_parameters(model):
@@ -191,12 +193,6 @@ def get_cifar_data(bs_train,bs_test):
 
 
 
-
-
-
-
-
-
 def get_lorenz_attractor(lag=1, washout=200):
     dataset = pd.read_csv("lorenz.csv", index_col="t").drop(columns=["Unnamed: 0"])
     dataset = torch.tensor(dataset.values).float()
@@ -204,13 +200,6 @@ def get_lorenz_attractor(lag=1, washout=200):
     # print(train_dataset)
     # print(train_target)
     return (train_dataset, train_target), (val_dataset, val_target), (test_dataset, test_target)
-
-
-
-
-
-
-
 
 
 
@@ -270,6 +259,32 @@ def separate_training_validation_test(dataset: torch.Tensor, washout=200, lag=1)
     print(f"test target: {(test_target.shape)}\n")
 
     return (train_dataset, train_target), (val_dataset, val_target), (test_dataset, test_target)
+
+
+
+def plot_lorenz_attractor_with_error(predictions: torch.Tensor, targets: torch.Tensor, title):
+    fig = plt.figure(figsize = (8,8))
+    ax = plt.axes(projection='3d')
+    ax.grid()
+    ax.set_title('Lorenz Attractor')
+    fig.canvas.manager.set_window_title(title)
+    x_pred = predictions[:, 0]
+    y_pred = predictions[:, 1]
+    z_pred = predictions[:, 2]
+    x_target = targets[:, 0]
+    y_target = targets[:, 1]
+    z_target = targets[:, 2]
+    ax.plot3D(x_pred, y_pred, z_pred, 'blue', label='Predictions')
+    ax.plot3D(x_target, y_target, z_target, 'red', label='Targets')
+    ax.set_title('3D Parametric Plot')
+
+    # Set axes label
+    ax.set_xlabel('x', labelpad=20)
+    ax.set_ylabel('y', labelpad=20)
+    ax.set_zlabel('z', labelpad=20)
+
+    plt.show()
+    return
 
 
 def get_mackey_glass(lag=1, washout=200, window_size=0):

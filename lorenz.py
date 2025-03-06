@@ -4,7 +4,7 @@ import argparse
 from esn_alternative import DeepReservoir
 from sklearn import preprocessing
 from sklearn.linear_model import Ridge
-from utils import get_lorenz, get_lorenz_attractor
+from utils import get_lorenz, get_lorenz_attractor, plot_lorenz_attractor_with_error
 
 # Try running with the following line:
 # python forecast_mackeyglass.py --test_trials=10 --use_test --rho 1. --inp_scaling 1 --leaky 0.9 --regul 1e-6 --lag 1 --n_hid 100 --solver svd
@@ -68,61 +68,51 @@ for guess in range(args.test_trials):
                                 leaky=args.leaky,
                                 ).to(device)
 
-
+    # no_grad means that the operations inside the block will not be added to the computation graph
+    # since we never use torch.backward() we don't need to compute the gradient
     @torch.no_grad()
-    def test_esn(dataset, target, classifier, scaler):
+    def test_esn(dataset, target, classifier, scaler, title):
+        # reshape the dataset and the target
         dataset = dataset.unsqueeze(0).reshape(1, -1, 3).to(device)
         target = target.reshape(-1, 3).numpy()
-        activations = model(dataset)[0].cpu().numpy()
+        activations = model(dataset)[0].cpu().numpy() # calculate activations and reshape + remove washout
         activations = activations.reshape(-1, args.n_hid)
         activations = activations[washout:]
         activations = scaler.transform(activations)
         predictions = classifier.predict(activations)
-        preds.append(predictions)
-        targets.append(target)
+        plot_lorenz_attractor_with_error(predictions, target, title)
         # print(f"---------- Predictions: {predictions}\n\n")
         # print(f"---------- Target: {target}\n\n\n\n\n\n")
+        # calculate nrmse
         mse = np.mean(np.square(predictions - target))
         rmse = np.sqrt(mse)
         norm = np.sqrt(np.square(target).mean())
         nrmse = rmse / (norm + 1e-9)
         return nrmse
 
-    # print("\n\n\n----------------------------")
-    # print("[MAIN] before call")
-    # print("----------------------------\n\n\n")
-    # print(f"\n\nTrain dataset: {(dataset.shape)}\nTarget: {(target.shape)}")
-    
-    print("\n\n")
-    print(train_dataset.shape)
-    # print(f"train dataset: {train_dataset}")
-    # print(f"train target: {train_target}\n")
-    # print(f"valid dataset: {valid_dataset}")
-    # print(f"valid target: {valid_target}\n")
-    # print(f"test dataset: {test_dataset}")
-    # print(f"test target: {test_target}\n\n\n")
-    dataset = train_dataset.unsqueeze(0).reshape(1, -1, 3).to(device)
-    target = train_target.reshape(-1, 3).numpy()
-    print(f"train dataset: {dataset.shape}")
-    print(f"train target: {target.shape}")
-    activations = model(dataset)[0].cpu().numpy()
-    print(f"activations: {activations.shape}")
-    activations = activations.reshape(-1, args.n_hid)
-    activations = activations[washout:] # why????
+    # columns = ['x', 'y', 'z']
+    dataset = train_dataset.unsqueeze(0).reshape(1, -1, 3).to(device) # reshape element to torch.Size([1, rows=len(train_dataset), columns=3])
+    target = train_target.reshape(-1, 3).numpy() # reshape element to torch.Size([rows=len(train_target), columns=3])
+    # print(f"train dataset: {dataset.shape}")
+    # print(f"train target: {target.shape}")
+    activations = model(dataset)[0].cpu().numpy() # train the deep reservoir to get the activations (states of last iteration combined)
+    # print(f"activations: {activations.shape}")
+    activations = activations.reshape(-1, args.n_hid) # reshape the activations to torch.Size([rows=len(train_dataset), columns=args.n_hid=256]) (why reshape to 256???)
+    activations = activations[washout:] # remove first washout elements (why????)
     # activations = activations.reshape(-1, args.n_hid)
-    print(f"activations: {activations.shape}")
+    # print(f"activations: {activations.shape}")
     scaler = preprocessing.StandardScaler().fit(activations)
-    activations = scaler.transform(activations)
-    print("target size:", (target.shape))
-    print("activations", (activations.shape))
+    activations = scaler.transform(activations) # scale the activations
+    # print("target size:", (target.shape))
+    # print("activations", (activations.shape))
     if args.solver is None:
         classifier = Ridge(alpha=args.regul, max_iter=1000).fit(activations, target)
     elif args.solver == 'svd':
         classifier = Ridge(alpha=args.regul, solver='svd').fit(activations, target)
     else:
         classifier = Ridge(alpha=args.regul, solver=args.solver).fit(activations, target)
-    valid_nmse = test_esn(valid_dataset, valid_target, classifier, scaler)
-    test_nmse = test_esn(test_dataset, test_target, classifier, scaler) if args.use_test else 0.0
+    valid_nmse = test_esn(valid_dataset, valid_target, classifier, scaler, title="Lorenz Attractor Validation Plot") # get nmse of the validation dataset
+    test_nmse = test_esn(test_dataset, test_target, classifier, scaler, title="Lorenz Attractor Test Plot") if args.use_test else 0.0 # get nmse of the test dataset
     NRMSE[guess] = test_nmse
 
     f = open(f'{main_folder}/{namefile}.txt', 'a')
