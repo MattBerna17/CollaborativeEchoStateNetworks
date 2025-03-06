@@ -1,0 +1,549 @@
+ ##################################################################### 
+Mean NRMSE 0.0,    std 0.0
+ ##################################################################### 
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.03868, test: 1.01249
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.02428, test: 1.00795
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.02605, test: 0.98846
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.0018, test: 0.98205
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.0834, test: 1.04838
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.00643, test: 1.01207
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.13294, test: 1.08973
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.0862, test: 1.07825
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 0.99268, test: 0.96884
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 0.99481, test: 0.9658
+**************
+
+
+ ##################################################################### 
+Mean NRMSE 1.0154014766216277,    std 0.04135597083154943
+ ##################################################################### 
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.01375, test: 1.01448
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 0.99747, test: 0.98113
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.00811, test: 1.01968
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.0273, test: 1.01545
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.0183, test: 0.96816
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.03674, test: 1.00268
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.00714, test: 0.98734
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.06776, test: 1.01454
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.00413, test: 0.97912
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.04867, test: 1.0541
+**************
+
+
+ ##################################################################### 
+Mean NRMSE 1.003667414188385,    std 0.024109687197682337
+ ##################################################################### 
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.0268, test: 1.01113
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.05611, test: 1.02701
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.05437, test: 1.02992
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.04566, test: 1.00772
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.03065, test: 1.01224
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 0.99894, test: 0.98139
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.00197, test: 0.97483
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 0.9983, test: 0.97489
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.08127, test: 1.02677
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.01755, test: 1.00229
+**************
+
+
+ ##################################################################### 
+Mean NRMSE 1.0048179507255555,    std 0.020144429534282568
+ ##################################################################### 
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.01241, test: 0.99332
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.02156, test: 0.98464
+**************
+
+
+ ##################################################################### 
+Mean NRMSE 0.0,    std 0.0
+ ##################################################################### 
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.13411, test: 1.23214
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.14071, test: 1.22919
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.13629, test: 1.23004
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.13788, test: 1.22784
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.13738, test: 1.22891
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.138, test: 1.22648
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.13809, test: 1.22712
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.1378, test: 1.22907
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.13502, test: 1.23063
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.13702, test: 1.22999
+**************
+
+
+ ##################################################################### 
+Mean NRMSE 1.2291417360305785,    std 0.0016009155124866855
+ ##################################################################### 
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.13781, test: 1.23008
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.13668, test: 1.22688
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.13441, test: 1.22838
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.1368, test: 1.22829
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.13692, test: 1.23039
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.14044, test: 1.22939
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.13676, test: 1.22653
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.14007, test: 1.23152
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.13673, test: 1.2297
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.13495, test: 1.22915
+**************
+
+
+ ##################################################################### 
+Mean NRMSE 1.2290309548377991,    std 0.001470459066517015
+ ##################################################################### 
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.13348, test: 1.22679
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.13858, test: 1.23041
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.1384, test: 1.22895
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.13493, test: 1.2277
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.13903, test: 1.2292
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.13947, test: 1.22808
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.14048, test: 1.23013
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.13758, test: 1.23092
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.13784, test: 1.23014
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.13817, test: 1.22952
+**************
+
+
+ ##################################################################### 
+Mean NRMSE 1.2291836142539978,    std 0.001251475613368295
+ ##################################################################### 
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.13218, test: 1.22942
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.13642, test: 1.22673
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.13508, test: 1.22742
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.13654, test: 1.22919
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.13513, test: 1.22906
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.13741, test: 1.2297
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.13579, test: 1.23105
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.13768, test: 1.23153
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.13845, test: 1.22953
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.13742, test: 1.2309
+**************
+
+
+ ##################################################################### 
+Mean NRMSE 1.229452133178711,    std 0.0014422603536095582
+ ##################################################################### 
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.13638, test: 1.22851
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.14011, test: 1.22938
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.12933, test: 1.22964
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.13726, test: 1.2287
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.1362, test: 1.23066
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.13544, test: 1.22979
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.13647, test: 1.2291
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.13563, test: 1.23018
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.14036, test: 1.2289
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.13896, test: 1.22933
+**************
+
+
+ ##################################################################### 
+Mean NRMSE 1.2294184803962707,    std 0.0006350303583480108
+ ##################################################################### 
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.13741, test: 1.22586
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.1487, test: 1.22511
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.12142, test: 1.21386
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.16235, test: 1.22058
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.14099, test: 1.22287
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.14924, test: 1.22831
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.12547, test: 1.23187
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.12252, test: 1.21481
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.11421, test: 1.22012
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.18218, test: 1.2147
+**************
+
+
+ ##################################################################### 
+Mean NRMSE 1.2218093752861023,    std 0.0058218946026469395
+ ##################################################################### 
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.12448, test: 1.21739
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.19151, test: 1.27069
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.15375, test: 1.21929
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.14837, test: 1.24577
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.12952, test: 1.24667
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.13484, test: 1.21257
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.16795, test: 1.24926
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.13484, test: 1.22583
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.12255, test: 1.25078
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 10, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.14506, test: 1.28479
+**************
+
+
+ ##################################################################### 
+Mean NRMSE 1.2423025369644165,    std 0.02251252893556714
+ ##################################################################### 
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 3, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.1365, test: 1.22896
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 3, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.13337, test: 1.23031
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 3, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.13225, test: 1.22709
+**************
+
+
+ ##################################################################### 
+Mean NRMSE 1.228788137435913,    std 0.001319046197545099
+ ##################################################################### 
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 3, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.13383, test: 1.22953
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 3, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.13852, test: 1.2301
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 3, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.13706, test: 1.22727
+**************
+
+
+ ##################################################################### 
+Mean NRMSE 1.2289679447809856,    std 0.0012241836778381044
+ ##################################################################### 
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 3, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.08088, test: 1.23289
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 3, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.08254, test: 1.23222
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 3, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.08043, test: 1.23153
+**************
+
+
+ ##################################################################### 
+Mean NRMSE 1.2322121063868205,    std 0.0005585083442070036
+ ##################################################################### 
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 3, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.08056, test: 1.23073
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 3, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.08, test: 1.22661
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 3, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.07743, test: 1.23107
+**************
+
+
+ ##################################################################### 
+Mean NRMSE 1.22947092851003,    std 0.002030861465226973
+ ##################################################################### 
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 3, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.07895, test: 1.23435
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 3, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.07836, test: 1.23095
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 3, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.07811, test: 1.23226
+**************
+
+
+ ##################################################################### 
+Mean NRMSE 1.2325235605239868,    std 0.0013998417400516569
+ ##################################################################### 
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 3, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.0778, test: 1.23145
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 3, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.07893, test: 1.23186
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 3, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.08355, test: 1.23405
+**************
+
+
+ ##################################################################### 
+Mean NRMSE 1.232455054918925,    std 0.00113951010405648
+ ##################################################################### 
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 3, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.07877, test: 1.23469
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 3, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.084, test: 1.23298
+**************
+
+
+n_hid: 256, cpu: False, inp_scaling: 1.0, rho: 0.99, leaky: 1.0, regul: 0.0, lag: 1, use_test: True, show_result: False, test_trials: 3, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 1.07468, test: 1.23271
+**************
+
+
+ ##################################################################### 
+Mean NRMSE 1.2334582805633545,    std 0.0008759997180101001
+ ##################################################################### 
