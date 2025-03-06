@@ -49,8 +49,8 @@ main_folder = 'result'
 
 device = torch.device("cuda") if torch.cuda.is_available() and not args.cpu else torch.device("cpu")
 print("Using device ", device)
-n_inp = 3
-n_out = 1
+n_inp = 3 # number of input features
+# n_out = 1
 washout = 200
 lag = args.lag
 
@@ -58,9 +58,6 @@ lag = args.lag
 
 NRMSE = np.zeros(args.test_trials)
 for guess in range(args.test_trials):
-    preds, targets = [], []
-
-
     model = DeepReservoir(n_inp, tot_units=args.n_hid, spectral_radius=args.rho,
                                 input_scaling=args.inp_scaling,
                                 connectivity_recurrent=args.n_hid,
