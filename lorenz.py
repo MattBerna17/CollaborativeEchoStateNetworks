@@ -76,7 +76,7 @@ for guess in range(args.test_trials):
         activations = activations[washout:]
         activations = scaler.transform(activations)
         predictions = classifier.predict(activations)
-        #plot_lorenz_attractor_with_error(predictions, target, title)
+        plot_lorenz_attractor_with_error(predictions, target, title)
         # print(f"---------- Predictions: {predictions}\n\n")
         # print(f"---------- Target: {target}\n\n\n\n\n\n")
         # calculate nrmse
