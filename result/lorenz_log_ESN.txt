@@ -1768,3 +1768,38 @@ n_hid: 512, cpu: False, inp_scaling: 0.8, rho: 1.0, leaky: 0.1, regul: 0.05, lag
  ##################################################################### 
 Mean NRMSE 0.0022660488612018526,    std 0.0006807155424683631
  ##################################################################### 
+n_hid: 512, cpu: False, inp_scaling: 0.8, rho: 1.0, leaky: 0.1, regul: 0.05, lag: 1, use_test: True, show_result: False, test_trials: 1, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 0.02023, test: 0.00181
+**************
+
+
+ ##################################################################### 
+Mean NRMSE 0.0018124085618183017,    std 0.0
+ ##################################################################### 
+n_hid: 512, cpu: False, inp_scaling: 0.8, rho: 1.0, leaky: 0.1, regul: 0.05, lag: 1, use_test: True, show_result: False, test_trials: 1, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 0.03969, test: 0.06792
+**************
+
+
+ ##################################################################### 
+Mean NRMSE 0.06791648268699646,    std 0.0
+ ##################################################################### 
+n_hid: 256, cpu: False, inp_scaling: 0.8, rho: 1.0, leaky: 0.1, regul: 0.05, lag: 1, use_test: True, show_result: False, test_trials: 1, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 0.05733, test: 0.07392
+**************
+
+
+ ##################################################################### 
+Mean NRMSE 0.07391507923603058,    std 0.0
+ ##################################################################### 
+n_hid: 1024, cpu: False, inp_scaling: 0.8, rho: 1.0, leaky: 0.1, regul: 0.05, lag: 1, use_test: True, show_result: False, test_trials: 1, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 0.03454, test: 0.06857
+**************
+
+
+ ##################################################################### 
+Mean NRMSE 0.06856626272201538,    std 0.0
+ ##################################################################### 
+n_hid: 512, cpu: False, inp_scaling: 0.8, rho: 1.0, leaky: 0.1, regul: 0.05, lag: 1, use_test: True, show_result: False, test_trials: 1, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 0.18703, test: 0.00787
+**************
+
+
+ ##################################################################### 
+Mean NRMSE 0.007866251282393932,    std 0.0
+ ##################################################################### 

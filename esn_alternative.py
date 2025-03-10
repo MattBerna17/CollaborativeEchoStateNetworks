@@ -102,7 +102,8 @@ def spectral_norm_scaling(W: torch.FloatTensor, rho_desired: float) -> torch.Flo
 
 class ReservoirCell(torch.nn.Module):
     def __init__(self, input_size, units, input_scaling=1., spectral_radius=0.99,
-                 leaky=1, connectivity_input=10, connectivity_recurrent=10):
+                 leaky=1, connectivity_input=10, connectivity_recurrent=10,
+                 feedback_size=0):
         """ Shallow reservoir to be used as cell of a Recurrent Neural Network.
 
         :param input_size: number of input units
@@ -115,6 +116,7 @@ class ReservoirCell(torch.nn.Module):
             input unit to the reservoir
         :param connectivity_recurrent: number of incoming recurrent connections
             for each reservoir unit
+        :param feedback_size: number of feedback connections from the output to the reservoir
         """
         super().__init__()
 
@@ -129,7 +131,7 @@ class ReservoirCell(torch.nn.Module):
 
         self.kernel = sparse_tensor_init(input_size, self.units,
                                          self.connectivity_input) * self.input_scaling
-        self.kernel = nn.Parameter(self.kernel, requires_grad=False)
+        self.kernel = nn.Parameter(self.kernel, requires_grad=False) # equivalent to the W_in in the original paper: its purpose is to multiply the input tensor to create a higher dimension representation of the input itself.
 
         W = sparse_recurrent_tensor_init(self.units, C=self.connectivity_recurrent)
         # re-scale the weight matrix to control the effective spectral radius
@@ -149,7 +151,14 @@ class ReservoirCell(torch.nn.Module):
         #self.bias = (torch.rand(self.units) * 2 - 1) * self.input_scaling
         self.bias = nn.Parameter(self.bias, requires_grad=False)
 
-    def forward(self, xt, h_prev):
+        # if feedback is enabled, create the feedback kernel, which cannot be trained (statically set), just like any other kernel
+        if feedback_size > 0:
+            self.feedback_kernel = nn.Parameter(torch.randn(3, self.units), requires_grad=False) # equivalent to the W_fb in the original paper: its purpose is to multiply the previous state to create a feedback loop.
+        else:
+            self.feedback_kernel = None # if feedback is not needed
+        # self.flag = False
+
+    def forward(self, xt, h_prev, y_prev=None):
         """ Computes the output of the cell given the input and previous state.
 
         :param xt:
@@ -161,16 +170,26 @@ class ReservoirCell(torch.nn.Module):
         # print(f"h_prev: {h_prev.shape}")
         input_part = torch.mm(xt, self.kernel)
         state_part = torch.mm(h_prev, self.recurrent_kernel)
-        # !!!!!!!!!!!!! add feedback term from neighbour reservoir cells
 
-        output = torch.tanh(input_part + self.bias + state_part)
+        # TODO: add feedback term from past prediction
+        # !!!!!!!!!!!!! add feedback term from neighbour reservoir cells
+        if self.feedback_kernel is not None and y_prev is not None:
+            feedback_part = torch.mm(y_prev, self.feedback_kernel) # multiply the feedback kernel with the previous output
+            print(f"feedback_part: {feedback_part.shape}")
+        else:
+            feedback_part = 0
+        output = torch.tanh(input_part + self.bias + state_part + feedback_part)
         leaky_output = h_prev * (1 - self.leaky) + output * self.leaky
+        # print(f"leaky_output: {leaky_output.shape}")
+        # if self.flag:
+        #     exit()
+        # self.flag = True
         return leaky_output, leaky_output
 
 
 class ReservoirLayer(torch.nn.Module):
     def __init__(self, input_size, units, input_scaling=1., spectral_radius=0.99,
-                 leaky=1, connectivity_input=10, connectivity_recurrent=10):
+                 leaky=1, connectivity_input=10, connectivity_recurrent=10, feedback_size=0):
         """ Shallow reservoir to be used as Recurrent Neural Network layer.
 
         :param input_size: number of input units
@@ -187,15 +206,16 @@ class ReservoirLayer(torch.nn.Module):
         super().__init__()
         self.net = ReservoirCell(input_size, units, input_scaling,
                                  spectral_radius, leaky, connectivity_input,
-                                 connectivity_recurrent)
+                                 connectivity_recurrent, feedback_size=feedback_size)
 
     def init_hidden(self, batch_size):
         return torch.zeros(batch_size, self.net.units)
 
-    def forward(self, x, h_prev=None):
+    def forward(self, x, y, h_prev=None):
         """ Computes the output of the cell given the input and previous state.
 
         :param x:
+        :param y: Y target tensor
         :param h_prev: h[0]
         :return: h, ht
         """
@@ -206,9 +226,14 @@ class ReservoirLayer(torch.nn.Module):
 
         hs = []
         for t in range(x.shape[1]):
+            print(f"t: {t}")
+            print(f"x: {x.shape}")
             xt = x[:, t].reshape(-1, self.net.input_size)
+            print(f"y: {y.shape}")
+            y_prev = torch.Tensor(y[t-1].reshape(-1, 3)) if t > 0 else None
             # print(f"h_prev:\n{h_prev}")
-            _, h_prev = self.net(xt, h_prev) # call to forward method
+            # print(f"y_prev: {y_prev}")
+            _, h_prev = self.net(xt, h_prev, y_prev=y_prev) # call to forward method
             # print(f"h:\n{h_prev}\n\n")
             hs.append(h_prev)
         hs = torch.stack(hs, dim=1)
@@ -221,7 +246,8 @@ class DeepReservoir(torch.nn.Module):
                  spectral_radius=0.99, leaky=1,
                  connectivity_recurrent=10,
                  connectivity_input=10,
-                 connectivity_inter=10):
+                 connectivity_inter=10,
+                 feedback_size=0):
         """ Deep Reservoir layer.
         The implementation realizes a number of stacked RNN layers using the
         ReservoirCell as core cell. All the reservoir layers share the same
@@ -269,7 +295,9 @@ class DeepReservoir(torch.nn.Module):
                     spectral_radius=spectral_radius,
                     leaky=leaky,
                     connectivity_input=connectivity_input_1,
-                    connectivity_recurrent=connectivity_recurrent)
+                    connectivity_recurrent=connectivity_recurrent,
+                    feedback_size=feedback_size # ??????????????
+                    )
             ]
             # last_h_size may be different for the first layer
             # because of the remainder if concat=True
@@ -285,7 +313,9 @@ class DeepReservoir(torch.nn.Module):
                     spectral_radius=spectral_radius,
                     leaky=leaky,
                     connectivity_input=connectivity_input_1,
-                    connectivity_recurrent=connectivity_recurrent)
+                    connectivity_recurrent=connectivity_recurrent,
+                    feedback_size=feedback_size # ??????????????
+                    )
             ]
             last_h_size = self.layers_units
 
@@ -315,7 +345,9 @@ class DeepReservoir(torch.nn.Module):
                 spectral_radius=spectral_radius,
                 leaky=leaky,
                 connectivity_input=connectivity_input_others,
-                connectivity_recurrent=connectivity_recurrent))
+                connectivity_recurrent=connectivity_recurrent,
+                feedback_size=feedback_size
+                ))
             last_h_size = self.layers_units
         self.reservoir = torch.nn.ModuleList(reservoir_layers)
         # print("\n\n\n\n////////////////////////")
@@ -325,7 +357,7 @@ class DeepReservoir(torch.nn.Module):
         #print('Input-to-hidden ', reservoir_layers[s].net.kernel)
         #print('Hidden-to-hidden ', reservoir_layers[s].net.recurrent_kernel)
 
-    def forward(self, X):
+    def forward(self, X, Y):
         """ compute the output of the deep reservoir.
 
         :param X:
@@ -336,7 +368,7 @@ class DeepReservoir(torch.nn.Module):
         # states_last is a list because different layers may have different size.
 
         for res_idx, res_layer in enumerate(self.reservoir):
-            [X, h_last] = res_layer(X)
+            [X, h_last] = res_layer(X, y=Y)
             states.append(X)
             states_last.append(h_last)
 

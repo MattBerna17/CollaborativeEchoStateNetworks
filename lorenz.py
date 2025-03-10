@@ -53,15 +53,16 @@ n_inp = 3 # number of input features
 washout = 200
 lag = args.lag
 
-(train_dataset, train_target), (valid_dataset, valid_target), (test_dataset, test_target) = get_lorenz_attractor()
+(train_dataset, train_target), (valid_dataset, valid_target), (test_dataset, test_target) = get_lorenz_attractor(washout=0)
 
 NRMSE = np.zeros(args.test_trials)
 for guess in range(args.test_trials):
-    model = DeepReservoir(n_inp, tot_units=args.n_hid, spectral_radius=args.rho,
+    model = DeepReservoir(n_inp, tot_units=args.n_hid, spectral_radius=args.rho, n_layers=2,
                                 input_scaling=args.inp_scaling,
                                 connectivity_recurrent=args.n_hid,
                                 connectivity_input=args.n_hid, 
                                 leaky=args.leaky,
+                                feedback_size=n_inp
                                 ).to(device)
 
     # no_grad means that the operations inside the block will not be added to the computation graph
@@ -71,11 +72,12 @@ for guess in range(args.test_trials):
         # reshape the dataset and the target
         dataset = dataset.unsqueeze(0).reshape(1, -1, 3).to(device)
         target = target.reshape(-1, 3).numpy()
-        activations = model(dataset)[0].cpu().numpy() # calculate activations and reshape + remove washout
+        activations = model(dataset, target)[0].cpu().numpy() # calculate activations and reshape + remove washout
         activations = activations.reshape(-1, args.n_hid)
         activations = activations[washout:]
         activations = scaler.transform(activations)
         predictions = classifier.predict(activations)
+        target = target[washout:]
         plot_lorenz_attractor_with_error(predictions, target, title)
         # print(f"---------- Predictions: {predictions}\n\n")
         # print(f"---------- Target: {target}\n\n\n\n\n\n")
@@ -91,7 +93,7 @@ for guess in range(args.test_trials):
     target = train_target.reshape(-1, 3).numpy() # reshape element to torch.Size([rows=len(train_target), columns=3])
     # print(f"train dataset: {dataset.shape}")
     # print(f"train target: {target.shape}")
-    activations = model(dataset)[0].cpu().numpy() # train the deep reservoir to get the activations (states of last iteration combined)
+    activations = model(dataset, target)[0].cpu().numpy() # train the deep reservoir to get the activations (states of last iteration combined)
     # print(f"activations: {activations.shape}")
     activations = activations.reshape(-1, args.n_hid) # reshape the activations to torch.Size([rows=len(train_dataset), columns=args.n_hid=256]) (why reshape to 256???)
     activations = activations[washout:] # remove first washout elements (why????)
@@ -101,6 +103,7 @@ for guess in range(args.test_trials):
     activations = scaler.transform(activations) # scale the activations
     # print("target size:", (target.shape))
     # print("activations", (activations.shape))
+    target = target[washout:] # remove first washout elements
     if args.solver is None:
         classifier = Ridge(alpha=args.regul, max_iter=1000).fit(activations, target)
     elif args.solver == 'svd':

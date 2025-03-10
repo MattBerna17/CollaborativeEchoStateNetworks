@@ -268,12 +268,12 @@ def plot_lorenz_attractor_with_error(predictions: torch.Tensor, targets: torch.T
     ax.grid()
     ax.set_title('Lorenz Attractor')
     fig.canvas.manager.set_window_title(title)
-    x_pred = predictions[:, 0]
-    y_pred = predictions[:, 1]
-    z_pred = predictions[:, 2]
     x_target = targets[:, 0]
     y_target = targets[:, 1]
     z_target = targets[:, 2]
+    x_pred = predictions[:, 0]
+    y_pred = predictions[:, 1]
+    z_pred = predictions[:, 2]
     ax.plot3D(x_pred, y_pred, z_pred, 'blue', label='Predictions')
     ax.plot3D(x_target, y_target, z_target, 'red', label='Targets')
     ax.set_title('3D Parametric Plot')

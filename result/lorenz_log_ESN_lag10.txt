@@ -1,0 +1,35 @@
+n_hid: 512, cpu: False, inp_scaling: 0.8, rho: 1.0, leaky: 0.1, regul: 0.05, lag: 10, use_test: True, show_result: False, test_trials: 1, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 0.00513, test: 0.00137
+**************
+
+
+ ##################################################################### 
+Mean NRMSE 0.0013720710994675756,    std 0.0
+ ##################################################################### 
+n_hid: 512, cpu: False, inp_scaling: 0.8, rho: 1.0, leaky: 0.1, regul: 0.05, lag: 10, use_test: True, show_result: False, test_trials: 1, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 0.00419, test: 0.00281
+**************
+
+
+ ##################################################################### 
+Mean NRMSE 0.0028055666480213404,    std 0.0
+ ##################################################################### 
+n_hid: 512, cpu: False, inp_scaling: 0.8, rho: 1.0, leaky: 0.1, regul: 0.05, lag: 10, use_test: True, show_result: False, test_trials: 1, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 0.00307, test: 0.00132
+**************
+
+
+ ##################################################################### 
+Mean NRMSE 0.0013162512332201004,    std 0.0
+ ##################################################################### 
+n_hid: 512, cpu: False, inp_scaling: 0.8, rho: 1.0, leaky: 0.1, regul: 0.05, lag: 10, use_test: True, show_result: False, test_trials: 1, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 0.005, test: 0.00289
+**************
+
+
+ ##################################################################### 
+Mean NRMSE 0.0028890306130051613,    std 0.0
+ ##################################################################### 
+n_hid: 512, cpu: False, inp_scaling: 0.8, rho: 1.0, leaky: 0.1, regul: 0.05, lag: 10, use_test: True, show_result: False, test_trials: 1, bias_scaling: None, avoid_rescal_effective: True, solver: None, valid: 0.00374, test: 0.0019
+**************
+
+
+ ##################################################################### 
+Mean NRMSE 0.0019006856018677354,    std 0.0
+ ##################################################################### 
