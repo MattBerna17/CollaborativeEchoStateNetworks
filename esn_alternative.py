@@ -101,6 +101,7 @@ def spectral_norm_scaling(W: torch.FloatTensor, rho_desired: float) -> torch.Flo
 
 
 class ReservoirCell(torch.nn.Module):
+    # !TODO: add output dimension (e.g. 3 for lorenz, 1 for mackey-glass)
     def __init__(self, input_size, units, input_scaling=1., spectral_radius=0.99,
                  leaky=1, connectivity_input=10, connectivity_recurrent=10,
                  feedback_size=0):
@@ -153,9 +154,10 @@ class ReservoirCell(torch.nn.Module):
         self.bias = nn.Parameter(self.bias, requires_grad=False)
 
         # if feedback is enabled, create the feedback kernel, which cannot be trained (statically set), just like any other kernel
+        # print(f"feedback_size: {feedback_size}")
         if feedback_size > 0:
-            # !TODO: change initialization of feedback kernel
-            self.feedback_kernel = nn.Parameter(sparse_tensor_init(3, self.units, C=self.feedback_size), requires_grad=False) # equivalent to the W_fb in the original paper: its purpose is to multiply the previous state to create a feedback loop.
+            self.feedback_kernel = nn.Parameter(sparse_tensor_init(3, self.units, C=self.feedback_size) * 0.5, requires_grad=False) # equivalent to the W_fb in the original paper: its purpose is to multiply the previous state to create a feedback loop.
+            # !TODO: check if feedback kernel needs to be scaled
         else:
             self.feedback_kernel = None # if feedback is not needed
 
@@ -172,7 +174,6 @@ class ReservoirCell(torch.nn.Module):
         input_part = torch.mm(xt, self.kernel)
         state_part = torch.mm(h_prev, self.recurrent_kernel)
 
-        # TODO: add feedback term from past prediction
         # !!!!!!!!!!!!! add feedback term from neighbour reservoir cells
         if self.feedback_kernel is not None and y_prev is not None:
             feedback_part = torch.mm(y_prev, self.feedback_kernel) # multiply the feedback kernel with the previous output
@@ -224,10 +225,10 @@ class ReservoirLayer(torch.nn.Module):
 
         hs = []
         for t in range(x.shape[1]):
-            print(f"t: {t}")
-            print(f"x: {x.shape}")
+            # print(f"t: {t}")
+            # print(f"x: {x.shape}")
             xt = x[:, t].reshape(-1, self.net.input_size)
-            print(f"y: {y.shape}")
+            # print(f"y: {y.shape}")
             y_prev = torch.Tensor(y[t-1].reshape(-1, 3)) if t > 0 else None
             # print(f"h_prev:\n{h_prev}")
             # print(f"y_prev: {y_prev}")
@@ -294,7 +295,7 @@ class DeepReservoir(torch.nn.Module):
                     leaky=leaky,
                     connectivity_input=connectivity_input_1,
                     connectivity_recurrent=connectivity_recurrent,
-                    feedback_size=feedback_size # ??????????????
+                    feedback_size=feedback_size
                     )
             ]
             # last_h_size may be different for the first layer
@@ -312,7 +313,7 @@ class DeepReservoir(torch.nn.Module):
                     leaky=leaky,
                     connectivity_input=connectivity_input_1,
                     connectivity_recurrent=connectivity_recurrent,
-                    feedback_size=feedback_size # ??????????????
+                    feedback_size=feedback_size
                     )
             ]
             last_h_size = self.layers_units

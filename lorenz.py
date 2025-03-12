@@ -92,7 +92,7 @@ for guess in range(args.test_trials):
                                 connectivity_recurrent=args.n_hid,
                                 connectivity_input=args.n_hid, 
                                 leaky=args.leaky,
-                                feedback_size=n_inp
+                                feedback_size=feedback_size
                                 ).to(device)
 
     # no_grad means that the operations inside the block will not be added to the computation graph
