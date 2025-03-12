@@ -128,6 +128,7 @@ class ReservoirCell(torch.nn.Module):
         self.leaky = leaky
         self.connectivity_input = connectivity_input
         self.connectivity_recurrent = connectivity_recurrent
+        self.feedback_size = feedback_size
 
         self.kernel = sparse_tensor_init(input_size, self.units,
                                          self.connectivity_input) * self.input_scaling
@@ -153,10 +154,10 @@ class ReservoirCell(torch.nn.Module):
 
         # if feedback is enabled, create the feedback kernel, which cannot be trained (statically set), just like any other kernel
         if feedback_size > 0:
-            self.feedback_kernel = nn.Parameter(torch.randn(3, self.units), requires_grad=False) # equivalent to the W_fb in the original paper: its purpose is to multiply the previous state to create a feedback loop.
+            # !TODO: change initialization of feedback kernel
+            self.feedback_kernel = nn.Parameter(sparse_tensor_init(3, self.units, C=self.feedback_size), requires_grad=False) # equivalent to the W_fb in the original paper: its purpose is to multiply the previous state to create a feedback loop.
         else:
             self.feedback_kernel = None # if feedback is not needed
-        # self.flag = False
 
     def forward(self, xt, h_prev, y_prev=None):
         """ Computes the output of the cell given the input and previous state.
@@ -175,15 +176,12 @@ class ReservoirCell(torch.nn.Module):
         # !!!!!!!!!!!!! add feedback term from neighbour reservoir cells
         if self.feedback_kernel is not None and y_prev is not None:
             feedback_part = torch.mm(y_prev, self.feedback_kernel) # multiply the feedback kernel with the previous output
-            print(f"feedback_part: {feedback_part.shape}")
+            # print(f"feedback_part: {feedback_part.shape}")
         else:
             feedback_part = 0
         output = torch.tanh(input_part + self.bias + state_part + feedback_part)
         leaky_output = h_prev * (1 - self.leaky) + output * self.leaky
         # print(f"leaky_output: {leaky_output.shape}")
-        # if self.flag:
-        #     exit()
-        # self.flag = True
         return leaky_output, leaky_output
 
 
@@ -237,7 +235,7 @@ class ReservoirLayer(torch.nn.Module):
             # print(f"h:\n{h_prev}\n\n")
             hs.append(h_prev)
         hs = torch.stack(hs, dim=1)
-        return hs, h_prev
+        return hs, h_prev # !TODO: send the last state of the current layer to the next
 
 
 class DeepReservoir(torch.nn.Module):

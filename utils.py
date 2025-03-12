@@ -243,13 +243,13 @@ def separate_training_validation_test(dataset: torch.Tensor, washout=200, lag=1)
 
     # ! TODO: check and correct washout offset (ask gallicchio)
     train_dataset = dataset[:end_train-lag]
-    train_target = dataset[washout+lag:end_train]
+    train_target = dataset[lag:end_train]
 
     val_dataset = dataset[end_train:end_val-lag]
-    val_target = dataset[end_train+washout+lag:end_val]
+    val_target = dataset[end_train+lag:end_val]
 
     test_dataset = dataset[end_val:end_test-lag]
-    test_target = dataset[end_val+washout+lag:end_test]
+    test_target = dataset[end_val+lag:end_test]
 
     print(f"\nDimensioni:\ntrain dataset: {(train_dataset.shape)}")
     print(f"train target: {(train_target.shape)}")

@@ -5,7 +5,7 @@ from utils import get_lorenz_attractor, plot_lorenz_attractor_with_error
 from esn_alternative import sparse_eye_init, sparse_recurrent_tensor_init, sparse_tensor_init, spectral_norm_scaling
 
 class Reservoir(torch.nn.Module):
-    def __init__(self, Nu, Nx, Ny, input_scaling=1., leaky=1, spectral_radius=0.9, W_connectivity_perc=0.1, use_bias=True, use_feedback=False):
+    def __init__(self, Nu, Nx, Ny, input_scaling=1., leaky=1, spectral_radius=0.9, W_connectivity_perc=0.1, use_bias=False, use_feedback=False):
         """
         Initialize the reservoir with random weights
         :param Nu: input size
@@ -44,6 +44,7 @@ class Reservoir(torch.nn.Module):
         self.X = [] # store the states of the reservoir
         self.Y = [] # store the outputs of the reservoir
         self.U = [] # store the inputs of the reservoir
+        self.ridge = Ridge(alpha=0.05, fit_intercept=False)
         # print(f'W_in: {self.W_in.shape}')
         # print(f'W: {self.W.shape}')
         # print(f'W_out: {self.W_out.shape}')
@@ -64,6 +65,7 @@ class Reservoir(torch.nn.Module):
         )
         # print(f'x_prev: {self.x_prev.shape}')
         self.X.append(self.x_prev) # append current state to history of states
+        # !TODO: change readout position: it should not be in the forward, since it needs X+!
         self.y_prev = self.W_out @ self.x_prev  # compute output for the current state (not considering directly the input and the bias)
         self.Y.append(self.y_prev) # append current output to history of outputs
         return self.y_prev                      # return prevision
@@ -98,12 +100,59 @@ class Reservoir(torch.nn.Module):
                     self.forward(u, Y_target[i-1])
                 X_states.append(self.x_prev.detach().numpy())
             X_states = np.array(X_states)
+            with open("weights_lorenz_alt.txt", "w") as f:
+                for i in range(X_states.shape[0]):
+                    for j in range(X_states.shape[1]):
+                        f.write(str(X_states[i][j]) + ',')
+                    f.write('\n')
             ridge = Ridge(alpha=0.05, fit_intercept=False)
             # print(f'X_states: {X_states.shape}')
             # print(f'Y_target: {Y_target.shape}')
             ridge.fit(X_states, Y_target)
             self.W_out.data = torch.tensor(ridge.coef_, dtype=torch.float32)
     
+    def load_W(self, file):
+        with open(file, "r") as f:
+            weights = []
+            while True:
+                line = f.readline()
+                if not line:
+                    break
+                data = line.strip().split(',')[:-1]
+                data = list(map(float, data))
+                weights.append(data)
+            # print(f'W: {weights}')
+            weights = np.array(weights).reshape(self.Nx, self.Nx)
+            self.W = torch.nn.Parameter(torch.tensor(weights, dtype=torch.float32), requires_grad=False)
+
+    def load_W_in(self, file):
+        with open(file, "r") as f:
+            weights = []
+            while True:
+                line = f.readline()
+                if not line:
+                    break
+                data = line.strip().split(',')[:-1]
+                data = list(map(float, data))
+                weights.append(data)
+            # print(f'W_in: {weights}')
+            weights = np.array(weights).reshape(self.Nx, self.Nu)
+            self.W_in = torch.nn.Parameter(torch.tensor(weights, dtype=torch.float32), requires_grad=False)
+
+    def load_W_out(self, file):
+        with open(file, "r") as f:
+            weights = []
+            while True:
+                line = f.readline()
+                if not line:
+                    break
+                data = line.strip().split(',')[:-1]
+                data = list(map(float, data))
+                weights.append(data)
+            # print(f'W_out: {weights}')
+            weights = np.array(weights).reshape(self.Ny, self.Nx)
+            self.W_out = torch.nn.Parameter(torch.tensor(weights, dtype=torch.float32), requires_grad=False)
+
     def predict(self, U):
         """
         Predict the output of the reservoir
@@ -113,10 +162,9 @@ class Reservoir(torch.nn.Module):
         Y_pred = torch.Tensor()
         pred = None
         for i in range(U.shape[0]):
-            if i == 0:
-                pred = self.forward(U[i])
-            else:
-                pred = self.forward(U[i], pred)
+            pred = self.forward(U[i])
+            print(f'Prediction shape: {pred.shape}')
+            print(f'Prediction: {pred}')
             Y_pred = torch.cat((Y_pred, pred))
         return Y_pred.reshape(-1, self.Ny).detach().numpy()
 
@@ -128,16 +176,25 @@ if __name__ == "__main__":
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     NRMSEs = []
     for i in range(1):
-        model = Reservoir(Nu=3, Nx=16, Ny=3, spectral_radius=0.7, leaky=0.4, input_scaling=1, use_feedback=False).to(device)
-        model.fit(train_dataset, train_target, epochs=1, use_backprop=False)
-        print(f'W_in: {model.W_in}')
-        print(f'W: {model.W}')
-        print(f'W_out: {model.W_out}')
+        model = Reservoir(Nu=3, Nx=512, Ny=3, spectral_radius=0.7, leaky=0.4, input_scaling=1, use_feedback=False).to(device)
+        # model.fit(train_dataset, train_target, epochs=1, use_backprop=False)
+        print(f'W_in: {model.W_in.shape}')
+        print(f'W: {model.W.shape}')
+        print(f'W_out: {model.W_out.shape}')
+        print("\n\n")
+        model.load_W_in("W_in.txt")
+        model.load_W("W.txt")
+        model.load_W_out("W_out.txt")
+        print(f'W_in: {model.W_in.shape}')
+        print(f'W: {model.W.shape}')
+        print(f'W_out: {model.W_out.shape}')
+        model.ridge.coef_ = model.W_out.detach().numpy()
         if model.use_feedback:
-            print(f'W_fb: {model.W_fb}')
+            print(f'W_fb: {model.W_fb.shape}')
         Y_pred = model.predict(test_dataset)
         # print(f'Predictions: {Y_pred.shape}')
-        # print(f'Predictions: {Y_pred}')
+        print(f'Predictions: {Y_pred[:10]}')
+        print(f'Target: {test_target[:10]}')
         plot_lorenz_attractor_with_error(torch.Tensor(Y_pred), test_target, 'Lorenz attractor')
         mse = np.mean(np.square(Y_pred - test_target.numpy()))
         rmse = np.sqrt(mse)
