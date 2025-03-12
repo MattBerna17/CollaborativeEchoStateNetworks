@@ -5,7 +5,7 @@ import os
 import torchvision
 import torchvision.transforms as transforms
 from torch import nn
-from esn import spectral_norm_scaling
+from esn_alternative import spectral_norm_scaling
 import pandas as pd
 from mpl_toolkits import mplot3d
 import matplotlib.pyplot as plt

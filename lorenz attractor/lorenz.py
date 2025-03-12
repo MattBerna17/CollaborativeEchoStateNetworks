@@ -58,6 +58,10 @@ parser.add_argument('--washout', type=int, default=250,
                     help='Number of washout iterations')
 parser.add_argument('--show_plot', action="store_true",
                     help='Whether to show the plot of the prediction compared to the actual function')
+parser.add_argument('--n_layers', type=int, default=1,
+                    help='Number of layers in the deep reservoir')
+
+
 
 
 # !TODO: add feedback kernel scaling param
@@ -82,12 +86,13 @@ washout = args.washout
 lag = args.lag
 show_plot = args.show_plot
 feedback_size = args.feedback_size
+n_layers = args.n_layers
 
 (train_dataset, train_target), (valid_dataset, valid_target), (test_dataset, test_target) = get_lorenz_attractor(washout=washout)
 
 NRMSE = np.zeros(args.test_trials)
 for guess in range(args.test_trials):
-    model = DeepReservoir(n_inp, tot_units=args.n_hid, spectral_radius=args.rho, n_layers=1,
+    model = DeepReservoir(n_inp, tot_units=args.n_hid, spectral_radius=args.rho, n_layers=n_layers,
                                 input_scaling=args.inp_scaling,
                                 connectivity_recurrent=args.n_hid,
                                 connectivity_input=args.n_hid, 
@@ -171,7 +176,7 @@ f.close()
 try:
     result_dataset = pd.read_csv("./results/lorenz_result.csv")
 except FileNotFoundError:
-    result_dataset = pd.DataFrame(columns=["n_hid", "inp_scaling", "rho", "leaky", "regul", "lag", "bias_scaling", "solver", "washout", "feedback_size", "NRMSE_mean, NRMSE_std"])
+    result_dataset = pd.DataFrame(columns=["n_hid", "inp_scaling", "rho", "leaky", "regul", "lag", "bias_scaling", "solver", "washout", "feedback_size", "n_layers", "NRMSE_mean, NRMSE_std"])
 
 new_row = {
     "n_hid": args.n_hid,
@@ -184,9 +189,10 @@ new_row = {
     "solver": args.solver,
     "washout": washout,
     "feedback_size": feedback_size,
+    "n_layers": n_layers,
     "NRMSE_mean": mean,
     "NRMSE_std": std
 }
 
 result_dataset = pd.concat([result_dataset, pd.DataFrame([new_row])], ignore_index=True)
-result_dataset.to_csv("./result/lorenz_result.csv", index=False)
+result_dataset.to_csv("./results/lorenz_result.csv", index=False)

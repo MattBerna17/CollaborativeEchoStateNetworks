@@ -169,7 +169,7 @@ class ReservoirCell(torch.nn.Module):
         :return: ht, ht
         """
         # print("[RESERVOIR CELL] forward method call\n")
-        # print(f"xt: {xt.shape}")
+        # print(f"xt: {xt}")
         # print(f"h_prev: {h_prev.shape}")
         input_part = torch.mm(xt, self.kernel)
         state_part = torch.mm(h_prev, self.recurrent_kernel)
@@ -182,7 +182,7 @@ class ReservoirCell(torch.nn.Module):
             feedback_part = 0
         output = torch.tanh(input_part + self.bias + state_part + feedback_part)
         leaky_output = h_prev * (1 - self.leaky) + output * self.leaky
-        # print(f"leaky_output: {leaky_output.shape}")
+        # print(f"leaky_output: {leaky_output}")
         return leaky_output, leaky_output
 
 
@@ -226,7 +226,7 @@ class ReservoirLayer(torch.nn.Module):
         hs = []
         for t in range(x.shape[1]):
             # print(f"t: {t}")
-            # print(f"x: {x.shape}")
+            # print(f"x: {x}")
             xt = x[:, t].reshape(-1, self.net.input_size)
             # print(f"y: {y.shape}")
             y_prev = torch.Tensor(y[t-1].reshape(-1, 3)) if t > 0 else None
@@ -296,7 +296,7 @@ class DeepReservoir(torch.nn.Module):
                     connectivity_input=connectivity_input_1,
                     connectivity_recurrent=connectivity_recurrent,
                     feedback_size=feedback_size
-                    )
+                )
             ]
             # last_h_size may be different for the first layer
             # because of the remainder if concat=True
@@ -314,26 +314,9 @@ class DeepReservoir(torch.nn.Module):
                     connectivity_input=connectivity_input_1,
                     connectivity_recurrent=connectivity_recurrent,
                     feedback_size=feedback_size
-                    )
+                )
             ]
             last_h_size = self.layers_units
-
-
-        """ I commented out the first reservoir because I think it's wrongly defined the number of units when concat=False and (tot_units % n_layers) > 0 
-
-        # creates a list of reservoirs
-        # the first:
-        reservoir_layers = [
-            ReservoirLayer(
-                input_size=input_size,
-                units=self.layers_units + tot_units % n_layers, # ACe: I think this is wrong, e.g. when concat=False and (tot_units % n_layers) > 0
-                input_scaling=input_scaling,
-                spectral_radius=spectral_radius,
-                leaky=leaky,
-                connectivity_input=connectivity_input_1,
-                connectivity_recurrent=connectivity_recurrent)
-        ]
-        """
 
         # create all the other reservoirs:
         for _ in range(n_layers - 1):
@@ -349,9 +332,6 @@ class DeepReservoir(torch.nn.Module):
                 ))
             last_h_size = self.layers_units
         self.reservoir = torch.nn.ModuleList(reservoir_layers)
-        # print("\n\n\n\n////////////////////////")
-        # print("[DEEP RESERVOIR] constructor ended")
-        # print("////////////////////////\n\n\n\n")
         #s = 9
         #print('Input-to-hidden ', reservoir_layers[s].net.kernel)
         #print('Hidden-to-hidden ', reservoir_layers[s].net.recurrent_kernel)
@@ -365,9 +345,12 @@ class DeepReservoir(torch.nn.Module):
         states = []  # list of all the states in all the layers
         states_last = []  # list of the states in all the layers for the last time step
         # states_last is a list because different layers may have different size.
+        # print("\n\n[DEEP RESERVOIR] FORWARD\n\n")
 
         for res_idx, res_layer in enumerate(self.reservoir):
-            [X, h_last] = res_layer(X, y=Y)
+            [X, h_last] = res_layer(X, y=Y) # !TODO: pass h_last to the next layer (but i already pass X??)
+            # should i pass the input AND X? add a weight matrix to multiply X? like W_neighfb
+            print(f"X: {X}")
             states.append(X)
             states_last.append(h_last)
 
