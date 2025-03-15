@@ -13,6 +13,9 @@ https://doi.org/10.1016/j.neucom.2016.12.08924.
 import torch
 from torch import nn
 import numpy as np
+from utils import create_sparse_connection_matrix
+
+
 
 def sparse_eye_init(M: int) -> torch.FloatTensor:
     """ Generates an M x M matrix to be used as sparse identity matrix for the
@@ -100,11 +103,14 @@ def spectral_norm_scaling(W: torch.FloatTensor, rho_desired: float) -> torch.Flo
     return W * (rho_desired / rho_curr)
 
 
+
+
 class ReservoirCell(torch.nn.Module):
     # !TODO: add output dimension (e.g. 3 for lorenz, 1 for mackey-glass)
+    # !TODO: modify neighbour_data (is it a 1xunits tensor? maybe. or maybe the X tensor?)
     def __init__(self, input_size, units, input_scaling=1., spectral_radius=0.99,
                  leaky=1, connectivity_input=10, connectivity_recurrent=10,
-                 feedback_size=0):
+                 feedback_size=0, neighbour_feedback_size=0):
         """ Shallow reservoir to be used as cell of a Recurrent Neural Network.
 
         :param input_size: number of input units
@@ -156,12 +162,20 @@ class ReservoirCell(torch.nn.Module):
         # if feedback is enabled, create the feedback kernel, which cannot be trained (statically set), just like any other kernel
         # print(f"feedback_size: {feedback_size}")
         if feedback_size > 0:
-            self.feedback_kernel = nn.Parameter(sparse_tensor_init(3, self.units, C=self.feedback_size) * 0.5, requires_grad=False) # equivalent to the W_fb in the original paper: its purpose is to multiply the previous state to create a feedback loop.
+            self.feedback_kernel = nn.Parameter(sparse_tensor_init(3, self.units, C=self.feedback_size) * 0.7, requires_grad=False) # equivalent to the W_fb in the original paper: its purpose is to multiply the previous state to create a feedback loop.
             # !TODO: check if feedback kernel needs to be scaled
         else:
             self.feedback_kernel = None # if feedback is not needed
 
-    def forward(self, xt, h_prev, y_prev=None):
+        self.neighbour_feedback_size = neighbour_feedback_size
+        if self.neighbour_feedback_size > 0:
+            # create a neighbour kernel (W_nb) to multiply all the neighbour data x(t) to
+            self.neighbour_kernel = nn.Parameter(sparse_tensor_init(self.units, self.units, C=self.units), requires_grad=False) # dense kernel
+            # TODO: check if neighbour kernel needs to be scaled
+        else:
+            self.neighbour_kernel = None
+
+    def forward(self, xt, h_prev, y_prev=None, X_neighbours=None):
         """ Computes the output of the cell given the input and previous state.
 
         :param xt:
@@ -180,7 +194,17 @@ class ReservoirCell(torch.nn.Module):
             # print(f"feedback_part: {feedback_part.shape}")
         else:
             feedback_part = 0
-        output = torch.tanh(input_part + self.bias + state_part + feedback_part)
+        
+        # print(f"X_neighbour size: {X_neighbours.shape}")
+        if self.neighbour_kernel is not None and X_neighbours is not None:
+            neighbours_part = 0
+            neighbours_part += torch.mm(X_neighbours, self.neighbour_kernel)
+        else:
+            neighbours_part = 0
+        # print(f"\n\nNeighbour's part: {neighbours_part}\n\n")
+        
+        
+        output = torch.tanh(input_part + self.bias + state_part + feedback_part + neighbours_part)
         leaky_output = h_prev * (1 - self.leaky) + output * self.leaky
         # print(f"leaky_output: {leaky_output}")
         return leaky_output, leaky_output
@@ -188,7 +212,7 @@ class ReservoirCell(torch.nn.Module):
 
 class ReservoirLayer(torch.nn.Module):
     def __init__(self, input_size, units, input_scaling=1., spectral_radius=0.99,
-                 leaky=1, connectivity_input=10, connectivity_recurrent=10, feedback_size=0):
+                 leaky=1, connectivity_input=10, connectivity_recurrent=10, feedback_size=0, neighbour_feedback_size=0):
         """ Shallow reservoir to be used as Recurrent Neural Network layer.
 
         :param input_size: number of input units
@@ -205,12 +229,12 @@ class ReservoirLayer(torch.nn.Module):
         super().__init__()
         self.net = ReservoirCell(input_size, units, input_scaling,
                                  spectral_radius, leaky, connectivity_input,
-                                 connectivity_recurrent, feedback_size=feedback_size)
+                                 connectivity_recurrent, feedback_size=feedback_size, neighbour_feedback_size=neighbour_feedback_size)
 
     def init_hidden(self, batch_size):
         return torch.zeros(batch_size, self.net.units)
 
-    def forward(self, x, y, h_prev=None):
+    def forward(self, x, y, h_prev=None, X_neighbours=None):
         """ Computes the output of the cell given the input and previous state.
 
         :param x:
@@ -226,17 +250,35 @@ class ReservoirLayer(torch.nn.Module):
         hs = []
         for t in range(x.shape[1]):
             # print(f"t: {t}")
-            # print(f"x: {x}")
-            xt = x[:, t].reshape(-1, self.net.input_size)
+            # print(f"x: {x.shape}")
+            # print(f"xt: {x[0, t, :].shape}")
+            xt = x[0, t, :].reshape(-1, self.net.input_size)
             # print(f"y: {y.shape}")
             y_prev = torch.Tensor(y[t-1].reshape(-1, 3)) if t > 0 else None
             # print(f"h_prev:\n{h_prev}")
             # print(f"y_prev: {y_prev}")
-            _, h_prev = self.net(xt, h_prev, y_prev=y_prev) # call to forward method
+            _, h_prev = self.net(xt, h_prev, y_prev=y_prev, X_neighbours=X_neighbours) # call to forward method
             # print(f"h:\n{h_prev}\n\n")
             hs.append(h_prev)
         hs = torch.stack(hs, dim=1)
         return hs, h_prev # !TODO: send the last state of the current layer to the next
+    
+
+    def forward(self, xt, h_prev=None, y_prev=None, X_neighbours=None):
+        """ Computes the output of the cell given the input and previous state.
+
+        :param xt:
+        :param yt: Y target tensor
+        :param h_prev: h[0]
+        :return: h, ht
+        """
+        # print("\n\n[RESERVOIR LAYER] forward method call\n")
+
+        if h_prev is None:
+            h_prev = self.init_hidden(xt.shape[0]).to(xt.device)
+
+        h, h_prev = self.net(xt, h_prev, y_prev=y_prev, X_neighbours=X_neighbours) # call to forward method
+        return h, h_prev
 
 
 class DeepReservoir(torch.nn.Module):
@@ -246,7 +288,10 @@ class DeepReservoir(torch.nn.Module):
                  connectivity_recurrent=10,
                  connectivity_input=10,
                  connectivity_inter=10,
-                 feedback_size=0):
+                 feedback_size=0,
+                 neighbour_feedback_size=0,
+                 number_of_reservoirs=1
+                ):
         """ Deep Reservoir layer.
         The implementation realizes a number of stacked RNN layers using the
         ReservoirCell as core cell. All the reservoir layers share the same
@@ -268,8 +313,12 @@ class DeepReservoir(torch.nn.Module):
         :param connectivity_recurrent:
         :param connectivity_input: input connectivity coefficient of the input weight matrix
         :param connectivity_inter: input connectivity coefficient of all the inter-levels weight matrices
+        :param feedback_size: size of the feedback matrix
+        :param neighbour_feedback_size: size of the neighbour feedback matrix
+        :param number_of_reservoirs: number of reservoirs in the "graph"
         """
         super().__init__()
+        number_of_reservoirs = n_layers # TODO: change this!!!!
         self.n_layers = n_layers
         self.tot_units = tot_units
         self.concat = concat
@@ -278,6 +327,18 @@ class DeepReservoir(torch.nn.Module):
         input_scaling_others = inter_scaling
         connectivity_input_1 = connectivity_input
         connectivity_input_others = connectivity_inter
+        self.neighbour_feedback_size = neighbour_feedback_size
+        self.number_of_reservoirs = number_of_reservoirs
+
+        self.reservoirs_connection_matrix = create_sparse_connection_matrix(number_of_reservoirs, 0.5) # TODO: change connectivity using a new parameter
+        self.input_size = input_size
+
+
+
+
+        # reservoir_layers is the list of reservoir, not necessarily a layer connection
+
+
 
         # in case in which all the reservoir layers are concatenated, each level
         # contains units/layers neurons. This is done to keep the number of
@@ -295,7 +356,8 @@ class DeepReservoir(torch.nn.Module):
                     leaky=leaky,
                     connectivity_input=connectivity_input_1,
                     connectivity_recurrent=connectivity_recurrent,
-                    feedback_size=feedback_size
+                    feedback_size=feedback_size,
+                    neighbour_feedback_size=neighbour_feedback_size
                 )
             ]
             # last_h_size may be different for the first layer
@@ -313,7 +375,8 @@ class DeepReservoir(torch.nn.Module):
                     leaky=leaky,
                     connectivity_input=connectivity_input_1,
                     connectivity_recurrent=connectivity_recurrent,
-                    feedback_size=feedback_size
+                    feedback_size=feedback_size,
+                    neighbour_feedback_size=neighbour_feedback_size
                 )
             ]
             last_h_size = self.layers_units
@@ -321,22 +384,23 @@ class DeepReservoir(torch.nn.Module):
         # create all the other reservoirs:
         for _ in range(n_layers - 1):
             reservoir_layers.append(ReservoirLayer(
-                input_size=last_h_size,
+                input_size=input_size,
                 units=self.layers_units,
                 input_scaling=input_scaling_others,
                 spectral_radius=spectral_radius,
                 leaky=leaky,
                 connectivity_input=connectivity_input_others,
                 connectivity_recurrent=connectivity_recurrent,
-                feedback_size=feedback_size
-                ))
+                feedback_size=feedback_size,
+                neighbour_feedback_size=neighbour_feedback_size
+            ))
             last_h_size = self.layers_units
         self.reservoir = torch.nn.ModuleList(reservoir_layers)
         #s = 9
         #print('Input-to-hidden ', reservoir_layers[s].net.kernel)
         #print('Hidden-to-hidden ', reservoir_layers[s].net.recurrent_kernel)
 
-    def forward(self, X, Y):
+    def forward(self, X_dataset, Y):
         """ compute the output of the deep reservoir.
 
         :param X:
@@ -345,17 +409,83 @@ class DeepReservoir(torch.nn.Module):
         states = []  # list of all the states in all the layers
         states_last = []  # list of the states in all the layers for the last time step
         # states_last is a list because different layers may have different size.
-        # print("\n\n[DEEP RESERVOIR] FORWARD\n\n")
-
+        print("\n\n[DEEP RESERVOIR] FORWARD\n\n")
+        X = None
+        h_last = None
         for res_idx, res_layer in enumerate(self.reservoir):
-            [X, h_last] = res_layer(X, y=Y) # !TODO: pass h_last to the next layer (but i already pass X??)
-            # should i pass the input AND X? add a weight matrix to multiply X? like W_neighfb
-            print(f"X: {X}")
+            # right now, i pass the input to each layer, and also pass the states of the previous layers as neighbour values to the current layer.
+
+            [X, h_last] = res_layer(X_dataset, y=Y, X_neighbours=h_last)
+            # print(f"[LAYER{res_idx}] h_last shape: {h_last.shape}")
+            
+            
+            # print(f"X: {X}")
             states.append(X)
             states_last.append(h_last)
 
-        if self.concat:
-            states = torch.cat(states, dim=2)
+        use_graph = True
+        if use_graph:
+            states = torch.stack([states[i] for i in range(len(states))], dim=0)
+            graph_state = states.sum(dim=0) # sum all the states of the layers
+            return graph_state, states_last
         else:
-            states = states[-1]
-        return states, states_last
+            if self.concat:
+                states = torch.cat(states, dim=2)
+            else:
+                states = states[-1]
+            return states, states_last
+    
+
+
+    def forward(self, X_dataset, Y):
+        """ compute the output of the deep reservoir.
+
+        :param X:
+        :return: hidden states (B, T, F), last state (L, B, F)
+        """
+        states = []  # list of all the states in all the layers
+        states_last = []  # list of the states in all the layers for the last time step
+        # states_last is a list because different layers may have different size.
+        print("\n\n[DEEP RESERVOIR] FORWARD\n\n")
+        X = None
+        h_last = None
+        h_prevs = {}
+        # manage hs
+        for t in range(X_dataset.shape[1]):
+            y_prev = torch.Tensor(Y[t-1].reshape(-1, 3)) if t > 0 else None
+            xt = X_dataset[0, t, :].reshape(-1, self.input_size)
+            for res_idx, res_layer in enumerate(self.reservoir):
+                if res_idx not in h_prevs:
+                    h_prevs[res_idx] = []
+                # right now, i pass the input to each layer, and also pass the states of the previous layers as neighbour values to the current layer.
+
+                [X, h_last] = res_layer(xt=xt, h_prev=h_prevs[res_idx][-1] if len(h_prevs[res_idx]) != 0 else None, y_prev=y_prev, X_neighbours=h_last)
+                # print(f"[LAYER{res_idx}] h_last shape: {h_last.shape}")
+                h_prevs[res_idx].append(h_last)
+                
+                # print(f"X: {X}")
+                states.append(X)
+                states_last.append(h_last)
+
+    
+        h_lasts = torch.stack([h_prevs[res_idx][-1] if len(h_prevs[res_idx]) != 0 else None for res_idx in range(len(self.reservoir))], dim=0)
+        print(f"h_lasts shape: {h_lasts.shape}")
+        print(len([h_prevs[res_idx] if len(h_prevs[res_idx]) != 0 else None for res_idx in range(len(self.reservoir))][0]))
+        hs = torch.stack([h_prevs[res_idx] if len(h_prevs[res_idx]) != 0 else None for res_idx in range(len(self.reservoir))][0], dim=0)
+        states = hs
+        states_last = h_lasts
+
+
+        use_graph = True
+        if use_graph:
+            # states = torch.stack([states[i] for i in range(len(states))], dim=0)
+            graph_state = states.sum(dim=1) # sum all the states of the layers
+            return graph_state, states_last
+        else:
+            # if self.concat:
+            #     states = torch.cat(states, dim=2)
+            # else:
+            #     states = states[-1]
+
+            # print(f"states shape: {states.shape}")
+            return states, states_last

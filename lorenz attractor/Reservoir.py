@@ -67,6 +67,7 @@ class Reservoir(torch.nn.Module):
         self.X.append(self.x_prev) # append current state to history of states
         # !TODO: change readout position: it should not be in the forward, since it needs X+!
         self.y_prev = self.W_out @ self.x_prev  # compute output for the current state (not considering directly the input and the bias)
+        #TODO: add leaky term
         self.Y.append(self.y_prev) # append current output to history of outputs
         return self.y_prev                      # return prevision
     

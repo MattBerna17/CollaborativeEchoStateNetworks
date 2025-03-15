@@ -4,7 +4,7 @@ import argparse
 from esn_alternative import DeepReservoir
 from sklearn import preprocessing
 from sklearn.linear_model import Ridge
-from utils import get_lorenz, get_lorenz_attractor, plot_lorenz_attractor_with_error
+from utils import get_lorenz, get_lorenz_attractor, plot_lorenz_attractor_with_error, save_matrix_to_file
 import pandas as pd
 
 # Try running with the following line:
@@ -49,6 +49,8 @@ parser.add_argument('--test_trials', type=int, default=1,
                     help='number of trials to compute mean and std on test')
 parser.add_argument('--feedback_size', type=int, default=0,
                     help='Number of connections the feedback matrix is going to have')
+parser.add_argument('--neighbour_feedback_size', type=int, default=0,
+                    help='Number of connections the neighbours\' feedback matrix is going to have')
 parser.add_argument('--bias_scaling', type=float, default=None,
                     help='ESN bias scaling')
 parser.add_argument('--avoid_rescal_effective', action="store_false")
@@ -87,6 +89,7 @@ lag = args.lag
 show_plot = args.show_plot
 feedback_size = args.feedback_size
 n_layers = args.n_layers
+neighbour_feedback_size = args.neighbour_feedback_size
 
 (train_dataset, train_target), (valid_dataset, valid_target), (test_dataset, test_target) = get_lorenz_attractor(washout=washout)
 
@@ -97,7 +100,8 @@ for guess in range(args.test_trials):
                                 connectivity_recurrent=args.n_hid,
                                 connectivity_input=args.n_hid, 
                                 leaky=args.leaky,
-                                feedback_size=feedback_size
+                                feedback_size=feedback_size,
+                                neighbour_feedback_size=neighbour_feedback_size
                                 ).to(device)
 
     # no_grad means that the operations inside the block will not be added to the computation graph
@@ -111,6 +115,8 @@ for guess in range(args.test_trials):
         activations = activations.reshape(-1, args.n_hid)
         activations = activations[washout:]
         activations = scaler.transform(activations)
+
+        save_matrix_to_file(activations, title + "_activations")
         # W_in = model.reservoir[0].net.kernel.transpose(0, 1)
         # W = model.reservoir[0].net.recurrent_kernel # get the weights of the reservoir
         # W_out = classifier.coef_
@@ -134,8 +140,10 @@ for guess in range(args.test_trials):
     activations = activations.reshape(-1, args.n_hid) # reshape the activations to torch.Size([rows=len(train_dataset), columns=args.n_hid=256]) (why reshape to 256???)
     activations = activations[washout:] # remove first washout elements (why????)
     # activations = activations.reshape(-1, args.n_hid)
+    print(activations.shape)
     scaler = preprocessing.StandardScaler().fit(activations)
     activations = scaler.transform(activations) # scale the activations
+    save_matrix_to_file(activations, "train_activations")
 
     target = target[washout:] # remove first washout elements
     if args.solver is None:
@@ -145,8 +153,8 @@ for guess in range(args.test_trials):
     else:
         classifier = Ridge(alpha=args.regul, solver=args.solver).fit(activations, target)
     
-    valid_nmse = test_esn(valid_dataset, valid_target, classifier, scaler, title="Lorenz Attractor Validation Plot") # get nmse of the validation dataset
-    test_nmse = test_esn(test_dataset, test_target, classifier, scaler, title="Lorenz Attractor Test Plot") if args.use_test else 0.0 # get nmse of the test dataset
+    valid_nmse = test_esn(valid_dataset, valid_target, classifier, scaler, title="validation") # get nmse of the validation dataset
+    test_nmse = test_esn(test_dataset, test_target, classifier, scaler, title="test") if args.use_test else 0.0 # get nmse of the test dataset
     NRMSE[guess] = test_nmse
 
     f = open(f'{main_folder}/{namefile}.txt', 'a')
@@ -176,7 +184,7 @@ f.close()
 try:
     result_dataset = pd.read_csv("./results/lorenz_result.csv")
 except FileNotFoundError:
-    result_dataset = pd.DataFrame(columns=["n_hid", "inp_scaling", "rho", "leaky", "regul", "lag", "bias_scaling", "solver", "washout", "feedback_size", "n_layers", "NRMSE_mean, NRMSE_std"])
+    result_dataset = pd.DataFrame(columns=["n_hid", "inp_scaling", "rho", "leaky", "regul", "lag", "bias_scaling", "solver", "washout", "feedback_size", "n_layers", "neighbour_size", "NRMSE_mean, NRMSE_std"])
 
 new_row = {
     "n_hid": args.n_hid,
@@ -190,6 +198,7 @@ new_row = {
     "washout": washout,
     "feedback_size": feedback_size,
     "n_layers": n_layers,
+    "neighbour_size": neighbour_feedback_size,
     "NRMSE_mean": mean,
     "NRMSE_std": std
 }

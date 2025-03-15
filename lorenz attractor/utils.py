@@ -1,3 +1,4 @@
+import datetime
 from scipy.integrate import odeint
 import numpy as np
 import torch
@@ -5,7 +6,7 @@ import os
 import torchvision
 import torchvision.transforms as transforms
 from torch import nn
-from esn_alternative import spectral_norm_scaling
+# from esn_alternative import spectral_norm_scaling
 import pandas as pd
 from mpl_toolkits import mplot3d
 import matplotlib.pyplot as plt
@@ -203,6 +204,8 @@ def get_lorenz_attractor(lag=1, washout=200):
 
 
 
+
+
 def get_lorenz(N=3, F=8, num_batch=128, lag=25, washout=200, window_size=0, serieslen=20):
     # https://en.wikipedia.org/wiki/Lorenz_96_model
     def L96(x, t):
@@ -234,8 +237,6 @@ def get_lorenz(N=3, F=8, num_batch=128, lag=25, washout=200, window_size=0, seri
     else:
         return separate_training_validation_test(dataset)
     
-
-
 def separate_training_validation_test(dataset: torch.Tensor, washout=200, lag=1):
     end_train = int(dataset.shape[0] / 2)
     end_val = end_train + int(dataset.shape[0] / 4)
@@ -259,6 +260,51 @@ def separate_training_validation_test(dataset: torch.Tensor, washout=200, lag=1)
     print(f"test target: {(test_target.shape)}\n")
 
     return (train_dataset, train_target), (val_dataset, val_target), (test_dataset, test_target)
+
+
+
+
+
+def create_sparse_connection_matrix(number_of_reservoirs, connection_density) -> torch.Tensor:
+    """
+    Create a sparse connection matrix between the reservoirs, diagonal elements are zero
+    :param: number_of_reservoirs: number of reservoirs
+    :param: connection_density: density of connections (percentage of non-zero elements)
+    """
+    connectivity = torch.zeros((number_of_reservoirs, number_of_reservoirs))
+    for i in range(number_of_reservoirs):
+        for j in range(number_of_reservoirs):
+            if i != j:
+                if np.random.rand() < connection_density:
+                    connectivity[i, j] = np.random.rand()
+    return connectivity
+
+
+
+
+
+
+
+def save_matrix_to_file(matrix: torch.Tensor, filename):
+    now = datetime.datetime.now().strftime("%m_%d__%H_%M")
+    now_file = datetime.datetime.now().strftime("%m_%d_%H_%M_%S")
+    # create folder with datetime expressed in now if it doesn't exist
+    if not os.path.exists('./data/' + now):
+        os.makedirs('./data/' + now)
+    filename = './data/' + now + '/' + now_file + '___' + filename + '.txt'
+    
+    with open(filename, 'w') as f:
+        for i in range(matrix.shape[0]):
+            for j in range(matrix.shape[1]):
+                f.write(str(matrix[i][j].item()) + ',')
+            f.write('\n')
+
+
+
+
+
+
+
 
 
 
