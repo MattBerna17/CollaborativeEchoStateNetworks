@@ -7,6 +7,10 @@ from sklearn.linear_model import Ridge
 from utils import get_lorenz, get_lorenz_attractor, plot_lorenz_attractor_with_error, save_matrix_to_file
 import pandas as pd
 
+torch.manual_seed(42)
+np.random.seed(42)
+
+
 # Try running with the following line:
 # python3 lorenz.py --test_trials=10 --use_test --rho 1.0 --leaky 0.1 --regul 0.05 --n_hid 512 --inp_scaling 0.8
 
@@ -62,6 +66,8 @@ parser.add_argument('--show_plot', action="store_true",
                     help='Whether to show the plot of the prediction compared to the actual function')
 parser.add_argument('--n_layers', type=int, default=1,
                     help='Number of layers in the deep reservoir')
+parser.add_argument('--neighbour_scaling', type=float, default=1.,
+                    help='ESN neighbour feedback scaling')
 
 
 
@@ -90,6 +96,7 @@ show_plot = args.show_plot
 feedback_size = args.feedback_size
 n_layers = args.n_layers
 neighbour_feedback_size = args.neighbour_feedback_size
+neighbour_scaling = args.neighbour_scaling if not(neighbour_feedback_size == 0) else 0
 
 (train_dataset, train_target), (valid_dataset, valid_target), (test_dataset, test_target) = get_lorenz_attractor(washout=washout)
 
@@ -101,7 +108,8 @@ for guess in range(args.test_trials):
                                 connectivity_input=args.n_hid, 
                                 leaky=args.leaky,
                                 feedback_size=feedback_size,
-                                neighbour_feedback_size=neighbour_feedback_size
+                                neighbour_feedback_size=neighbour_feedback_size,
+                                neighbour_scaling=neighbour_scaling
                                 ).to(device)
 
     # no_grad means that the operations inside the block will not be added to the computation graph
@@ -140,10 +148,12 @@ for guess in range(args.test_trials):
     activations = activations.reshape(-1, args.n_hid) # reshape the activations to torch.Size([rows=len(train_dataset), columns=args.n_hid=256]) (why reshape to 256???)
     activations = activations[washout:] # remove first washout elements (why????)
     # activations = activations.reshape(-1, args.n_hid)
-    print(activations.shape)
     scaler = preprocessing.StandardScaler().fit(activations)
+    print(f"Activations' std: {np.std(activations)}")
     activations = scaler.transform(activations) # scale the activations
     save_matrix_to_file(activations, "train_activations")
+
+    print(f"Conditioning: {np.linalg.cond(activations)}\n\n")
 
     target = target[washout:] # remove first washout elements
     if args.solver is None:
@@ -184,7 +194,7 @@ f.close()
 try:
     result_dataset = pd.read_csv("./results/lorenz_result.csv")
 except FileNotFoundError:
-    result_dataset = pd.DataFrame(columns=["n_hid", "inp_scaling", "rho", "leaky", "regul", "lag", "bias_scaling", "solver", "washout", "feedback_size", "n_layers", "neighbour_size", "NRMSE_mean, NRMSE_std"])
+    result_dataset = pd.DataFrame(columns=["n_hid", "inp_scaling", "rho", "leaky", "regul", "lag", "bias_scaling", "solver", "washout", "feedback_size", "n_layers", "neighbour_size", "neighbour_scaling", "NRMSE_mean, NRMSE_std"])
 
 new_row = {
     "n_hid": args.n_hid,
@@ -199,6 +209,7 @@ new_row = {
     "feedback_size": feedback_size,
     "n_layers": n_layers,
     "neighbour_size": neighbour_feedback_size,
+    "neighbour_scaling": neighbour_scaling,
     "NRMSE_mean": mean,
     "NRMSE_std": std
 }

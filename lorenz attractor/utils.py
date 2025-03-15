@@ -12,6 +12,10 @@ from mpl_toolkits import mplot3d
 import matplotlib.pyplot as plt
 
 
+torch.manual_seed(42)
+np.random.seed(42)
+
+
 def count_parameters(model):
     """Return total number of parameters and
     trainable parameters of a PyTorch model.

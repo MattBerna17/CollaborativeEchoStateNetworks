@@ -15,6 +15,10 @@ from torch import nn
 import numpy as np
 from utils import create_sparse_connection_matrix
 
+torch.manual_seed(42)
+np.random.seed(42)
+
+
 
 
 def sparse_eye_init(M: int) -> torch.FloatTensor:
@@ -110,7 +114,7 @@ class ReservoirCell(torch.nn.Module):
     # !TODO: modify neighbour_data (is it a 1xunits tensor? maybe. or maybe the X tensor?)
     def __init__(self, input_size, units, input_scaling=1., spectral_radius=0.99,
                  leaky=1, connectivity_input=10, connectivity_recurrent=10,
-                 feedback_size=0, neighbour_feedback_size=0):
+                 feedback_size=0, neighbour_feedback_size=0, neighbour_scaling=1.):
         """ Shallow reservoir to be used as cell of a Recurrent Neural Network.
 
         :param input_size: number of input units
@@ -136,6 +140,7 @@ class ReservoirCell(torch.nn.Module):
         self.connectivity_input = connectivity_input
         self.connectivity_recurrent = connectivity_recurrent
         self.feedback_size = feedback_size
+        self.neighbour_scaling = neighbour_scaling
 
         self.kernel = sparse_tensor_init(input_size, self.units,
                                          self.connectivity_input) * self.input_scaling
@@ -162,16 +167,16 @@ class ReservoirCell(torch.nn.Module):
         # if feedback is enabled, create the feedback kernel, which cannot be trained (statically set), just like any other kernel
         # print(f"feedback_size: {feedback_size}")
         if feedback_size > 0:
-            self.feedback_kernel = nn.Parameter(sparse_tensor_init(3, self.units, C=self.feedback_size) * 0.7, requires_grad=False) # equivalent to the W_fb in the original paper: its purpose is to multiply the previous state to create a feedback loop.
-            # !TODO: check if feedback kernel needs to be scaled
+            self.feedback_kernel = nn.Parameter(sparse_tensor_init(3, self.units, C=self.feedback_size) * (1 - (self.neighbour_scaling if self.neighbour_scaling > 0 else 0) - self.input_scaling), requires_grad=False) # equivalent to the W_fb in the original paper: its purpose is to multiply the previous state to create a feedback loop.
         else:
             self.feedback_kernel = None # if feedback is not needed
 
         self.neighbour_feedback_size = neighbour_feedback_size
         if self.neighbour_feedback_size > 0:
             # create a neighbour kernel (W_nb) to multiply all the neighbour data x(t) to
-            self.neighbour_kernel = nn.Parameter(sparse_tensor_init(self.units, self.units, C=self.units), requires_grad=False) # dense kernel
-            # TODO: check if neighbour kernel needs to be scaled
+            self.neighbour_kernel = nn.Parameter(sparse_tensor_init(self.units, self.units, C=self.units) * self.neighbour_scaling, requires_grad=False) # dense kernel
+            # print(self.neighbour_kernel)
+            # print(f"neighbour_kernel: mu {np.mean(self.neighbour_kernel)}\tstd {np.std(self.neighbour_kernel)}")
         else:
             self.neighbour_kernel = None
 
@@ -212,7 +217,7 @@ class ReservoirCell(torch.nn.Module):
 
 class ReservoirLayer(torch.nn.Module):
     def __init__(self, input_size, units, input_scaling=1., spectral_radius=0.99,
-                 leaky=1, connectivity_input=10, connectivity_recurrent=10, feedback_size=0, neighbour_feedback_size=0):
+                 leaky=1, connectivity_input=10, connectivity_recurrent=10, feedback_size=0, neighbour_feedback_size=0, neighbour_scaling=1.):
         """ Shallow reservoir to be used as Recurrent Neural Network layer.
 
         :param input_size: number of input units
@@ -229,7 +234,7 @@ class ReservoirLayer(torch.nn.Module):
         super().__init__()
         self.net = ReservoirCell(input_size, units, input_scaling,
                                  spectral_radius, leaky, connectivity_input,
-                                 connectivity_recurrent, feedback_size=feedback_size, neighbour_feedback_size=neighbour_feedback_size)
+                                 connectivity_recurrent, feedback_size=feedback_size, neighbour_feedback_size=neighbour_feedback_size, neighbour_scaling=neighbour_scaling)
 
     def init_hidden(self, batch_size):
         return torch.zeros(batch_size, self.net.units)
@@ -290,7 +295,8 @@ class DeepReservoir(torch.nn.Module):
                  connectivity_inter=10,
                  feedback_size=0,
                  neighbour_feedback_size=0,
-                 number_of_reservoirs=1
+                 number_of_reservoirs=1,
+                 neighbour_scaling=1.
                 ):
         """ Deep Reservoir layer.
         The implementation realizes a number of stacked RNN layers using the
@@ -332,6 +338,7 @@ class DeepReservoir(torch.nn.Module):
 
         self.reservoirs_connection_matrix = create_sparse_connection_matrix(number_of_reservoirs, 0.5) # TODO: change connectivity using a new parameter
         self.input_size = input_size
+        self.neighbour_scaling = neighbour_scaling
 
 
 
@@ -357,7 +364,8 @@ class DeepReservoir(torch.nn.Module):
                     connectivity_input=connectivity_input_1,
                     connectivity_recurrent=connectivity_recurrent,
                     feedback_size=feedback_size,
-                    neighbour_feedback_size=neighbour_feedback_size
+                    neighbour_feedback_size=neighbour_feedback_size,
+                    neighbour_scaling=neighbour_scaling
                 )
             ]
             # last_h_size may be different for the first layer
@@ -376,7 +384,8 @@ class DeepReservoir(torch.nn.Module):
                     connectivity_input=connectivity_input_1,
                     connectivity_recurrent=connectivity_recurrent,
                     feedback_size=feedback_size,
-                    neighbour_feedback_size=neighbour_feedback_size
+                    neighbour_feedback_size=neighbour_feedback_size,
+                    neighbour_scaling=neighbour_scaling
                 )
             ]
             last_h_size = self.layers_units
@@ -392,7 +401,8 @@ class DeepReservoir(torch.nn.Module):
                 connectivity_input=connectivity_input_others,
                 connectivity_recurrent=connectivity_recurrent,
                 feedback_size=feedback_size,
-                neighbour_feedback_size=neighbour_feedback_size
+                neighbour_feedback_size=neighbour_feedback_size,
+                neighbour_scaling=neighbour_scaling
             ))
             last_h_size = self.layers_units
         self.reservoir = torch.nn.ModuleList(reservoir_layers)
@@ -454,6 +464,7 @@ class DeepReservoir(torch.nn.Module):
         for t in range(X_dataset.shape[1]):
             y_prev = torch.Tensor(Y[t-1].reshape(-1, 3)) if t > 0 else None
             xt = X_dataset[0, t, :].reshape(-1, self.input_size)
+            
             for res_idx, res_layer in enumerate(self.reservoir):
                 if res_idx not in h_prevs:
                     h_prevs[res_idx] = []
