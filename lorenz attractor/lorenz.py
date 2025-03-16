@@ -114,7 +114,7 @@ for guess in range(args.test_trials):
         # reshape the dataset and the target
         dataset = dataset.unsqueeze(0).reshape(1, -1, 3).to(device)
         target = target.reshape(-1, 3).numpy()
-        activations = model(dataset, target)[0].cpu().numpy() # calculate activations and reshape + remove washout
+        activations = model(dataset)[0].cpu().numpy() # calculate activations and reshape + remove washout
         activations = activations.reshape(-1, args.n_hid)
         activations = activations[washout:]
         activations = scaler.transform(activations)

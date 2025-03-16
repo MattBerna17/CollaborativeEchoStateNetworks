@@ -278,8 +278,8 @@ def create_sparse_connection_matrix(number_of_reservoirs, connection_density) ->
     """
     connectivity = torch.zeros((number_of_reservoirs, 1))
     for i in range(number_of_reservoirs):
-        if np.random.rand() < connection_density:
-            connectivity[i] = np.random.rand()
+        if torch.rand(1) < connection_density:
+            connectivity[i] = torch.rand(1)
     return connectivity
 
 
