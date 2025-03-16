@@ -10,10 +10,11 @@ from torch import nn
 import pandas as pd
 from mpl_toolkits import mplot3d
 import matplotlib.pyplot as plt
+import random
 
 
-torch.manual_seed(42)
-np.random.seed(42)
+# torch.manual_seed(42)
+# np.random.seed(42)
 
 
 def count_parameters(model):
@@ -256,12 +257,12 @@ def separate_training_validation_test(dataset: torch.Tensor, washout=200, lag=1)
     test_dataset = dataset[end_val:end_test-lag]
     test_target = dataset[end_val+lag:end_test]
 
-    print(f"\nDimensioni:\ntrain dataset: {(train_dataset.shape)}")
-    print(f"train target: {(train_target.shape)}")
-    print(f"val dataset: {(val_dataset.shape)}")
-    print(f"val target: {(val_target.shape)}")
-    print(f"test dataset: {(test_dataset.shape)}")
-    print(f"test target: {(test_target.shape)}\n")
+    # print(f"\nDimensioni:\ntrain dataset: {(train_dataset.shape)}")
+    # print(f"train target: {(train_target.shape)}")
+    # print(f"val dataset: {(val_dataset.shape)}")
+    # print(f"val target: {(val_target.shape)}")
+    # print(f"test dataset: {(test_dataset.shape)}")
+    # print(f"test target: {(test_target.shape)}\n")
 
     return (train_dataset, train_target), (val_dataset, val_target), (test_dataset, test_target)
 

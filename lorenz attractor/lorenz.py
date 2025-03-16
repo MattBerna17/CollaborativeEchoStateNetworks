@@ -7,8 +7,8 @@ from sklearn.linear_model import Ridge
 from utils import get_lorenz, get_lorenz_attractor, plot_lorenz_attractor_with_error, save_matrix_to_file
 import pandas as pd
 
-torch.manual_seed(42)
-np.random.seed(42)
+# torch.manual_seed(42)
+# np.random.seed(42)
 
 
 # Try running with the following line:
@@ -68,11 +68,6 @@ parser.add_argument('--n_layers', type=int, default=1,
                     help='Number of layers in the deep reservoir')
 parser.add_argument('--neighbour_scaling', type=float, default=1.,
                     help='ESN neighbour feedback scaling')
-
-
-
-
-# !TODO: add feedback kernel scaling param
 
 
 
@@ -153,7 +148,9 @@ for guess in range(args.test_trials):
     activations = scaler.transform(activations) # scale the activations
     save_matrix_to_file(activations, "train_activations")
 
-    print(f"Conditioning: {np.linalg.cond(activations)}\n\n")
+    print(f"\n\nConditioning: {np.linalg.cond(activations)}\n\n")
+
+    # print(f"Activations: {activations[:10]}\n\n\n")
 
     target = target[washout:] # remove first washout elements
     if args.solver is None:
