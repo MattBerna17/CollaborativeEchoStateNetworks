@@ -149,7 +149,7 @@ for guess in range(args.test_trials):
     activations = activations[washout:] # remove first washout elements (why????)
     # activations = activations.reshape(-1, args.n_hid)
     scaler = preprocessing.StandardScaler().fit(activations)
-    print(f"Activations' std: {np.std(activations)}")
+    # print(f"Activations' std: {np.std(activations)}")
     activations = scaler.transform(activations) # scale the activations
     save_matrix_to_file(activations, "train_activations")
 

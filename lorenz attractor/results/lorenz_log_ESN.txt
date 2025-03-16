@@ -1152,3 +1152,290 @@ n_hid: 512, cpu: False, inp_scaling: 0.2, rho: 0.9, leaky: 0.1, regul: 0.05, lag
  ##################################################################### 
 Mean NRMSE 0.0002327643014723435,    std 0.0
  ##################################################################### 
+n_hid: 512, cpu: False, inp_scaling: 0.2, rho: 0.9, leaky: 0.1, regul: 0.05, lag: 1, use_test: True, show_result: False, test_trials: 1, feedback_size: 64, neighbour_feedback_size: 1, bias_scaling: None, avoid_rescal_effective: True, solver: None, washout: 200, show_plot: True, n_layers: 2, neighbour_scaling: 0.4, valid: 0.00041, test: 0.00035
+**************
+
+
+ ##################################################################### 
+Mean NRMSE 0.0003462080785539001,    std 0.0
+ ##################################################################### 
+n_hid: 512, cpu: False, inp_scaling: 0.2, rho: 0.9, leaky: 0.1, regul: 0.05, lag: 1, use_test: True, show_result: False, test_trials: 1, feedback_size: 64, neighbour_feedback_size: 1, bias_scaling: None, avoid_rescal_effective: True, solver: None, washout: 200, show_plot: True, n_layers: 2, neighbour_scaling: 1.0, valid: 0.00044, test: 0.00036
+**************
+
+
+ ##################################################################### 
+Mean NRMSE 0.0003590574488043785,    std 0.0
+ ##################################################################### 
+n_hid: 512, cpu: False, inp_scaling: 0.2, rho: 0.9, leaky: 0.1, regul: 0.05, lag: 1, use_test: True, show_result: False, test_trials: 1, feedback_size: 64, neighbour_feedback_size: 1, bias_scaling: None, avoid_rescal_effective: True, solver: None, washout: 200, show_plot: True, n_layers: 4, neighbour_scaling: 1.0, valid: 0.00041, test: 0.00034
+**************
+
+
+ ##################################################################### 
+Mean NRMSE 0.000337555626174435,    std 0.0
+ ##################################################################### 
+n_hid: 512, cpu: False, inp_scaling: 0.2, rho: 0.9, leaky: 0.1, regul: 0.05, lag: 1, use_test: True, show_result: False, test_trials: 1, feedback_size: 64, neighbour_feedback_size: 0, bias_scaling: None, avoid_rescal_effective: True, solver: None, washout: 200, show_plot: True, n_layers: 4, neighbour_scaling: 1.0, valid: 0.00082, test: 0.0005
+**************
+
+
+ ##################################################################### 
+Mean NRMSE 0.0004988941946066916,    std 0.0
+ ##################################################################### 
+n_hid: 512, cpu: False, inp_scaling: 0.2, rho: 0.9, leaky: 0.1, regul: 0.05, lag: 1, use_test: True, show_result: False, test_trials: 1, feedback_size: 64, neighbour_feedback_size: 1, bias_scaling: None, avoid_rescal_effective: True, solver: None, washout: 200, show_plot: True, n_layers: 2, neighbour_scaling: 0.3, valid: 0.00048, test: 0.00034
+**************
+
+
+ ##################################################################### 
+Mean NRMSE 0.00034448617952875793,    std 0.0
+ ##################################################################### 
+n_hid: 256, cpu: False, inp_scaling: 0.8, rho: 0.9, leaky: 0.1, regul: 0.05, lag: 1, use_test: True, show_result: False, test_trials: 1, feedback_size: 16, neighbour_feedback_size: 0, bias_scaling: None, avoid_rescal_effective: True, solver: None, washout: 200, show_plot: True, n_layers: 1, neighbour_scaling: 0.3, valid: 0.00484, test: 0.00235
+**************
+
+
+ ##################################################################### 
+Mean NRMSE 0.002345062093809247,    std 0.0
+ ##################################################################### 
+n_hid: 256, cpu: False, inp_scaling: 0.8, rho: 0.9, leaky: 0.1, regul: 0.05, lag: 1, use_test: True, show_result: False, test_trials: 1, feedback_size: 0, neighbour_feedback_size: 0, bias_scaling: None, avoid_rescal_effective: True, solver: None, washout: 200, show_plot: True, n_layers: 1, neighbour_scaling: 0.3, valid: 0.00388, test: 0.00256
+**************
+
+
+ ##################################################################### 
+Mean NRMSE 0.0025554224848747253,    std 0.0
+ ##################################################################### 
+n_hid: 16, cpu: False, inp_scaling: 0.8, rho: 0.9, leaky: 0.1, regul: 0.05, lag: 1, use_test: True, show_result: False, test_trials: 1, feedback_size: 0, neighbour_feedback_size: 0, bias_scaling: None, avoid_rescal_effective: True, solver: None, washout: 200, show_plot: True, n_layers: 1, neighbour_scaling: 0.3, valid: 0.13107, test: 0.13737
+**************
+
+
+ ##################################################################### 
+Mean NRMSE 0.13737447559833527,    std 0.0
+ ##################################################################### 
+n_hid: 32, cpu: False, inp_scaling: 0.8, rho: 0.9, leaky: 0.1, regul: 0.05, lag: 1, use_test: True, show_result: False, test_trials: 1, feedback_size: 0, neighbour_feedback_size: 0, bias_scaling: None, avoid_rescal_effective: True, solver: None, washout: 200, show_plot: True, n_layers: 1, neighbour_scaling: 0.3, valid: 0.10101, test: 0.09994
+**************
+
+
+ ##################################################################### 
+Mean NRMSE 0.09993503242731094,    std 0.0
+ ##################################################################### 
+n_hid: 32, cpu: False, inp_scaling: 0.8, rho: 0.9, leaky: 0.1, regul: 0.05, lag: 1, use_test: True, show_result: False, test_trials: 1, feedback_size: 8, neighbour_feedback_size: 0, bias_scaling: None, avoid_rescal_effective: True, solver: None, washout: 200, show_plot: True, n_layers: 1, neighbour_scaling: 0.3, valid: 0.10329, test: 0.1033
+**************
+
+
+ ##################################################################### 
+Mean NRMSE 0.10329965502023697,    std 0.0
+ ##################################################################### 
+n_hid: 32, cpu: False, inp_scaling: 0.8, rho: 0.9, leaky: 0.1, regul: 0.05, lag: 1, use_test: True, show_result: False, test_trials: 1, feedback_size: 2, neighbour_feedback_size: 0, bias_scaling: None, avoid_rescal_effective: True, solver: None, washout: 200, show_plot: True, n_layers: 1, neighbour_scaling: 0.3, valid: 0.08951, test: 0.1014
+**************
+
+
+ ##################################################################### 
+Mean NRMSE 0.1014031171798706,    std 0.0
+ ##################################################################### 
+n_hid: 32, cpu: False, inp_scaling: 0.8, rho: 0.9, leaky: 0.1, regul: 0.05, lag: 1, use_test: True, show_result: False, test_trials: 1, feedback_size: 4, neighbour_feedback_size: 0, bias_scaling: None, avoid_rescal_effective: True, solver: None, washout: 200, show_plot: True, n_layers: 1, neighbour_scaling: 0.3, valid: 0.09839, test: 0.08623
+**************
+
+
+ ##################################################################### 
+Mean NRMSE 0.08622962981462479,    std 0.0
+ ##################################################################### 
+n_hid: 32, cpu: False, inp_scaling: 0.8, rho: 0.9, leaky: 0.1, regul: 0.05, lag: 1, use_test: True, show_result: False, test_trials: 1, feedback_size: 0, neighbour_feedback_size: 0, bias_scaling: None, avoid_rescal_effective: True, solver: None, washout: 200, show_plot: True, n_layers: 2, neighbour_scaling: 0.3, valid: 0.10882, test: 0.07875
+**************
+
+
+ ##################################################################### 
+Mean NRMSE 0.07874829322099686,    std 0.0
+ ##################################################################### 
+n_hid: 32, cpu: False, inp_scaling: 0.8, rho: 0.9, leaky: 0.1, regul: 0.05, lag: 1, use_test: True, show_result: False, test_trials: 1, feedback_size: 0, neighbour_feedback_size: 0, bias_scaling: None, avoid_rescal_effective: True, solver: None, washout: 200, show_plot: True, n_layers: 4, neighbour_scaling: 0.3, valid: 0.06733, test: 0.07612
+**************
+
+
+ ##################################################################### 
+Mean NRMSE 0.07612237334251404,    std 0.0
+ ##################################################################### 
+n_hid: 32, cpu: False, inp_scaling: 0.8, rho: 0.9, leaky: 0.1, regul: 0.05, lag: 1, use_test: True, show_result: False, test_trials: 1, feedback_size: 0, neighbour_feedback_size: 0, bias_scaling: None, avoid_rescal_effective: True, solver: None, washout: 200, show_plot: True, n_layers: 8, neighbour_scaling: 0.3, valid: 0.08058, test: 0.07559
+**************
+
+
+ ##################################################################### 
+Mean NRMSE 0.07559368759393692,    std 0.0
+ ##################################################################### 
+n_hid: 32, cpu: False, inp_scaling: 0.8, rho: 0.9, leaky: 0.1, regul: 0.05, lag: 1, use_test: True, show_result: False, test_trials: 1, feedback_size: 0, neighbour_feedback_size: 1, bias_scaling: None, avoid_rescal_effective: True, solver: None, washout: 200, show_plot: True, n_layers: 2, neighbour_scaling: 0.3, valid: 0.10882, test: 0.07875
+**************
+
+
+ ##################################################################### 
+Mean NRMSE 0.07874829322099686,    std 0.0
+ ##################################################################### 
+n_hid: 32, cpu: False, inp_scaling: 0.3, rho: 0.9, leaky: 0.1, regul: 0.05, lag: 1, use_test: True, show_result: False, test_trials: 1, feedback_size: 0, neighbour_feedback_size: 0, bias_scaling: None, avoid_rescal_effective: True, solver: None, washout: 200, show_plot: True, n_layers: 2, neighbour_scaling: 0.3, valid: 0.02293, test: 0.02016
+**************
+
+
+ ##################################################################### 
+Mean NRMSE 0.02015646919608116,    std 0.0
+ ##################################################################### 
+n_hid: 32, cpu: False, inp_scaling: 0.3, rho: 0.9, leaky: 0.1, regul: 0.05, lag: 1, use_test: True, show_result: False, test_trials: 1, feedback_size: 0, neighbour_feedback_size: 1, bias_scaling: None, avoid_rescal_effective: True, solver: None, washout: 200, show_plot: True, n_layers: 2, neighbour_scaling: 0.3, valid: 0.02293, test: 0.02016
+**************
+
+
+ ##################################################################### 
+Mean NRMSE 0.02015646919608116,    std 0.0
+ ##################################################################### 
+n_hid: 32, cpu: False, inp_scaling: 0.3, rho: 0.9, leaky: 0.1, regul: 0.05, lag: 1, use_test: True, show_result: False, test_trials: 1, feedback_size: 0, neighbour_feedback_size: 1, bias_scaling: None, avoid_rescal_effective: True, solver: None, washout: 200, show_plot: True, n_layers: 2, neighbour_scaling: 0.6, valid: 0.02293, test: 0.02016
+**************
+
+
+ ##################################################################### 
+Mean NRMSE 0.02015646919608116,    std 0.0
+ ##################################################################### 
+n_hid: 32, cpu: False, inp_scaling: 0.3, rho: 0.9, leaky: 0.1, regul: 0.05, lag: 1, use_test: True, show_result: False, test_trials: 1, feedback_size: 0, neighbour_feedback_size: 1, bias_scaling: None, avoid_rescal_effective: True, solver: None, washout: 200, show_plot: True, n_layers: 4, neighbour_scaling: 0.6, valid: 0.01305, test: 0.01372
+**************
+
+
+ ##################################################################### 
+Mean NRMSE 0.01372018363326788,    std 0.0
+ ##################################################################### 
+n_hid: 32, cpu: False, inp_scaling: 0.3, rho: 0.9, leaky: 0.1, regul: 0.05, lag: 1, use_test: True, show_result: False, test_trials: 1, feedback_size: 0, neighbour_feedback_size: 1, bias_scaling: None, avoid_rescal_effective: True, solver: None, washout: 200, show_plot: True, n_layers: 8, neighbour_scaling: 0.6, valid: 0.01878, test: 0.02013
+**************
+
+
+ ##################################################################### 
+Mean NRMSE 0.020130205899477005,    std 0.0
+ ##################################################################### 
+n_hid: 32, cpu: False, inp_scaling: 0.3, rho: 0.9, leaky: 0.1, regul: 0.05, lag: 1, use_test: True, show_result: False, test_trials: 1, feedback_size: 0, neighbour_feedback_size: 1, bias_scaling: None, avoid_rescal_effective: True, solver: None, washout: 200, show_plot: True, n_layers: 5, neighbour_scaling: 0.6, valid: 0.01669, test: 0.01757
+**************
+
+
+ ##################################################################### 
+Mean NRMSE 0.017571156844496727,    std 0.0
+ ##################################################################### 
+n_hid: 32, cpu: False, inp_scaling: 0.3, rho: 0.9, leaky: 0.1, regul: 0.05, lag: 1, use_test: True, show_result: False, test_trials: 1, feedback_size: 0, neighbour_feedback_size: 1, bias_scaling: None, avoid_rescal_effective: True, solver: None, washout: 200, show_plot: True, n_layers: 5, neighbour_scaling: 1.0, valid: 0.01669, test: 0.01757
+**************
+
+
+ ##################################################################### 
+Mean NRMSE 0.017571156844496727,    std 0.0
+ ##################################################################### 
+n_hid: 32, cpu: False, inp_scaling: 0.3, rho: 0.9, leaky: 0.1, regul: 0.05, lag: 1, use_test: True, show_result: False, test_trials: 1, feedback_size: 0, neighbour_feedback_size: 1, bias_scaling: None, avoid_rescal_effective: True, solver: None, washout: 200, show_plot: True, n_layers: 5, neighbour_scaling: 0.1, valid: 0.01669, test: 0.01757
+**************
+
+
+ ##################################################################### 
+Mean NRMSE 0.017571156844496727,    std 0.0
+ ##################################################################### 
+n_hid: 32, cpu: False, inp_scaling: 0.1, rho: 0.9, leaky: 0.1, regul: 0.05, lag: 1, use_test: True, show_result: False, test_trials: 1, feedback_size: 0, neighbour_feedback_size: 1, bias_scaling: None, avoid_rescal_effective: True, solver: None, washout: 200, show_plot: True, n_layers: 5, neighbour_scaling: 0.8, valid: 0.00317, test: 0.00291
+**************
+
+
+ ##################################################################### 
+Mean NRMSE 0.00290715042501688,    std 0.0
+ ##################################################################### 
+n_hid: 32, cpu: False, inp_scaling: 0.1, rho: 0.9, leaky: 0.1, regul: 0.05, lag: 1, use_test: True, show_result: False, test_trials: 1, feedback_size: 0, neighbour_feedback_size: 1, bias_scaling: None, avoid_rescal_effective: True, solver: None, washout: 200, show_plot: True, n_layers: 5, neighbour_scaling: 0.9, valid: 0.00317, test: 0.00291
+**************
+
+
+ ##################################################################### 
+Mean NRMSE 0.00290715042501688,    std 0.0
+ ##################################################################### 
+n_hid: 32, cpu: False, inp_scaling: 0.1, rho: 0.9, leaky: 0.1, regul: 0.05, lag: 1, use_test: True, show_result: False, test_trials: 1, feedback_size: 0, neighbour_feedback_size: 0, bias_scaling: None, avoid_rescal_effective: True, solver: None, washout: 200, show_plot: True, n_layers: 5, neighbour_scaling: 0.9, valid: 0.00317, test: 0.00291
+**************
+
+
+ ##################################################################### 
+Mean NRMSE 0.00290715042501688,    std 0.0
+ ##################################################################### 
+n_hid: 32, cpu: False, inp_scaling: 0.1, rho: 0.9, leaky: 0.1, regul: 0.05, lag: 1, use_test: True, show_result: False, test_trials: 1, feedback_size: 0, neighbour_feedback_size: 0, bias_scaling: None, avoid_rescal_effective: True, solver: None, washout: 200, show_plot: True, n_layers: 5, neighbour_scaling: 0.9, valid: 0.00317, test: 0.00291
+**************
+
+
+ ##################################################################### 
+Mean NRMSE 0.00290715042501688,    std 0.0
+ ##################################################################### 
+n_hid: 32, cpu: False, inp_scaling: 0.1, rho: 0.9, leaky: 0.1, regul: 0.05, lag: 1, use_test: True, show_result: False, test_trials: 1, feedback_size: 0, neighbour_feedback_size: 0, bias_scaling: None, avoid_rescal_effective: True, solver: None, washout: 200, show_plot: True, n_layers: 5, neighbour_scaling: 0.9, valid: 0.00317, test: 0.00291
+**************
+
+
+ ##################################################################### 
+Mean NRMSE 0.00290715042501688,    std 0.0
+ ##################################################################### 
+n_hid: 32, cpu: False, inp_scaling: 0.1, rho: 0.9, leaky: 0.1, regul: 0.05, lag: 1, use_test: True, show_result: False, test_trials: 1, feedback_size: 0, neighbour_feedback_size: 1, bias_scaling: None, avoid_rescal_effective: True, solver: None, washout: 200, show_plot: True, n_layers: 5, neighbour_scaling: 0.9, valid: 0.00317, test: 0.00291
+**************
+
+
+ ##################################################################### 
+Mean NRMSE 0.00290715042501688,    std 0.0
+ ##################################################################### 
+n_hid: 32, cpu: False, inp_scaling: 0.1, rho: 0.9, leaky: 0.1, regul: 0.05, lag: 1, use_test: True, show_result: False, test_trials: 1, feedback_size: 0, neighbour_feedback_size: 1, bias_scaling: None, avoid_rescal_effective: True, solver: None, washout: 200, show_plot: True, n_layers: 5, neighbour_scaling: 0.9, valid: 0.00317, test: 0.00291
+**************
+
+
+ ##################################################################### 
+Mean NRMSE 0.00290715042501688,    std 0.0
+ ##################################################################### 
+n_hid: 32, cpu: False, inp_scaling: 0.1, rho: 0.9, leaky: 0.1, regul: 0.05, lag: 1, use_test: True, show_result: False, test_trials: 1, feedback_size: 0, neighbour_feedback_size: 1, bias_scaling: None, avoid_rescal_effective: True, solver: None, washout: 200, show_plot: True, n_layers: 5, neighbour_scaling: 0.0, valid: 0.00317, test: 0.00291
+**************
+
+
+ ##################################################################### 
+Mean NRMSE 0.00290715042501688,    std 0.0
+ ##################################################################### 
+n_hid: 32, cpu: False, inp_scaling: 0.1, rho: 0.9, leaky: 0.1, regul: 0.05, lag: 1, use_test: True, show_result: False, test_trials: 1, feedback_size: 0, neighbour_feedback_size: 0, bias_scaling: None, avoid_rescal_effective: True, solver: None, washout: 200, show_plot: True, n_layers: 5, neighbour_scaling: 0.0, valid: 0.00317, test: 0.00291
+**************
+
+
+ ##################################################################### 
+Mean NRMSE 0.00290715042501688,    std 0.0
+ ##################################################################### 
+n_hid: 32, cpu: False, inp_scaling: 0.1, rho: 0.9, leaky: 0.1, regul: 0.05, lag: 1, use_test: True, show_result: False, test_trials: 1, feedback_size: 0, neighbour_feedback_size: 0, bias_scaling: None, avoid_rescal_effective: True, solver: None, washout: 200, show_plot: True, n_layers: 5, neighbour_scaling: 0.0, valid: 0.00317, test: 0.00291
+**************
+
+
+ ##################################################################### 
+Mean NRMSE 0.00290715042501688,    std 0.0
+ ##################################################################### 
+n_hid: 32, cpu: False, inp_scaling: 0.1, rho: 0.9, leaky: 0.1, regul: 0.05, lag: 1, use_test: True, show_result: False, test_trials: 1, feedback_size: 0, neighbour_feedback_size: 1, bias_scaling: None, avoid_rescal_effective: True, solver: None, washout: 200, show_plot: True, n_layers: 2, neighbour_scaling: 0.0, valid: 0.00358, test: 0.00323
+**************
+
+
+ ##################################################################### 
+Mean NRMSE 0.003225864376872778,    std 0.0
+ ##################################################################### 
+n_hid: 32, cpu: False, inp_scaling: 0.1, rho: 0.9, leaky: 0.1, regul: 0.05, lag: 1, use_test: True, show_result: False, test_trials: 1, feedback_size: 0, neighbour_feedback_size: 0, bias_scaling: None, avoid_rescal_effective: True, solver: None, washout: 200, show_plot: True, n_layers: 5, neighbour_scaling: 0.0, valid: 0.00317, test: 0.00291
+**************
+
+
+ ##################################################################### 
+Mean NRMSE 0.00290715042501688,    std 0.0
+ ##################################################################### 
+n_hid: 32, cpu: False, inp_scaling: 0.1, rho: 0.9, leaky: 0.1, regul: 0.05, lag: 1, use_test: True, show_result: False, test_trials: 1, feedback_size: 0, neighbour_feedback_size: 1, bias_scaling: None, avoid_rescal_effective: True, solver: None, washout: 200, show_plot: True, n_layers: 5, neighbour_scaling: 0.0, valid: 0.00317, test: 0.00291
+**************
+
+
+ ##################################################################### 
+Mean NRMSE 0.00290715042501688,    std 0.0
+ ##################################################################### 
+n_hid: 32, cpu: False, inp_scaling: 0.1, rho: 0.9, leaky: 0.1, regul: 0.05, lag: 1, use_test: True, show_result: False, test_trials: 1, feedback_size: 0, neighbour_feedback_size: 0, bias_scaling: None, avoid_rescal_effective: True, solver: None, washout: 200, show_plot: True, n_layers: 5, neighbour_scaling: 0.0, valid: 0.00843, test: 0.00812
+**************
+
+
+ ##################################################################### 
+Mean NRMSE 0.008121988736093044,    std 0.0
+ ##################################################################### 
+n_hid: 32, cpu: False, inp_scaling: 0.1, rho: 0.9, leaky: 0.1, regul: 0.05, lag: 1, use_test: True, show_result: False, test_trials: 1, feedback_size: 0, neighbour_feedback_size: 1, bias_scaling: None, avoid_rescal_effective: True, solver: None, washout: 200, show_plot: True, n_layers: 5, neighbour_scaling: 0.0, valid: 0.00843, test: 0.00812
+**************
+
+
+ ##################################################################### 
+Mean NRMSE 0.008121988736093044,    std 0.0
+ ##################################################################### 
+n_hid: 32, cpu: False, inp_scaling: 0.1, rho: 0.9, leaky: 0.1, regul: 0.05, lag: 1, use_test: True, show_result: False, test_trials: 1, feedback_size: 0, neighbour_feedback_size: 0, bias_scaling: None, avoid_rescal_effective: True, solver: None, washout: 200, show_plot: True, n_layers: 5, neighbour_scaling: 0.0, valid: 0.00248, test: 0.00245
+**************
+
+
+ ##################################################################### 
+Mean NRMSE 0.0024519176222383976,    std 0.0
+ ##################################################################### 
+n_hid: 32, cpu: False, inp_scaling: 0.1, rho: 0.9, leaky: 0.1, regul: 0.05, lag: 1, use_test: True, show_result: False, test_trials: 1, feedback_size: 0, neighbour_feedback_size: 1, bias_scaling: None, avoid_rescal_effective: True, solver: None, washout: 200, show_plot: True, n_layers: 5, neighbour_scaling: 0.0, valid: 0.00248, test: 0.00245
+**************
+
+
+ ##################################################################### 
+Mean NRMSE 0.0024519176222383976,    std 0.0
+ ##################################################################### 
