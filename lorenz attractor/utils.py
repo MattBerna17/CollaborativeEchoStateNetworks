@@ -6,15 +6,10 @@ import os
 import torchvision
 import torchvision.transforms as transforms
 from torch import nn
-# from esn_alternative import spectral_norm_scaling
 import pandas as pd
 from mpl_toolkits import mplot3d
 import matplotlib.pyplot as plt
 import random
-
-
-# torch.manual_seed(42)
-# np.random.seed(42)
 
 
 def count_parameters(model):
@@ -247,7 +242,6 @@ def separate_training_validation_test(dataset: torch.Tensor, washout=200, lag=1)
     end_val = end_train + int(dataset.shape[0] / 4)
     end_test = dataset.shape[0]
 
-    # ! TODO: check and correct washout offset (ask gallicchio)
     train_dataset = dataset[:end_train-lag]
     train_target = dataset[lag:end_train]
 

@@ -4,33 +4,25 @@ import argparse
 from esn_alternative import DeepReservoir
 from sklearn import preprocessing
 from sklearn.linear_model import Ridge
-from utils import get_lorenz, get_lorenz_attractor, plot_lorenz_attractor_with_error, save_matrix_to_file
+from utils import get_lorenz_attractor, plot_lorenz_attractor_with_error, save_matrix_to_file
 import pandas as pd
 
-# torch.manual_seed(42)
-# np.random.seed(42)
+
+
+##########################################################################################
+# DISCLAIMER:
+# the "feedback" term is the teacher forcing term, in the original paper called W_fb
+# the "neighbour" term is the feedback from the neighbour reservoirs in the deep reservoir
+##########################################################################################
+
 
 
 # Try running with the following line:
-# python3 lorenz.py --test_trials=10 --use_test --rho 1.0 --leaky 0.1 --regul 0.05 --n_hid 512 --inp_scaling 0.8
+# python3 lorenz.py --test_trials=1 --use_test --rho 0.9 --leaky 0.1 --regul 0.05 --n_hid 64 --inp_scaling 0.2 --washout 200 --feedback_size 0 --n_layers 2 --neighbour_feedback_size 1 --neighbour_scaling 0.3
+# add
+# --show_plot
+# to see the plot with predictions for both validation and test
 
-
-def save_models_weights(W_in, W, W_out, filenames):
-    with open(filenames[0], "w") as f:
-        for i in range(W_in.shape[0]):
-            for j in range(W_in.shape[1]):
-                f.write(str(W_in[i][j].item()) + ',')
-            f.write('\n')
-    with open(filenames[1], "w") as f:
-        for i in range(W.shape[0]):
-            for j in range(W.shape[1]):
-                f.write(str(W[i][j].item()) + ',')
-            f.write('\n')
-    with open(filenames[2], "w") as f:
-        for i in range(W_out.shape[0]):
-            for j in range(W_out.shape[1]):
-                f.write(str(W_out[i][j]) + ',')
-            f.write('\n')
 
 
 parser = argparse.ArgumentParser(description='training parameters')
@@ -118,17 +110,10 @@ for guess in range(args.test_trials):
         activations = activations.reshape(-1, args.n_hid)
         activations = activations[washout:]
         activations = scaler.transform(activations)
-
-        save_matrix_to_file(activations, title + "_activations")
-        # W_in = model.reservoir[0].net.kernel.transpose(0, 1)
-        # W = model.reservoir[0].net.recurrent_kernel # get the weights of the reservoir
-        # W_out = classifier.coef_
-        # save_models_weights(W_in, W, W_out, ["W_in.txt", "W.txt", "W_out.txt"])
+        # save_matrix_to_file(activations, title + "_activations") # to save the activations from the model
         predictions = classifier.predict(activations)
         target = target[washout:]
-        # print(f"Predictions: {predictions[:10]}\n\n")
-        # print(f"Target: {target[:10]}\n\n")
-        plot_lorenz_attractor_with_error(predictions, target, title) if show_plot else None
+        plot_lorenz_attractor_with_error(predictions, target, title) if show_plot else None # plot the lorenz attractor with predictions
         # calculate nrmse
         mse = np.mean(np.square(predictions - target))
         rmse = np.sqrt(mse)
@@ -140,17 +125,13 @@ for guess in range(args.test_trials):
     dataset = train_dataset.unsqueeze(0).reshape(1, -1, 3).to(device) # reshape element to torch.Size([1, rows=len(train_dataset), columns=3])
     target = train_target.reshape(-1, 3).numpy() # reshape element to torch.Size([rows=len(train_target), columns=3])
     activations = model(dataset, target)[0].cpu().numpy() # train the deep reservoir to get the activations (states of last iteration combined)
-    activations = activations.reshape(-1, args.n_hid) # reshape the activations to torch.Size([rows=len(train_dataset), columns=args.n_hid=256]) (why reshape to 256???)
-    activations = activations[washout:] # remove first washout elements (why????)
-    # activations = activations.reshape(-1, args.n_hid)
+    activations = activations.reshape(-1, args.n_hid) # reshape the activations to torch.Size([rows=len(train_dataset), columns=args.n_hid])
+    activations = activations[washout:]
     scaler = preprocessing.StandardScaler().fit(activations)
-    # print(f"Activations' std: {np.std(activations)}")
     activations = scaler.transform(activations) # scale the activations
-    save_matrix_to_file(activations, "train_activations")
+    # save_matrix_to_file(activations, "train_activations")
 
     print(f"\n\nConditioning: {np.linalg.cond(activations)}\n\n")
-
-    # print(f"Activations: {activations[:10]}\n\n\n")
 
     target = target[washout:] # remove first washout elements
     if args.solver is None:
@@ -188,6 +169,8 @@ print(lastprint)
 f = open(f'{main_folder}/{namefile}.txt', 'a')
 f.write(lastprint)
 f.close()
+
+# store new experiment to csv
 try:
     result_dataset = pd.read_csv("./results/lorenz_result.csv")
 except FileNotFoundError:
