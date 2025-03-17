@@ -2461,3 +2461,31 @@ n_hid: 16, cpu: False, inp_scaling: 0.2, rho: 0.9, leaky: 0.1, regul: 0.05, lag:
  ##################################################################### 
 Mean NRMSE 0.08134898543357849,    std 0.0
  ##################################################################### 
+n_hid: 16, cpu: False, inp_scaling: 0.2, rho: 0.9, leaky: 0.1, regul: 0.05, lag: 1, use_test: True, show_result: False, test_trials: 1, feedback_size: 0, neighbour_feedback_size: 0, bias_scaling: None, avoid_rescal_effective: True, solver: None, washout: 200, show_plot: False, n_layers: 2, neighbour_scaling: 0.3, valid: 0.06739, test: 0.07234
+**************
+
+
+ ##################################################################### 
+Mean NRMSE 0.07233543694019318,    std 0.0
+ ##################################################################### 
+n_hid: 16, cpu: False, inp_scaling: 0.2, rho: 0.9, leaky: 0.1, regul: 0.05, lag: 1, use_test: True, show_result: False, test_trials: 1, feedback_size: 0, neighbour_feedback_size: 0, bias_scaling: None, avoid_rescal_effective: True, solver: None, washout: 200, show_plot: False, n_layers: 2, neighbour_scaling: 0.3, valid: 0.07011, test: 0.0798
+**************
+
+
+ ##################################################################### 
+Mean NRMSE 0.079801544547081,    std 0.0
+ ##################################################################### 
+n_hid: 16, cpu: False, inp_scaling: 0.2, rho: 0.9, leaky: 0.1, regul: 0.05, lag: 1, use_test: True, show_result: False, test_trials: 1, feedback_size: 0, neighbour_feedback_size: 0, bias_scaling: None, avoid_rescal_effective: True, solver: None, washout: 200, show_plot: False, n_layers: 2, neighbour_scaling: 0.3, valid: 0.07011, test: 0.0798
+**************
+
+
+ ##################################################################### 
+Mean NRMSE 0.079801544547081,    std 0.0
+ ##################################################################### 
+n_hid: 16, cpu: False, inp_scaling: 0.2, rho: 0.9, leaky: 0.1, regul: 0.05, lag: 1, use_test: True, show_result: False, test_trials: 1, feedback_size: 0, neighbour_feedback_size: 1, bias_scaling: None, avoid_rescal_effective: True, solver: None, washout: 200, show_plot: False, n_layers: 2, neighbour_scaling: 0.3, valid: 0.07504, test: 0.08297
+**************
+
+
+ ##################################################################### 
+Mean NRMSE 0.08297275006771088,    std 0.0
+ ##################################################################### 

@@ -1,0 +1,7 @@
+n_hid: 16, cpu: False, inp_scaling: 0.2, rho: 0.9, leaky: 0.1, regul: 0.05, lag: 100, use_test: True, show_result: False, test_trials: 1, feedback_size: 0, neighbour_feedback_size: 0, bias_scaling: None, avoid_rescal_effective: True, solver: None, washout: 200, show_plot: False, n_layers: 2, neighbour_scaling: 0.3, valid: 0.06739, test: 0.07234
+**************
+
+
+ ##################################################################### 
+Mean NRMSE 0.07233543694019318,    std 0.0
+ ##################################################################### 
