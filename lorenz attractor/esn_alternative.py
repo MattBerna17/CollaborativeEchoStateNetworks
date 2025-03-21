@@ -289,7 +289,7 @@ class ReservoirLayer(torch.nn.Module):
     def init_hidden(self, batch_size):
         return torch.zeros(batch_size, self.net.units)
 
-    def old_forward(self, x, y, h_prev=None, X_neighbours=None):
+    def forward(self, x, y, h_prev=None, X_neighbours=None):
         """ Computes the output of the cell given the input and previous state.
 
         :param x:
@@ -309,21 +309,6 @@ class ReservoirLayer(torch.nn.Module):
             hs.append(h_prev)
         hs = torch.stack(hs, dim=1)
         return hs, h_prev
-    
-    def forward(self, ut, x_prev=None, y_prev=None, X_neighbours=None):
-        """ Computes the output of the cell given the input and previous state.
-
-        :param ut: input u(t) at time step t
-        :param x_prev: expansion of the reservoir at time step t-1
-        :param y_prev: target y(t-1) at time step t-1
-        :param X_neighbours: expansion of the neighbours at time step t-1
-        :return: h, h_prev (they are the same)
-        """
-        if x_prev is None:
-            x_prev = self.init_hidden(ut.shape[0]).to(ut.device)
-
-        x, x_prev = self.net(ut, x_prev, y_prev=y_prev, X_neighbours=X_neighbours) # call to forward method of the reservoir cell inside the layer
-        return x, x_prev
 
 
 
@@ -451,7 +436,7 @@ class DeepReservoir(torch.nn.Module):
             last_h_size = self.layers_units
         self.reservoir = torch.nn.ModuleList(reservoir_layers)
 
-    def old_forward(self, X_dataset, Y=None):
+    def forward(self, X_dataset, Y=None):
         """ compute the output of the deep reservoir.
 
         :param X:
@@ -471,45 +456,9 @@ class DeepReservoir(torch.nn.Module):
             states.append(X)
             states_last.append(h_last)
 
-        use_graph = False
-        if use_graph:
-            states = torch.stack([states[i] for i in range(len(states))], dim=0)
-            graph_state = states.sum(dim=0) # sum all the states of the layers
-            return graph_state, states_last
+        if self.concat:
+            states = torch.cat(states, dim=2)
         else:
-            if self.concat:
-                states = torch.cat(states, dim=2)
-            else:
-                states = states[-1]
-            return states, states_last
-    
-    
-    def forward(self, U, Y=None):
-        """
-        compute output of the deep reservoir.
-
-        :param U: input data
-        :param Y: target data
-        """
-        previous_Xs = torch.tensor([[[0.0 for _ in range(self.layers_units)]] for _ in range(self.n_layers)]) # previous states for each layer (i.e. reservoir cell), in the beginning they're all None
-        states = [] # list with all states from all layers
-
-        for t in range(U.shape[1]): # for each time step
-            u_t = U[0, t, :].reshape(-1, self.input_size) # take input at time step t
-            y_prev = torch.Tensor(Y[t-1].reshape(-1, 3)) if t > 0 and Y is not None else None # take target at time step t-1 (if given for teacher forcing)
-            current_Xs = torch.tensor([[[0.0 for _ in range(self.layers_units)]] for _ in range(self.n_layers)]) # current state is initially None, and is filled as reservoirs are presented with u(t)
-            for res_idx, res_layer in enumerate(self.reservoir): # for each layer (i.e. reservoir cell)
-                x_l_t, _ = res_layer(u_t, x_prev=previous_Xs[res_idx], y_prev=y_prev, X_neighbours=previous_Xs) # expand u_t given target, previous state x_t-1, and previous states of other reservoirs
-                current_Xs[res_idx] = x_l_t # store the current expansion x_t of layer l in the current_Xs list
-            
-            previous_Xs = current_Xs # prepare for next iteration
-            states.append(current_Xs) # add current_Xs to states
-        
-        # now previous_Xs is a list of the last state of each layer
-        # and states contains the state of each layer at each time step
-        states = torch.stack([states[i] for i in range(len(states))], dim=0)
-        states = states.sum(dim=1) # sum all the states of the layers
-        return states, previous_Xs
-
-
+            states = states[-1]
+        return states, states_last
 
