@@ -10,6 +10,8 @@ A  critical  experimental  analysis.    Neurocomputing268,  87–99  (2017).
 https://doi.org/10.1016/j.neucom.2016.12.08924.
 """
 
+from sklearn import preprocessing
+from sklearn.linear_model import Ridge
 import torch
 from torch import nn
 import numpy as np
@@ -141,10 +143,6 @@ class ReservoirCell(torch.nn.Module):
         self.leaky = leaky
         self.connectivity_input = connectivity_input
         self.connectivity_recurrent = connectivity_recurrent
-        self.feedback_size = feedback_size
-        self.neighbour_scaling = neighbour_scaling
-        self.index = index
-        self.n_layers = n_layers
 
         self.kernel = sparse_tensor_init(input_size, self.units,
                                          self.connectivity_input) * self.input_scaling
@@ -165,27 +163,10 @@ class ReservoirCell(torch.nn.Module):
 
         self.bias = (torch.rand(self.units) * 2 - 1)
         self.bias = nn.Parameter(self.bias, requires_grad=False)
-
-        # if feedback is enabled, create the feedback kernel, which cannot be trained (statically set), just like any other kernel
-        if feedback_size > 0:
-            self.feedback_kernel = nn.Parameter(sparse_tensor_init(3, self.units, C=self.feedback_size) * (1 - (self.neighbour_scaling if self.neighbour_scaling > 0 else 0) - self.input_scaling), requires_grad=False) # equivalent to the W_fb in the original paper: its purpose is to multiply the previous time step's ground truth output to create a feedback loop.
-        else:
-            self.feedback_kernel = None # if feedback is not needed
-
-        self.neighbour_feedback_size = neighbour_feedback_size
-        if self.neighbour_feedback_size > 0:
-            # create a neighbour kernel (W_nb) which is just an n_layers by 1 matrix which contains the connection weights between reservoirs.
-            # the value W_nb[i] is just a scalar (defining the connection strength between current layer and layer i)
-            # which will be multiplied by the i layer's expansion of the previous time step x_i(t-1).
-            self.neighbour_kernel = nn.Parameter(create_sparse_connection_matrix(self.n_layers, 1.0) * self.neighbour_scaling, requires_grad=False)
-            self.neighbour_kernel[index] = 0.0 # remove the self connection
-            # print(f"[CELL {self.index}]\n{self.neighbour_kernel}\n\n")
-        else:
-            self.neighbour_kernel = None
     
 
 
-    def forward(self, ut, x_prev, y_prev=None, X_neighbours=None):
+    def forward(self, ut):
         """ Computes the output of the cell given the input and previous state.
 
         :param ut: input at time step t (shape: [1, input_size])
@@ -195,25 +176,11 @@ class ReservoirCell(torch.nn.Module):
         :return: xt, xt
         """
         input_part = torch.mm(ut, self.kernel)
-        state_part = torch.mm(x_prev, self.recurrent_kernel)
-
-        if self.feedback_kernel is not None and y_prev is not None:
-            feedback_part = torch.mm(y_prev, self.feedback_kernel) # multiply the feedback kernel with the previous output
-        else:
-            feedback_part = 0
-        
-        if self.neighbour_kernel is not None and X_neighbours is not None:
-            neighbours_part = 0
-            assert len(X_neighbours) == self.n_layers
-            for i in range(self.n_layers): # for each neighbour (reservoir)
-                if X_neighbours[i] is not None:
-                    # add the neighbour's state (multiplied by the weight W_nb[n]) to the neighbours_part
-                    neighbours_part += torch.mul(X_neighbours[i], self.neighbour_kernel[i]) # W_nb[n] * x_n(t) ---> scalar x vector(n_hid = self.units)
-        else:
-            neighbours_part = 0
+        state_part = torch.mm(self.h_prev, self.recurrent_kernel)
                 
-        output = torch.tanh(input_part + self.bias + state_part + feedback_part + neighbours_part)
-        leaky_output = x_prev * (1 - self.leaky) + output * self.leaky
+        output = torch.tanh(input_part + 0*self.bias + state_part)
+        leaky_output = self.h_prev * (1 - self.leaky) + output * self.leaky
+        self.h_prev = leaky_output
 
         return leaky_output, leaky_output
     
@@ -283,13 +250,13 @@ class ReservoirLayer(torch.nn.Module):
         super().__init__()
         self.net = ReservoirCell(input_size, units, index, n_layers, input_scaling,
                                  spectral_radius, leaky, connectivity_input,
-                                 connectivity_recurrent, feedback_size=feedback_size, neighbour_feedback_size=neighbour_feedback_size, neighbour_scaling=neighbour_scaling)
+                                 connectivity_recurrent)
         # self.net.save_parameters(f"./params/cell_{index}_params.pth") # save the parameters of the reservoir
 
     def init_hidden(self, batch_size):
         return torch.zeros(batch_size, self.net.units)
 
-    def forward(self, x, y, h_prev=None, X_neighbours=None):
+    def forward(self, u, h_prev=None):
         """ Computes the output of the cell given the input and previous state.
 
         :param x:
@@ -299,13 +266,13 @@ class ReservoirLayer(torch.nn.Module):
         """
 
         if h_prev is None:
-            h_prev = self.init_hidden(x.shape[0]).to(x.device)
+            self.net.h_prev = self.init_hidden(u.shape[0]).to(u.device)
 
         hs = []
-        for t in range(x.shape[1]):
-            xt = x[0, t, :].reshape(-1, self.net.input_size)
-            y_prev = torch.Tensor(y[t-1].reshape(-1, 3)) if t > 0 and y is not None else None
-            _, h_prev = self.net(xt, h_prev, y_prev=y_prev, X_neighbours=X_neighbours) # call to forward method
+        # print(u.shape)
+        for t in range(u.shape[1]):
+            ut = u[0, t, :].reshape(-1, self.net.input_size)
+            _, h_prev = self.net(ut) # call to forward method
             hs.append(h_prev)
         hs = torch.stack(hs, dim=1)
         return hs, h_prev
@@ -327,10 +294,7 @@ class DeepReservoir(torch.nn.Module):
                  spectral_radius=0.99, leaky=1,
                  connectivity_recurrent=10,
                  connectivity_input=10,
-                 connectivity_inter=10,
-                 feedback_size=0,
-                 neighbour_feedback_size=0,
-                 neighbour_scaling=1.
+                 connectivity_inter=10
                 ):
         """ Deep Reservoir layer.
         The implementation realizes a number of stacked RNN layers using the
@@ -367,11 +331,6 @@ class DeepReservoir(torch.nn.Module):
         input_scaling_others = inter_scaling
         connectivity_input_1 = connectivity_input
         connectivity_input_others = connectivity_inter
-        self.neighbour_feedback_size = neighbour_feedback_size
-
-        self.reservoirs_connection_matrix = create_sparse_connection_matrix(number_of_reservoirs, 0.5) # TODO: change connectivity using a new parameter
-        self.input_size = input_size
-        self.neighbour_scaling = neighbour_scaling
 
 
         if concat:
@@ -387,10 +346,7 @@ class DeepReservoir(torch.nn.Module):
                     spectral_radius=spectral_radius,
                     leaky=leaky,
                     connectivity_input=connectivity_input_1,
-                    connectivity_recurrent=connectivity_recurrent,
-                    feedback_size=feedback_size,
-                    neighbour_feedback_size=neighbour_feedback_size,
-                    neighbour_scaling=neighbour_scaling
+                    connectivity_recurrent=connectivity_recurrent
                 )
             ]
             # last_h_size may be different for the first layer
@@ -409,10 +365,7 @@ class DeepReservoir(torch.nn.Module):
                     spectral_radius=spectral_radius,
                     leaky=leaky,
                     connectivity_input=connectivity_input_1,
-                    connectivity_recurrent=connectivity_recurrent,
-                    feedback_size=feedback_size,
-                    neighbour_feedback_size=neighbour_feedback_size,
-                    neighbour_scaling=neighbour_scaling
+                    connectivity_recurrent=connectivity_recurrent
                 )
             ]
             last_h_size = self.layers_units
@@ -428,15 +381,14 @@ class DeepReservoir(torch.nn.Module):
                 spectral_radius=spectral_radius,
                 leaky=leaky,
                 connectivity_input=connectivity_input_others,
-                connectivity_recurrent=connectivity_recurrent,
-                feedback_size=feedback_size,
-                neighbour_feedback_size=neighbour_feedback_size,
-                neighbour_scaling=neighbour_scaling
+                connectivity_recurrent=connectivity_recurrent
             ))
             last_h_size = self.layers_units
         self.reservoir = torch.nn.ModuleList(reservoir_layers)
 
-    def forward(self, X_dataset, Y=None):
+    
+
+    def forward(self, U, h_prev=None):
         """ compute the output of the deep reservoir.
 
         :param X:
@@ -445,20 +397,63 @@ class DeepReservoir(torch.nn.Module):
         states = []  # list of all the states in all the layers
         states_last = []  # list of the states in all the layers for the last time step
         # states_last is a list because different layers may have different size.
-        X = None
-        h_lasts = [None for _ in range(self.n_layers)]
         for res_idx, res_layer in enumerate(self.reservoir):
             # right now, i pass the input to each layer, and also pass the states of the previous layers as neighbour values to the current layer.
 
-            [X, h_last] = res_layer(X_dataset, y=Y, X_neighbours=h_lasts)
-            h_lasts[res_idx] = h_last
+            [H, h_last] = res_layer(U, h_prev=h_prev)
             
-            states.append(X)
+            states.append(H)
             states_last.append(h_last)
 
         if self.concat:
             states = torch.cat(states, dim=2)
         else:
             states = states[-1]
+        states_last = states_last[-1]
         return states, states_last
+    
 
+    def train(self, U, Y, washout=200, solver=None, regul=1e-3):
+        activations = self(U)[0].cpu().numpy() # train the deep reservoir to get the activations (states of last iteration combined)
+        activations = activations.reshape(-1, self.reservoir[0].net.units) # reshape the activations to torch.Size([rows=len(train_dataset), columns=args.n_hid])
+        activations = activations[washout:]
+        scaler = preprocessing.StandardScaler().fit(activations)
+        self.scaler = scaler
+        activations = scaler.transform(activations) # scale the activations
+        self.activations = activations
+        # print(f"Activations training: {self.activations}\n")
+        # save_matrix_to_file(activations, "train_activations")
+
+        print(f"\n\nConditioning: {np.linalg.cond(activations)}\n\n")
+
+        target = Y[washout:] # remove first washout elements
+        if solver is None:
+            classifier = Ridge(alpha=regul, max_iter=1000).fit(activations, target)
+        elif solver == 'svd':
+            classifier = Ridge(alpha=regul, solver='svd').fit(activations, target)
+        else:
+            classifier = Ridge(alpha=regul, solver=solver).fit(activations, target)
+        self.classifier = classifier
+        print(f"Last training activation: {activations[-1]}\n")
+        print(f"Last prediction: {self.classifier.predict(activations[-1].reshape(1, activations[-1].shape[0]))}\nY[last]: {Y[-1]}")
+        return scaler, classifier
+
+    def test(self, n_iter, U):
+        print("\n\n\n")
+        # print(f"Activations' shape: {self.activations.shape}")
+        last_activation = self.activations[-1]
+        ot = self.classifier.predict(last_activation.reshape(1, last_activation.shape[0]))[0] # output predicted for next iteration
+        print(f"Ot: {ot}\n")
+        ot = U[0][0].reshape(1, 1, 3)
+        print(ot.shape)
+        predictions = []
+        activations = None
+        # self.reservoir[0].init_hidden()
+        for i in range(n_iter):
+            activations = self(ot, activations)[0].cpu().numpy()  # Use predicted output
+            activations = activations.reshape(-1, self.reservoir[0].net.units)
+            activations = self.scaler.transform(activations)
+            print(f"First testing activation: {activations[0]}")
+            ot = torch.tensor(self.classifier.predict(activations)[0]).reshape(1, 1, 3)
+            predictions.append(ot)
+        return predictions

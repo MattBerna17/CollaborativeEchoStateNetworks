@@ -6,19 +6,11 @@ from sklearn import preprocessing
 from sklearn.linear_model import Ridge
 from utils import get_lorenz_attractor, plot_lorenz_attractor_with_error, save_matrix_to_file
 import pandas as pd
-
-
-
-##########################################################################################
-# DISCLAIMER:
-# the "feedback" term is the teacher forcing term, in the original paper called W_fb
-# the "neighbour" term is the feedback from the neighbour reservoirs in the deep reservoir
-##########################################################################################
-
+import matplotlib.pyplot as plt
 
 
 # Try running with the following line:
-# python3 lorenz.py --test_trials=1 --use_test --rho 0.9 --leaky 0.1 --regul 0.05 --n_hid 64 --inp_scaling 0.2 --washout 200 --feedback_size 0 --n_layers 2 --neighbour_feedback_size 1 --neighbour_scaling 0.3
+# python3 lorenz.py --test_trials=1 --use_test --rho 0.9 --leaky 0.1 --regul 0.05 --n_hid 512 --inp_scaling 0.2 --washout 200 --n_layers 2
 # add
 # --show_plot
 # to see the plot with predictions for both validation and test
@@ -93,10 +85,7 @@ for guess in range(args.test_trials):
                                 input_scaling=args.inp_scaling,
                                 connectivity_recurrent=args.n_hid,
                                 connectivity_input=args.n_hid, 
-                                leaky=args.leaky,
-                                feedback_size=feedback_size,
-                                neighbour_feedback_size=neighbour_feedback_size,
-                                neighbour_scaling=neighbour_scaling
+                                leaky=args.leaky
                                 ).to(device)
 
     # no_grad means that the operations inside the block will not be added to the computation graph
@@ -110,6 +99,7 @@ for guess in range(args.test_trials):
         activations = activations.reshape(-1, args.n_hid)
         activations = activations[washout:]
         activations = scaler.transform(activations)
+        # print(f"Activations: {activations}")
         # save_matrix_to_file(activations, title + "_activations") # to save the activations from the model
         predictions = classifier.predict(activations)
         target = target[washout:]
@@ -121,42 +111,73 @@ for guess in range(args.test_trials):
         nrmse = rmse / (norm + 1e-9)
         return nrmse
 
+
+    def compute_nrmse(predictions, target):
+        mse = np.mean(np.square(predictions - target))
+        rmse = np.sqrt(mse)
+        norm = np.sqrt(np.square(target).mean())
+        nrmse = rmse / (norm + 1e-9)
+        return nrmse
+
+    def plot_error(predictions, target):
+        target = target.reshape(target.shape[0], target.shape[-1])
+        print(target.shape)
+        assert len(predictions) == target.shape[0]
+        errors = [(abs(predictions[i] - target[i])[0][0]) for i in range(target.shape[0])]
+        indexes = range(target.shape[0])
+        plt.plot(indexes, errors)
+        plt.title("Errors")
+        plt.show()
+    
+    def plot_prediction(predictions):
+        indexes = range(len(predictions))
+        predictions = np.array(predictions).reshape(-1, 3)
+        plt.plot(indexes, predictions)
+        plt.title("Predictions")
+        plt.show()
+        
+
+
     # columns = ['x', 'y', 'z']
     dataset = train_dataset.unsqueeze(0).reshape(1, -1, 3).to(device) # reshape element to torch.Size([1, rows=len(train_dataset), columns=3])
     target = train_target.reshape(-1, 3).numpy() # reshape element to torch.Size([rows=len(train_target), columns=3])
-    activations = model(dataset, target)[0].cpu().numpy() # train the deep reservoir to get the activations (states of last iteration combined)
-    activations = activations.reshape(-1, args.n_hid) # reshape the activations to torch.Size([rows=len(train_dataset), columns=args.n_hid])
-    activations = activations[washout:]
-    scaler = preprocessing.StandardScaler().fit(activations)
-    activations = scaler.transform(activations) # scale the activations
-    # save_matrix_to_file(activations, "train_activations")
-
-    print(f"\n\nConditioning: {np.linalg.cond(activations)}\n\n")
-
-    target = target[washout:] # remove first washout elements
-    if args.solver is None:
-        classifier = Ridge(alpha=args.regul, max_iter=1000).fit(activations, target)
-    elif args.solver == 'svd':
-        classifier = Ridge(alpha=args.regul, solver='svd').fit(activations, target)
-    else:
-        classifier = Ridge(alpha=args.regul, solver=args.solver).fit(activations, target)
     
-    valid_nmse = test_esn(valid_dataset, valid_target, classifier, scaler, title="validation") # get nmse of the validation dataset
-    test_nmse = test_esn(test_dataset, test_target, classifier, scaler, title="test") if args.use_test else 0.0 # get nmse of the test dataset
-    NRMSE[guess] = test_nmse
+    
+    scaler, classifier = model.train(dataset, target, args.washout, args.solver, args.regul) # train the model's Wout weights
+    
 
-    f = open(f'{main_folder}/{namefile}.txt', 'a')
-    ar = ''
-    for k, v in vars(args).items():
-        ar += f'{str(k)}: {str(v)}, '
-    ar += f'valid: {str(round(valid_nmse, 5))}, test: {str(round(test_nmse, 5))}'
-    f.write(ar + '\n')
-    f.write('**************\n\n\n')
-    f.close()
+    # print(valid_target.shape)
+    dataset = valid_dataset.unsqueeze(0).reshape(1, -1, 3).to(device)
+    target = valid_target.reshape(-1, 3).numpy()
+    # print(f"First target element: {target[0]}\n")
+    predictions = model.test(target.shape[0], dataset)
+    n = 5
+    print(f"First {n} predictions vs ground truth:\n")
+    for i in range(n):
+        print(f"{predictions[i]}")
+        print(f"{target[i]}")
+        print("\n\n")
+    # target[washout:]
+    NRMSE = [compute_nrmse(predictions, target)]
+    plot_error(predictions, target) if show_plot else None
+    plot_prediction(predictions) if show_plot else None
+
+    # valid_nmse = test_esn(valid_dataset, valid_target, classifier, scaler, title="validation") # get nmse of the validation dataset
+    # test_nmse = test_esn(test_dataset, test_target, classifier, scaler, title="test") if args.use_test else 0.0 # get nmse of the test dataset
+    # NRMSE[guess] = test_nmse
+
+    # f = open(f'{main_folder}/{namefile}.txt', 'a')
+    # ar = ''
+    # for k, v in vars(args).items():
+    #     ar += f'{str(k)}: {str(v)}, '
+    # ar += f'valid: {str(round(valid_nmse, 5))}, test: {str(round(test_nmse, 5))}'
+    # f.write(ar + '\n')
+    # f.write('**************\n\n\n')
+    # f.close()
 
 
-    if args.show_result:
-        print(ar)
+    # if args.show_result:
+    #     print(ar)
 
 
 
@@ -172,9 +193,9 @@ f.close()
 
 # store new experiment to csv
 try:
-    result_dataset = pd.read_csv("./results/lorenz_result.csv")
+    result_dataset = pd.read_csv("./results/v2/lorenz_results.csv")
 except FileNotFoundError:
-    result_dataset = pd.DataFrame(columns=["n_hid", "inp_scaling", "rho", "leaky", "regul", "lag", "bias_scaling", "solver", "washout", "feedback_size", "n_layers", "neighbour_size", "neighbour_scaling", "NRMSE_mean, NRMSE_std"])
+    result_dataset = pd.DataFrame(columns=["n_hid", "inp_scaling", "rho", "leaky", "regul", "lag", "bias_scaling", "solver", "washout", "n_layers", "NRMSE_mean, NRMSE_std"])
 
 new_row = {
     "n_hid": args.n_hid,
@@ -186,13 +207,10 @@ new_row = {
     "bias_scaling": args.bias_scaling,
     "solver": args.solver,
     "washout": washout,
-    "feedback_size": feedback_size,
     "n_layers": n_layers,
-    "neighbour_size": neighbour_feedback_size,
-    "neighbour_scaling": neighbour_scaling,
     "NRMSE_mean": mean,
     "NRMSE_std": std
 }
 
 result_dataset = pd.concat([result_dataset, pd.DataFrame([new_row])], ignore_index=True)
-result_dataset.to_csv("./results/lorenz_result.csv", index=False)
+result_dataset.to_csv("./results/v2/lorenz_results.csv", index=False)
