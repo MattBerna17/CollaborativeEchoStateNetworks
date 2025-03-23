@@ -7,6 +7,7 @@ from sklearn.linear_model import Ridge
 from utils import get_lorenz_attractor, plot_lorenz_attractor_with_error, save_matrix_to_file
 import pandas as pd
 import matplotlib.pyplot as plt
+import mplcursors
 
 
 # Try running with the following line:
@@ -123,10 +124,15 @@ for guess in range(args.test_trials):
         target = target.reshape(target.shape[0], target.shape[-1])
         print(target.shape)
         assert len(predictions) == target.shape[0]
-        errors = [(abs(predictions[i] - target[i])[0][0]) for i in range(target.shape[0])]
+        norm = np.sqrt(np.square(target).mean())
+        errors = [(np.sqrt((predictions[i] - target[i])**2)[0][0])/norm for i in range(target.shape[0])]
         indexes = range(target.shape[0])
         plt.plot(indexes, errors)
         plt.title("Errors")
+        plt.legend(["Error in x", "Error in y", "Error in z"])
+        plt.xticks(fontsize=12)
+        plt.yticks(fontsize=12)
+        mplcursors.cursor(hover=True)  # Enables hover effect showing values
         plt.show()
     
     def plot_prediction(predictions):
@@ -134,6 +140,29 @@ for guess in range(args.test_trials):
         predictions = np.array(predictions).reshape(-1, 3)
         plt.plot(indexes, predictions)
         plt.title("Predictions")
+        plt.legend(["Predicted x", "Predicted y", "Predicted z"])
+        plt.xticks(fontsize=12)
+        plt.yticks(fontsize=12)
+        mplcursors.cursor(hover=True)  # Enables hover effect showing values
+        plt.show()
+    
+    def plot_prediction_and_target(predictions, target):
+        predictions = np.array(predictions).reshape(-1, 3)
+        target = np.array(target).reshape(-1, 3)
+        fig, axs = plt.subplots(3)
+        axs[0].plot(range(len(predictions)), predictions[:, 0], label='Predictions')
+        axs[0].plot(range(len(target)), target[:, 0], label='Targets')
+        axs[0].set_title('x')
+        axs[1].plot(range(len(predictions)), predictions[:, 1], label='Predictions')
+        axs[1].plot(range(len(target)), target[:, 1], label='Targets')
+        axs[1].set_title('y')
+        axs[2].plot(range(len(predictions)), predictions[:, 2], label='Predictions')
+        axs[2].plot(range(len(target)), target[:, 2], label='Targets')
+        axs[2].set_title('z')
+        for ax in axs.flat:
+            ax.set(xlabel='Timesteps', ylabel='Values')
+            ax.label_outer()
+        fig.legend()
         plt.show()
         
 
@@ -144,23 +173,31 @@ for guess in range(args.test_trials):
     
     
     scaler, classifier = model.train(dataset, target, args.washout, args.solver, args.regul) # train the model's Wout weights
+    # print(f"Last target training: {target[-1]}\n")
+    # print(f"Last prediction: {classifier.predict(model.activations)[-1]}\n")
     
 
     # print(valid_target.shape)
     dataset = valid_dataset.unsqueeze(0).reshape(1, -1, 3).to(device)
     target = valid_target.reshape(-1, 3).numpy()
     # print(f"First target element: {target[0]}\n")
-    predictions = model.test(target.shape[0], dataset)
-    n = 5
-    print(f"First {n} predictions vs ground truth:\n")
-    for i in range(n):
-        print(f"{predictions[i]}")
-        print(f"{target[i]}")
-        print("\n\n")
+    n = target.shape[0]
+    # n = 20
+    target = target[:n]
+    # print(f"First target: {dataset[0][0]}\n")
+    predictions = model.test(target.shape[0])
+    # print(f"First {n} predictions vs ground truth:\n")
+    # for i in range(n):
+    #     print(f"Prediction: {predictions[i]}")
+    #     print(f"Target: {target[i]}")
+    #     print(f"Error: {(abs(predictions[i] - target[i])[0][0]).numpy()}")
+    #     print(f"Residual error: {((abs(predictions[i] - target[i])/target[i]*100)[0][0]).numpy()}%")
+    #     print("\n\n")
     # target[washout:]
     NRMSE = [compute_nrmse(predictions, target)]
     plot_error(predictions, target) if show_plot else None
-    plot_prediction(predictions) if show_plot else None
+    # plot_prediction(predictions) if show_plot else None
+    plot_prediction_and_target(predictions, target) if show_plot else None
 
     # valid_nmse = test_esn(valid_dataset, valid_target, classifier, scaler, title="validation") # get nmse of the validation dataset
     # test_nmse = test_esn(test_dataset, test_target, classifier, scaler, title="test") if args.use_test else 0.0 # get nmse of the test dataset

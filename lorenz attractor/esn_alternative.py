@@ -166,7 +166,7 @@ class ReservoirCell(torch.nn.Module):
     
 
 
-    def forward(self, ut):
+    def forward(self, ut, h_prev):
         """ Computes the output of the cell given the input and previous state.
 
         :param ut: input at time step t (shape: [1, input_size])
@@ -176,11 +176,11 @@ class ReservoirCell(torch.nn.Module):
         :return: xt, xt
         """
         input_part = torch.mm(ut, self.kernel)
-        state_part = torch.mm(self.h_prev, self.recurrent_kernel)
-                
-        output = torch.tanh(input_part + 0*self.bias + state_part)
-        leaky_output = self.h_prev * (1 - self.leaky) + output * self.leaky
-        self.h_prev = leaky_output
+        # print(f"h_prev dimensions: {h_prev.shape}\n")
+        state_part = torch.mm(h_prev, self.recurrent_kernel)
+        # print(f"\tinput_part: {input_part}\n\tstate_part: {state_part}\n")     
+        output = torch.tanh(input_part + self.bias + state_part)
+        leaky_output = h_prev * (1 - self.leaky) + output * self.leaky
 
         return leaky_output, leaky_output
     
@@ -266,13 +266,13 @@ class ReservoirLayer(torch.nn.Module):
         """
 
         if h_prev is None:
-            self.net.h_prev = self.init_hidden(u.shape[0]).to(u.device)
+            h_prev = self.init_hidden(u.shape[0]).to(u.device)
 
         hs = []
         # print(u.shape)
         for t in range(u.shape[1]):
             ut = u[0, t, :].reshape(-1, self.net.input_size)
-            _, h_prev = self.net(ut) # call to forward method
+            _, h_prev = self.net(ut, h_prev=h_prev) # call to forward method
             hs.append(h_prev)
         hs = torch.stack(hs, dim=1)
         return hs, h_prev
@@ -396,6 +396,8 @@ class DeepReservoir(torch.nn.Module):
         """
         states = []  # list of all the states in all the layers
         states_last = []  # list of the states in all the layers for the last time step
+        if h_prev is not None:
+            states.append(h_prev)
         # states_last is a list because different layers may have different size.
         for res_idx, res_layer in enumerate(self.reservoir):
             # right now, i pass the input to each layer, and also pass the states of the previous layers as neighbour values to the current layer.
@@ -434,26 +436,35 @@ class DeepReservoir(torch.nn.Module):
         else:
             classifier = Ridge(alpha=regul, solver=solver).fit(activations, target)
         self.classifier = classifier
-        print(f"Last training activation: {activations[-1]}\n")
-        print(f"Last prediction: {self.classifier.predict(activations[-1].reshape(1, activations[-1].shape[0]))}\nY[last]: {Y[-1]}")
+        # print(f"Last training activation: {activations[-1]}\n")
+        # print(f"Last prediction: {self.classifier.predict(activations[-1].reshape(1, activations[-1].shape[0]))}\nY[last]: {Y[-1]}")
         return scaler, classifier
 
-    def test(self, n_iter, U):
-        print("\n\n\n")
-        # print(f"Activations' shape: {self.activations.shape}")
-        last_activation = self.activations[-1]
-        ot = self.classifier.predict(last_activation.reshape(1, last_activation.shape[0]))[0] # output predicted for next iteration
-        print(f"Ot: {ot}\n")
-        ot = U[0][0].reshape(1, 1, 3)
-        print(ot.shape)
+    def test(self, n_iter):
+        activations = torch.tensor(self.activations, dtype=torch.float32)
+        # print(f"Activations: {activations.shape}\n")
+        # print(f"Whole prediction: {self.classifier.predict(activations)[-10:]}\n")
+        ot = torch.tensor(self.classifier.predict(activations)[-1].reshape(1, 1, 3), dtype=torch.float32)
+        # print(f"First prediction: {ot}\n")
         predictions = []
-        activations = None
-        # self.reservoir[0].init_hidden()
         for i in range(n_iter):
-            activations = self(ot, activations)[0].cpu().numpy()  # Use predicted output
-            activations = activations.reshape(-1, self.reservoir[0].net.units)
-            activations = self.scaler.transform(activations)
-            print(f"First testing activation: {activations[0]}")
-            ot = torch.tensor(self.classifier.predict(activations)[0]).reshape(1, 1, 3)
+            # print(f"Prediction: {ot}\n")
+            # print(f"Activations: {activations}\n\n")
+            # print(f"Predictions: {self.classifier.predict(activations)}\n\n")
+            new_activation = self.reservoir[0](ot, activations[-1].reshape(1, -1))[0].reshape(1, -1)
+            # print(f"new activation dimension: {new_activation.shape}")
+            activations = torch.cat((activations, new_activation), dim=0)
+            # activations = self(ot, activations)[0].cpu().numpy()
+            # print(f"activations shape: {activations.shape}")
+
+            #######################################################################
+            pred_activations = activations
+            # print(f"pred_activations shape: {pred_activations.shape}")
+            #######################################################################
+            
+            pred_activations = self.scaler.transform(pred_activations)
+            pred_activations = torch.tensor(pred_activations, dtype=torch.float32)
+            # activations = activations / (torch.norm(activations, p=2) + 1e-6)
+            ot = torch.tensor(self.classifier.predict(pred_activations)[-1].reshape(1, 1, 3), dtype=torch.float32)
             predictions.append(ot)
         return predictions
