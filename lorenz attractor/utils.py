@@ -1,4 +1,5 @@
 import datetime
+import mplcursors
 from scipy.integrate import odeint
 import numpy as np
 import torch
@@ -194,14 +195,99 @@ def get_cifar_data(bs_train,bs_test):
 
 
 
-def get_lorenz_attractor(lag=1, washout=200):
-    dataset = pd.read_csv("lorenz.csv", index_col="t").drop(columns=["Unnamed: 0"])
+def get_lorenz_attractor(lag=1, washout=200, bigger_dataset=False):
+    dataset = pd.read_csv("data/lorenz.csv", index_col="t").drop(columns=["Unnamed: 0"]) if not bigger_dataset else pd.read_csv("data/lorenz_attractor_10000.csv", index_col="t").drop(columns=["Unnamed: 0"])
     dataset = torch.tensor(dataset.values).float()
     (train_dataset, train_target), (val_dataset, val_target), (test_dataset, test_target) = separate_training_validation_test(dataset, washout, lag)
-    # print(train_dataset)
-    # print(train_target)
     return (train_dataset, train_target), (val_dataset, val_target), (test_dataset, test_target)
 
+
+
+
+def compute_nrmse(predictions, target):
+    """
+    Function to compute nrmse
+
+    :param predictions: predictions of the model
+    :param target: targets
+    :return: NRMSE value
+    """
+    mse = np.mean(np.square(predictions - target))
+    rmse = np.sqrt(mse)
+    norm = np.sqrt(np.square(target).mean())
+    nrmse = rmse / (norm + 1e-9)
+    return nrmse
+
+def plot_error(predictions, target):
+    """
+    Function to plot the error of the predictions
+
+    :param predictions: predictions of the model
+    :param target: targets
+    """
+    target = target.reshape(target.shape[0], target.shape[-1])
+    predictions = predictions.reshape(predictions.shape[0], predictions.shape[-1])
+    assert predictions.shape[0] == target.shape[0]
+
+    norm = np.sqrt(np.square(target).mean())
+    errors = np.sqrt(np.square(predictions - target)) / norm
+
+    indexes = range(target.shape[0])
+
+    fig, axs = plt.subplots(3, 1, figsize=(10, 8), sharex=True)
+
+    labels = ['Error in x', 'Error in y', 'Error in z']
+    for i, ax in enumerate(axs):
+        ax.plot(indexes, errors[:, i], label=labels[i], color=f"C{i}")
+        ax.set_title(labels[i])
+        ax.legend()
+        ax.grid()
+
+    plt.xlabel("Time Steps")
+    plt.tight_layout()
+    plt.show()
+
+def plot_prediction(predictions):
+    """
+    Function to plot the predictions made
+
+    :param predictions: predictions of the model
+    """
+    indexes = range(len(predictions))
+    predictions = np.array(predictions).reshape(-1, 3)
+    plt.plot(indexes, predictions)
+    plt.title("Predictions")
+    plt.legend(["Predicted x", "Predicted y", "Predicted z"])
+    plt.xticks(fontsize=12)
+    plt.yticks(fontsize=12)
+    mplcursors.cursor(hover=True)  # Enables hover effect showing values
+    plt.show()
+
+def plot_prediction_and_target(predictions, target):
+    """
+    Function to plot the predictions and the target
+
+    :param predictions: predictions of the model
+    :param target: targets
+    """
+    predictions = np.array(predictions).reshape(-1, 3)
+    target = np.array(target).reshape(-1, 3)
+    fig, axs = plt.subplots(3, sharex=True)
+    axs[0].plot(range(len(predictions)), predictions[:, 0], label='Predictions')
+    axs[0].plot(range(len(target)), target[:, 0], label='Targets')
+    axs[0].set_title('x')
+    axs[1].plot(range(len(predictions)), predictions[:, 1])
+    axs[1].plot(range(len(target)), target[:, 1])
+    axs[1].set_title('y')
+    axs[2].plot(range(len(predictions)), predictions[:, 2])
+    axs[2].plot(range(len(target)), target[:, 2])
+    axs[2].set_title('z')
+    axs[1].set(ylabel='Values')
+    axs[2].set(xlabel='Time steps')
+    axs[1].label_outer()
+    axs[2].label_outer()
+    fig.legend()
+    plt.show()
 
 
 

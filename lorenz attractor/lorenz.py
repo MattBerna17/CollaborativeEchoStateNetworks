@@ -4,10 +4,9 @@ import argparse
 from esn_alternative import DeepReservoir
 from sklearn import preprocessing
 from sklearn.linear_model import Ridge
-from utils import get_lorenz_attractor, plot_lorenz_attractor_with_error, save_matrix_to_file
+from utils import get_lorenz_attractor, plot_lorenz_attractor_with_error, save_matrix_to_file, plot_prediction_and_target, compute_nrmse, plot_error
 import pandas as pd
 import matplotlib.pyplot as plt
-import mplcursors
 
 
 # Try running with the following line:
@@ -53,6 +52,10 @@ parser.add_argument('--n_layers', type=int, default=1,
                     help='Number of layers in the deep reservoir')
 parser.add_argument('--neighbour_scaling', type=float, default=1.,
                     help='ESN neighbour feedback scaling')
+parser.add_argument('--bigger_dataset', action="store_true",
+                    help='If specified, uses the bigger dataset (lorenz_attractor_10000.csv) instead of the standard one (lorenz.csv)')
+parser.add_argument('--use_self_loop', action="store_true",
+                    help='If specified, uses the feedback loop: the output at timestep t is given as input at timestep t+1 (i.e. o(t) = u(t+1))')
 
 
 
@@ -77,8 +80,10 @@ feedback_size = args.feedback_size
 n_layers = args.n_layers
 neighbour_feedback_size = args.neighbour_feedback_size
 neighbour_scaling = args.neighbour_scaling if not(neighbour_feedback_size == 0) else 0
+bigger_dataset = args.bigger_dataset
+use_self_loop = args.use_self_loop
 
-(train_dataset, train_target), (valid_dataset, valid_target), (test_dataset, test_target) = get_lorenz_attractor(washout=washout)
+(train_dataset, train_target), (valid_dataset, valid_target), (test_dataset, test_target) = get_lorenz_attractor(washout=washout, bigger_dataset=bigger_dataset)
 
 NRMSE = np.zeros(args.test_trials)
 for guess in range(args.test_trials):
@@ -100,11 +105,11 @@ for guess in range(args.test_trials):
         activations = activations.reshape(-1, args.n_hid)
         activations = activations[washout:]
         activations = scaler.transform(activations)
-        # print(f"Activations: {activations}")
         # save_matrix_to_file(activations, title + "_activations") # to save the activations from the model
         predictions = classifier.predict(activations)
         target = target[washout:]
-        plot_lorenz_attractor_with_error(predictions, target, title) if show_plot else None # plot the lorenz attractor with predictions
+        plot_error(torch.from_numpy(predictions), target) if show_plot else None
+        plot_prediction_and_target(predictions, target) if show_plot else None
         # calculate nrmse
         mse = np.mean(np.square(predictions - target))
         rmse = np.sqrt(mse)
@@ -113,108 +118,45 @@ for guess in range(args.test_trials):
         return nrmse
 
 
-    def compute_nrmse(predictions, target):
-        mse = np.mean(np.square(predictions - target))
-        rmse = np.sqrt(mse)
-        norm = np.sqrt(np.square(target).mean())
-        nrmse = rmse / (norm + 1e-9)
-        return nrmse
-
-    def plot_error(predictions, target):
-        target = target.reshape(target.shape[0], target.shape[-1])
-        print(target.shape)
-        assert len(predictions) == target.shape[0]
-        norm = np.sqrt(np.square(target).mean())
-        errors = [(np.sqrt((predictions[i] - target[i])**2)[0][0])/norm for i in range(target.shape[0])]
-        indexes = range(target.shape[0])
-        plt.plot(indexes, errors)
-        plt.title("Errors")
-        plt.legend(["Error in x", "Error in y", "Error in z"])
-        plt.xticks(fontsize=12)
-        plt.yticks(fontsize=12)
-        mplcursors.cursor(hover=True)  # Enables hover effect showing values
-        plt.show()
-    
-    def plot_prediction(predictions):
-        indexes = range(len(predictions))
-        predictions = np.array(predictions).reshape(-1, 3)
-        plt.plot(indexes, predictions)
-        plt.title("Predictions")
-        plt.legend(["Predicted x", "Predicted y", "Predicted z"])
-        plt.xticks(fontsize=12)
-        plt.yticks(fontsize=12)
-        mplcursors.cursor(hover=True)  # Enables hover effect showing values
-        plt.show()
-    
-    def plot_prediction_and_target(predictions, target):
-        predictions = np.array(predictions).reshape(-1, 3)
-        target = np.array(target).reshape(-1, 3)
-        fig, axs = plt.subplots(3)
-        axs[0].plot(range(len(predictions)), predictions[:, 0], label='Predictions')
-        axs[0].plot(range(len(target)), target[:, 0], label='Targets')
-        axs[0].set_title('x')
-        axs[1].plot(range(len(predictions)), predictions[:, 1], label='Predictions')
-        axs[1].plot(range(len(target)), target[:, 1], label='Targets')
-        axs[1].set_title('y')
-        axs[2].plot(range(len(predictions)), predictions[:, 2], label='Predictions')
-        axs[2].plot(range(len(target)), target[:, 2], label='Targets')
-        axs[2].set_title('z')
-        for ax in axs.flat:
-            ax.set(xlabel='Timesteps', ylabel='Values')
-            ax.label_outer()
-        fig.legend()
-        plt.show()
-        
-
-
     # columns = ['x', 'y', 'z']
     dataset = train_dataset.unsqueeze(0).reshape(1, -1, 3).to(device) # reshape element to torch.Size([1, rows=len(train_dataset), columns=3])
     target = train_target.reshape(-1, 3).numpy() # reshape element to torch.Size([rows=len(train_target), columns=3])
     
     
-    scaler, classifier = model.train(dataset, target, args.washout, args.solver, args.regul) # train the model's Wout weights
-    # print(f"Last target training: {target[-1]}\n")
-    # print(f"Last prediction: {classifier.predict(model.activations)[-1]}\n")
-    
+    scaler, classifier = model.train(dataset, target, args.washout, args.solver, args.regul) # train the model's Wout weights feeding it the training dataset  
 
-    # print(valid_target.shape)
     dataset = valid_dataset.unsqueeze(0).reshape(1, -1, 3).to(device)
     target = valid_target.reshape(-1, 3).numpy()
-    # print(f"First target element: {target[0]}\n")
-    n = target.shape[0]
-    # n = 20
-    target = target[:n]
-    # print(f"First target: {dataset[0][0]}\n")
-    predictions = model.test(target.shape[0])
-    # print(f"First {n} predictions vs ground truth:\n")
-    # for i in range(n):
-    #     print(f"Prediction: {predictions[i]}")
-    #     print(f"Target: {target[i]}")
-    #     print(f"Error: {(abs(predictions[i] - target[i])[0][0]).numpy()}")
-    #     print(f"Residual error: {((abs(predictions[i] - target[i])/target[i]*100)[0][0]).numpy()}%")
-    #     print("\n\n")
-    # target[washout:]
-    NRMSE = [compute_nrmse(predictions, target)]
-    plot_error(predictions, target) if show_plot else None
-    # plot_prediction(predictions) if show_plot else None
-    plot_prediction_and_target(predictions, target) if show_plot else None
 
-    # valid_nmse = test_esn(valid_dataset, valid_target, classifier, scaler, title="validation") # get nmse of the validation dataset
-    # test_nmse = test_esn(test_dataset, test_target, classifier, scaler, title="test") if args.use_test else 0.0 # get nmse of the test dataset
-    # NRMSE[guess] = test_nmse
-
-    # f = open(f'{main_folder}/{namefile}.txt', 'a')
-    # ar = ''
-    # for k, v in vars(args).items():
-    #     ar += f'{str(k)}: {str(v)}, '
-    # ar += f'valid: {str(round(valid_nmse, 5))}, test: {str(round(test_nmse, 5))}'
-    # f.write(ar + '\n')
-    # f.write('**************\n\n\n')
-    # f.close()
+    if use_self_loop:
+        n = target.shape[0]
+        # n = 20
+        # target = target[:n]
+        predictions = model.predict(n) # get the model's prediction for n iterations
+        NRMSE = [compute_nrmse(predictions, target)] # compute nrmse for each prediction
+        predictions = torch.stack(predictions)
+        plot_error(predictions, target) if show_plot else None # plot the error
+        # plot_prediction(predictions) if show_plot else None
+        plot_prediction_and_target(predictions, target) if show_plot else None # plot the prediction
+    else:
+        valid_nmse = test_esn(valid_dataset, valid_target, classifier, scaler, title="validation") # get nmse of the validation dataset
+        test_nmse = test_esn(test_dataset, test_target, classifier, scaler, title="test") if args.use_test else 0.0 # get nmse of the test dataset
+        NRMSE[guess] = test_nmse
+        f = open(f'{main_folder}/{namefile}.txt', 'a')
+        ar = ''
+        for k, v in vars(args).items():
+            ar += f'{str(k)}: {str(v)}, '
+        ar += f'valid: {str(round(valid_nmse, 5))}, test: {str(round(test_nmse, 5))}'
+        f.write(ar + '\n')
+        f.write('**************\n\n\n')
+        f.close()
 
 
-    # if args.show_result:
-    #     print(ar)
+        if args.show_result:
+            print(ar)
+
+
+
 
 
 
@@ -230,7 +172,7 @@ f.close()
 
 # store new experiment to csv
 try:
-    result_dataset = pd.read_csv("./results/v2/lorenz_results.csv")
+    result_dataset = pd.read_csv("./results/lorenz_results.csv")
 except FileNotFoundError:
     result_dataset = pd.DataFrame(columns=["n_hid", "inp_scaling", "rho", "leaky", "regul", "lag", "bias_scaling", "solver", "washout", "n_layers", "NRMSE_mean, NRMSE_std"])
 
@@ -250,4 +192,4 @@ new_row = {
 }
 
 result_dataset = pd.concat([result_dataset, pd.DataFrame([new_row])], ignore_index=True)
-result_dataset.to_csv("./results/v2/lorenz_results.csv", index=False)
+result_dataset.to_csv("./results/lorenz_results.csv", index=False)
