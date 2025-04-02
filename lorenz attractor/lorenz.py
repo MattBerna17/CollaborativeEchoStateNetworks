@@ -133,6 +133,7 @@ for guess in range(args.test_trials):
         # n = 20
         # target = target[:n]
         predictions = model.predict(n) # get the model's prediction for n iterations
+        print(predictions)
         NRMSE = [compute_nrmse(predictions, target)] # compute nrmse for each prediction
         predictions = torch.stack(predictions)
         test_predictions = predictions
