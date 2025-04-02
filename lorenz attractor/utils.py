@@ -290,6 +290,47 @@ def plot_prediction_and_target(predictions, target):
     plt.show()
 
 
+def plot_train_test_prediction_and_target(train_predictions, train_target, test_predictions, test_target):
+    """
+    Function to plot the predictions and the target for both train and test sets.
+    A vertical line marks the transition from train to test.
+    
+    :param train_predictions: predictions for the training set
+    :param train_target: targets for the training set
+    :param test_predictions: predictions for the test set
+    :param test_target: targets for the test set
+    """
+    train_predictions = np.array(train_predictions).reshape(-1, 3)
+    test_predictions = np.array(test_predictions).reshape(-1, 3)
+    train_target = np.array(train_target).reshape(-1, 3)
+    test_target = np.array(test_target).reshape(-1, 3)
+
+    # Define the transition point
+    split_index = len(train_predictions)
+
+    fig, axs = plt.subplots(3, sharex=True, figsize=(10, 6))
+    
+    for i, label in enumerate(['x', 'y', 'z']):
+        # Plot train predictions and targets
+        axs[i].plot(range(split_index), train_predictions[:, i], label='Train Predictions', linestyle='dashed')
+        axs[i].plot(range(split_index), train_target[:, i], label='Train Targets', linestyle='solid')
+        
+        # Plot test predictions and targets
+        axs[i].plot(range(split_index, split_index + len(test_predictions)), test_predictions[:, i], label='Test Predictions', linestyle='dashed')
+        axs[i].plot(range(split_index, split_index + len(test_target)), test_target[:, i], label='Test Targets', linestyle='solid')
+        
+        # Draw a vertical line at the transition point
+        axs[i].axvline(x=split_index, color='black', linestyle='dotted', linewidth=1)
+
+        axs[i].set_title(label)
+    
+    axs[1].set(ylabel='Values')
+    axs[2].set(xlabel='Time steps')
+
+    fig.legend(loc="upper right")
+    plt.show()
+
+
 
 
 def get_lorenz(N=3, F=8, num_batch=128, lag=25, washout=200, window_size=0, serieslen=20):

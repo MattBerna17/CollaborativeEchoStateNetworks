@@ -446,14 +446,17 @@ class DeepReservoir(torch.nn.Module):
         """
         activations = torch.tensor(self.activations, dtype=torch.float32)
         # take the last training iteration's activations and predict the next state of the system (so, at time step dim_training + 1, i.e. first element in the validation/test dataset)
-        ot = torch.tensor(self.classifier.predict(activations)[-1].reshape(1, 1, 3), dtype=torch.float32)
+        scaled_activations = self.scaler.transform(activations)
+        ot = torch.tensor(self.classifier.predict(scaled_activations)[-1].reshape(1, 1, 3), dtype=torch.float32)
+        print(f"First prediction: {ot}\n")
         predictions = [] # to store all the predictions
-        for i in range(n_iter): # for each timestep
+        for i in range(n_iter+1): # for each timestep
             # get new activations from the forward method, passing the previous activations and the prediction of the past iteration (i.e. h(t-1) and o(t-1))
             new_activation = self.reservoir[0](ot, activations[-1].reshape(1, -1))[0].reshape(1, -1)
             activations = torch.cat((activations, new_activation), dim=0) # add the new activation to the activations
             scaled_activations = self.scaler.transform(activations) # scale the activations together (to avoid scaling the past activations multiple times)
             scaled_activations = torch.tensor(scaled_activations, dtype=torch.float32)
-            ot = torch.tensor(self.classifier.predict(scaled_activations)[-1].reshape(1, 1, 3), dtype=torch.float32) # predict the next state (o(t))
+            # print(f"Scaled activations dimension: {scaled_activations.shape}")
+            ot = torch.tensor(self.classifier.predict(scaled_activations[-1].unsqueeze(0)).reshape(1, 1, 3), dtype=torch.float32) # predict the next state (o(t))
             predictions.append(ot)
-        return predictions
+        return predictions[1:]

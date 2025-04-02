@@ -4,16 +4,13 @@ import argparse
 from esn_alternative import DeepReservoir
 from sklearn import preprocessing
 from sklearn.linear_model import Ridge
-from utils import get_lorenz_attractor, plot_lorenz_attractor_with_error, save_matrix_to_file, plot_prediction_and_target, compute_nrmse, plot_error
+from utils import get_lorenz_attractor, plot_lorenz_attractor_with_error, save_matrix_to_file, plot_prediction_and_target, compute_nrmse, plot_error, plot_train_test_prediction_and_target
 import pandas as pd
 import matplotlib.pyplot as plt
 
 
 # Try running with the following line:
-# python3 lorenz.py --test_trials=1 --use_test --rho 0.9 --leaky 0.1 --regul 0.05 --n_hid 512 --inp_scaling 0.2 --washout 200 --n_layers 2
-# add
-# --show_plot
-# to see the plot with predictions for both validation and test
+# python3 lorenz.py --test_trials=1 --use_test --rho 0.9 --leaky 0.9 --regul 0.000001 --n_hid 256 --inp_scaling 0.014 --washout 200 --n_layers 1 --use_self_loop --show_plot
 
 
 
@@ -123,10 +120,13 @@ for guess in range(args.test_trials):
     target = train_target.reshape(-1, 3).numpy() # reshape element to torch.Size([rows=len(train_target), columns=3])
     
     
-    scaler, classifier = model.train(dataset, target, args.washout, args.solver, args.regul) # train the model's Wout weights feeding it the training dataset  
+    scaler, classifier = model.train(dataset, target, args.washout, args.solver, args.regul) # train the model's Wout weights feeding it the training dataset
+    train_predictions = classifier.predict(scaler.transform(model.activations))
+    train_target = target[washout:]
 
     dataset = valid_dataset.unsqueeze(0).reshape(1, -1, 3).to(device)
     target = valid_target.reshape(-1, 3).numpy()
+    # assert train_dataset[-1] == dataset[0][0]
 
     if use_self_loop:
         n = target.shape[0]
@@ -135,6 +135,9 @@ for guess in range(args.test_trials):
         predictions = model.predict(n) # get the model's prediction for n iterations
         NRMSE = [compute_nrmse(predictions, target)] # compute nrmse for each prediction
         predictions = torch.stack(predictions)
+        test_predictions = predictions
+        test_target = target
+        plot_train_test_prediction_and_target(train_predictions, train_target, test_predictions, test_target)
         plot_error(predictions, target) if show_plot else None # plot the error
         # plot_prediction(predictions) if show_plot else None
         plot_prediction_and_target(predictions, target) if show_plot else None # plot the prediction
