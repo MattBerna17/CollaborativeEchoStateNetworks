@@ -120,9 +120,21 @@ for guess in range(args.test_trials):
     target = train_target.reshape(-1, 3).numpy() # reshape element to torch.Size([rows=len(train_target), columns=3])
     
     
-    scaler, classifier = model.train(dataset, target, args.washout, args.solver, args.regul) # train the model's Wout weights feeding it the training dataset
-    train_predictions = classifier.predict(scaler.transform(model.activations))
+    scalers, classifiers = model.train(dataset, target, args.washout, args.solver, args.regul) # train the model's Wout weights feeding it the training dataset
+    if n_layers > 1:
+        train_predictions = [None for _ in range(n_inp)]
+        for l in range(model.n_layers):
+            train_predictions[(l+1)%model.n_layers] = classifiers[l].predict(scalers[l].transform(model.reservoir[l].activations))
+        train_predictions = np.stack(train_predictions, axis=1)
+    else:
+        train_predictions = classifiers[0].predict(scalers[0].transform(model.reservoir[0].activations))
     train_target = target[washout:]
+    plot_prediction_and_target(train_predictions, train_target) if show_plot else None # plot the prediction
+    # print(f"[TRAINING PREDICTION] {train_predictions[-5:]}") # print the first 5 predictions
+    # print(f"[TRAINING GROUND TRUTH] {train_target[-5:]}") # print the first 5 targets
+    # print("\n\n\n")
+    # print(f"[COEFFICIENTS] {[classifiers[l].coef_ for l in range(n_layers)]}") # print the coefficients of the classifier
+    # print(f"[INTERCEPTS] {[classifiers[l].intercept_ for l in range(n_layers)]}") # print the intercept of the classifier
 
     dataset = valid_dataset.unsqueeze(0).reshape(1, -1, 3).to(device)
     target = valid_target.reshape(-1, 3).numpy()
@@ -130,19 +142,24 @@ for guess in range(args.test_trials):
 
     if use_self_loop:
         n = target.shape[0]
-        # n = 20
+        # n = 5
         # target = target[:n]
-        predictions = model.predict(n) # get the model's prediction for n iterations
-        print(predictions)
+        target = dataset[0:n].reshape(-1, 3).numpy() # reshape element to torch.Size([rows=len(train_target), columns=3])
+        # print(f"[GROUND TRUTH] {dataset[0:n]}")
+        predictions = model.predict(n, y_init=train_target[-1], Y=target) # get the model's prediction for n iterations
+        # print(predictions)
+        # predictions = predictions[washout:] # remove the washout
+        # target = target[washout:] # remove the washout
         NRMSE = [compute_nrmse(predictions, target)] # compute nrmse for each prediction
         predictions = torch.stack(predictions)
         test_predictions = predictions
         test_target = target
-        plot_train_test_prediction_and_target(train_predictions, train_target, test_predictions, test_target)
-        plot_error(predictions, target) if show_plot else None # plot the error
+        plot_train_test_prediction_and_target(train_predictions, train_target, test_predictions, test_target) if show_plot else None
+        # plot_error(predictions, target) if show_plot else None # plot the error
         # plot_prediction(predictions) if show_plot else None
         plot_prediction_and_target(predictions, target) if show_plot else None # plot the prediction
     else:
+
         valid_nmse = test_esn(valid_dataset, valid_target, classifier, scaler, title="validation") # get nmse of the validation dataset
         test_nmse = test_esn(test_dataset, test_target, classifier, scaler, title="test") if args.use_test else 0.0 # get nmse of the test dataset
         NRMSE[guess] = test_nmse
