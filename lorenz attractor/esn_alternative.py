@@ -546,7 +546,7 @@ class DeepReservoir(torch.nn.Module):
                 # print("\n")
                 # exit(0)
                 ot = torch.stack((ot_unordered[-1:] + ot_unordered[0:-1]))
-                print(f"ot: {ot}\n")
+                # print(f"ot: {ot}\n")
                 predictions.append(ot)
 
             return predictions

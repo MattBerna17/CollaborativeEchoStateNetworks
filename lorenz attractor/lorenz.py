@@ -7,6 +7,7 @@ from sklearn.linear_model import Ridge
 from utils import get_lorenz_attractor, plot_lorenz_attractor_with_error, save_matrix_to_file, plot_prediction_and_target, compute_nrmse, plot_error, plot_train_test_prediction_and_target
 import pandas as pd
 import matplotlib.pyplot as plt
+import torch
 
 
 # Try running with the following line:
@@ -133,7 +134,7 @@ for guess in range(args.test_trials):
     # print(f"[TRAINING PREDICTION] {train_predictions[-5:]}") # print the first 5 predictions
     # print(f"[TRAINING GROUND TRUTH] {train_target[-5:]}") # print the first 5 targets
     # print("\n\n\n")
-    # print(f"[COEFFICIENTS] {[classifiers[l].coef_ for l in range(n_layers)]}") # print the coefficients of the classifier
+    print(f"[COEFFICIENTS] {[np.linalg.norm(classifiers[l].coef_) for l in range(n_layers)]}") # print the coefficients of the classifier
     # print(f"[INTERCEPTS] {[classifiers[l].intercept_ for l in range(n_layers)]}") # print the intercept of the classifier
 
     dataset = valid_dataset.unsqueeze(0).reshape(1, -1, 3).to(device)
@@ -158,8 +159,11 @@ for guess in range(args.test_trials):
         # plot_error(predictions, target) if show_plot else None # plot the error
         # plot_prediction(predictions) if show_plot else None
         plot_prediction_and_target(predictions, target) if show_plot else None # plot the prediction
+    
+    
+    
+    
     else:
-
         valid_nmse = test_esn(valid_dataset, valid_target, classifier, scaler, title="validation") # get nmse of the validation dataset
         test_nmse = test_esn(test_dataset, test_target, classifier, scaler, title="test") if args.use_test else 0.0 # get nmse of the test dataset
         NRMSE[guess] = test_nmse
