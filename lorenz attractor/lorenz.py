@@ -4,7 +4,7 @@ import argparse
 from esn_alternative import DeepReservoir
 from sklearn import preprocessing
 from sklearn.linear_model import Ridge
-from utils import get_lorenz_attractor, plot_lorenz_attractor_with_error, save_matrix_to_file, plot_prediction_and_target, compute_nrmse, plot_error, plot_train_test_prediction_and_target
+from utils import get_lorenz_attractor, plot_lorenz_attractor_with_error, save_matrix_to_file, plot_prediction_and_target, compute_nrmse, plot_error, plot_train_test_prediction_and_target, plot_variable_correlations
 import pandas as pd
 import matplotlib.pyplot as plt
 import torch
@@ -129,13 +129,30 @@ for guess in range(args.test_trials):
         train_predictions = np.stack(train_predictions, axis=1)
     else:
         train_predictions = classifiers[0].predict(scalers[0].transform(model.reservoir[0].activations))
+
     train_target = target[washout:]
+    dataset = dataset[0][washout:] # remove the washout from the dataset
+
+    # plot_variable_correlations(dataset)
+
+    print(f"[INPUT] {dataset}")
+    print(f"##########################")
+    print(f"[TRAINING PREDICTION] {train_predictions}") # print the first 5 predictions
+    print(f"\n\n\n##########################\n\n\n")
+    print(f"[TRAINING GROUND TRUTH] {train_target}\n\n\n\n") # print the first 5 targets
     plot_prediction_and_target(train_predictions, train_target) if show_plot else None # plot the prediction
     # print(f"[TRAINING PREDICTION] {train_predictions[-5:]}") # print the first 5 predictions
     # print(f"[TRAINING GROUND TRUTH] {train_target[-5:]}") # print the first 5 targets
     # print("\n\n\n")
-    print(f"[COEFFICIENTS] {[np.linalg.norm(classifiers[l].coef_) for l in range(n_layers)]}") # print the coefficients of the classifier
+    # print(f"[COEFFICIENTS] {[np.linalg.norm(classifiers[l].coef_) for l in range(n_layers)]}") # print the coefficients of the classifier
     # print(f"[INTERCEPTS] {[classifiers[l].intercept_ for l in range(n_layers)]}") # print the intercept of the classifier
+
+
+    print(f"###########################################################")
+    print(f"######################## DEBUG ############################")
+    print(f"###########################################################")
+    # print(f"Prediction of reservoir 0 on 2.2534: {model.reservoir[0].classifier.predict(model.reservoir[0].forward(torch.tensor([2.2534]).reshape(1, 1, 1)))}\n\n")
+
 
     dataset = valid_dataset.unsqueeze(0).reshape(1, -1, 3).to(device)
     target = valid_target.reshape(-1, 3).numpy()
@@ -147,6 +164,7 @@ for guess in range(args.test_trials):
         # target = target[:n]
         target = dataset[0:n].reshape(-1, 3).numpy() # reshape element to torch.Size([rows=len(train_target), columns=3])
         # print(f"[GROUND TRUTH] {dataset[0:n]}")
+        print(f"[TRAIN PRED] {train_predictions[-1]}")
         predictions = model.predict(n, y_init=train_target[-1], Y=target) # get the model's prediction for n iterations
         # print(predictions)
         # predictions = predictions[washout:] # remove the washout

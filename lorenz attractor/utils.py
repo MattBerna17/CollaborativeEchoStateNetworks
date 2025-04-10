@@ -204,6 +204,45 @@ def get_lorenz_attractor(lag=1, washout=200, bigger_dataset=False):
 
 
 
+
+import matplotlib.pyplot as plt
+
+def plot_variable_correlations(train_dataset):
+    """
+    Plots the pairwise correlations (scatter plots) between x, y, z in the training dataset.
+
+    :param train_dataset: a NumPy or Torch tensor of shape (n_samples, 3)
+    """
+    # Convert to numpy if it's a tensor
+    if hasattr(train_dataset, 'numpy'):
+        data = train_dataset.cpu().numpy()
+    else:
+        data = train_dataset
+
+    x = data[:, 0]
+    y = data[:, 1]
+    z = data[:, 2]
+
+    fig, axs = plt.subplots(1, 3, figsize=(15, 5))
+    
+    axs[0].scatter(x, y, alpha=0.5)
+    axs[0].set_title('x vs y')
+    axs[0].set_xlabel('x')
+    axs[0].set_ylabel('y')
+
+    axs[1].scatter(y, z, alpha=0.5)
+    axs[1].set_title('y vs z')
+    axs[1].set_xlabel('y')
+    axs[1].set_ylabel('z')
+
+    axs[2].scatter(z, x, alpha=0.5)
+    axs[2].set_title('z vs x')
+    axs[2].set_xlabel('z')
+    axs[2].set_ylabel('x')
+
+    plt.tight_layout()
+    plt.show()
+
 def compute_nrmse(predictions, target):
     """
     Function to compute nrmse
