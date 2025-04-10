@@ -140,8 +140,9 @@ class ReservoirCell(torch.nn.Module):
         self.leaky = leaky
         self.connectivity_input = connectivity_input
         self.connectivity_recurrent = connectivity_recurrent
+        self.verbose = False
 
-        print(f"[RESERVOIR CELL] created with {self.units} units.\n")
+        print(f"[RESERVOIR CELL {self.index}] created with {self.units} units.\n")
 
         self.kernel = sparse_tensor_init(input_size, self.units,
                                          self.connectivity_input) * self.input_scaling
@@ -176,7 +177,7 @@ class ReservoirCell(torch.nn.Module):
         state_part = torch.mm(h_prev, self.recurrent_kernel)
         output = torch.tanh(input_part + self.bias + state_part)
         leaky_output = h_prev * (1 - self.leaky) + output * self.leaky
-        # print(f"[RESERVOIR CELL] output: {leaky_output}\n")
+        print(f"[RESERVOIR CELL {self.index}] output: {leaky_output}\n") if self.verbose else None
 
         return leaky_output, leaky_output
     
@@ -510,7 +511,7 @@ class DeepReservoir(torch.nn.Module):
             for l in range(self.n_layers):
                 U_layer = U[:, :, l].reshape(1, -1, 1) # shape = [1, n_examples, 1]
                 Y_layer = Y[:, (l+1)%Y.shape[1]].reshape(-1, 1) # shape = [n_examples, 1]
-                scaler, classifier = self.reservoir[l].train(U_layer, Y_layer, washout, solver, regul)
+                scaler, classifier = self.reservoir[l].train(U_layer, Y_layer, washout, solver, regul if l != 2 else 0) # train the reservoir layer
                 scalers.append(scaler)
                 classifiers.append(classifier)
         else:
@@ -529,6 +530,8 @@ class DeepReservoir(torch.nn.Module):
         """
         # exit(0)
         if self.n_layers > 1:
+            for l in range(self.n_layers):
+                self.reservoir[l].net.verbose = True
             # initialize first ot
             # separate ot in 3 dims (x, y, z)
             # predict for each layer the respective dimension
@@ -580,12 +583,13 @@ class DeepReservoir(torch.nn.Module):
                     # print(f"layers activations transformed: {layers_scaled_activations[l]}\n\n")
                     layers_scaled_activations[l] = torch.tensor(layers_scaled_activations[l], dtype=torch.float32)
                     ot_unordered[l] = torch.tensor(self.reservoir[l].classifier.predict(layers_scaled_activations[l][-1].unsqueeze(0)).reshape(1, 1, self.reservoir[l].net.input_size), dtype=torch.float32)
-                    # print(f"[R {l}] prediction: {ot_unordered[l]}\n")
+                    print(f"[R {l}] prediction: {ot_unordered[l]}\n")
                 # print("\n")
                 # exit(0)
                 ot = torch.stack((ot_unordered[-1:] + ot_unordered[0:-1]))
                 # print(f"ot: {ot}\n")
                 predictions.append(ot)
+                exit(0)
 
             return predictions
         else:

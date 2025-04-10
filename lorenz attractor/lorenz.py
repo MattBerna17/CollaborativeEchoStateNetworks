@@ -118,8 +118,10 @@ for guess in range(args.test_trials):
 
     # columns = ['x', 'y', 'z']
     dataset = train_dataset.unsqueeze(0).reshape(1, -1, 3).to(device) # reshape element to torch.Size([1, rows=len(train_dataset), columns=3])
+    # inp_scaler = preprocessing.StandardScaler() # standard scaler to scale the input
+    # dataset = torch.tensor(inp_scaler.fit_transform(dataset[0]).reshape(1, -1, 3), dtype=torch.float32) # scale the input
     target = train_target.reshape(-1, 3).numpy() # reshape element to torch.Size([rows=len(train_target), columns=3])
-    
+    # target = inp_scaler.transform(target) # scale the target
     
     scalers, classifiers = model.train(dataset, target, args.washout, args.solver, args.regul) # train the model's Wout weights feeding it the training dataset
     if n_layers > 1:
@@ -143,9 +145,9 @@ for guess in range(args.test_trials):
     plot_prediction_and_target(train_predictions, train_target) if show_plot else None # plot the prediction
     # print(f"[TRAINING PREDICTION] {train_predictions[-5:]}") # print the first 5 predictions
     # print(f"[TRAINING GROUND TRUTH] {train_target[-5:]}") # print the first 5 targets
-    # print("\n\n\n")
-    # print(f"[COEFFICIENTS] {[np.linalg.norm(classifiers[l].coef_) for l in range(n_layers)]}") # print the coefficients of the classifier
-    # print(f"[INTERCEPTS] {[classifiers[l].intercept_ for l in range(n_layers)]}") # print the intercept of the classifier
+    print("\n\n\n")
+    print(f"[COEFFICIENTS] {[np.linalg.norm(classifiers[l].coef_) for l in range(n_layers)]}") # print the coefficients of the classifier
+    print(f"[INTERCEPTS] {[classifiers[l].intercept_ for l in range(n_layers)]}") # print the intercept of the classifier
 
 
     print(f"###########################################################")
@@ -155,7 +157,9 @@ for guess in range(args.test_trials):
 
 
     dataset = valid_dataset.unsqueeze(0).reshape(1, -1, 3).to(device)
+    # dataset = torch.tensor(inp_scaler.transform(dataset[0]).reshape(1, -1, 3), dtype=torch.float32)
     target = valid_target.reshape(-1, 3).numpy()
+    # target = inp_scaler.transform(target)
     # assert train_dataset[-1] == dataset[0][0]
 
     if use_self_loop:
