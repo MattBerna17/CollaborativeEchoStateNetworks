@@ -302,34 +302,25 @@ def plot_prediction(predictions):
     mplcursors.cursor(hover=True)  # Enables hover effect showing values
     plt.show()
 
-def plot_prediction_and_target(predictions, target):
+def plot_prediction_and_target(predictions, target, inp_dim=3):
     """
     Function to plot the predictions and the target
 
     :param predictions: predictions of the model
     :param target: targets
     """
-    predictions = np.array(predictions).reshape(-1, 3)
-    target = np.array(target).reshape(-1, 3)
-    fig, axs = plt.subplots(3, sharex=True)
-    axs[0].plot(range(len(predictions)), predictions[:, 0], label='Predictions')
-    axs[0].plot(range(len(target)), target[:, 0], label='Targets')
-    axs[0].set_title('x')
-    axs[1].plot(range(len(predictions)), predictions[:, 1])
-    axs[1].plot(range(len(target)), target[:, 1])
-    axs[1].set_title('y')
-    axs[2].plot(range(len(predictions)), predictions[:, 2])
-    axs[2].plot(range(len(target)), target[:, 2])
-    axs[2].set_title('z')
-    axs[1].set(ylabel='Values')
-    axs[2].set(xlabel='Time steps')
-    axs[1].label_outer()
-    axs[2].label_outer()
+    predictions = np.array(predictions).reshape(-1, inp_dim)
+    target = np.array(target).reshape(-1, inp_dim)
+    fig, axs = plt.subplots(inp_dim, sharex=True)
+    for i in range(inp_dim):
+        axs[i].plot(range(len(predictions)), predictions[:, i], label='Predictions')
+        axs[i].plot(range(len(target)), target[:, i], label='Targets')
+        axs[i].set_title(f'Variable {i+1}')
     fig.legend()
     plt.show()
 
 
-def plot_train_test_prediction_and_target(train_predictions, train_target, test_predictions, test_target):
+def plot_train_test_prediction_and_target(train_predictions, train_target, test_predictions, test_target, inp_dim=3):
     """
     Function to plot the predictions and the target for both train and test sets.
     A vertical line marks the transition from train to test.
@@ -339,17 +330,17 @@ def plot_train_test_prediction_and_target(train_predictions, train_target, test_
     :param test_predictions: predictions for the test set
     :param test_target: targets for the test set
     """
-    train_predictions = np.array(train_predictions).reshape(-1, 3)
-    test_predictions = np.array(test_predictions).reshape(-1, 3)
-    train_target = np.array(train_target).reshape(-1, 3)
-    test_target = np.array(test_target).reshape(-1, 3)
+    train_predictions = np.array(train_predictions).reshape(-1, inp_dim)
+    test_predictions = np.array(test_predictions).reshape(-1, inp_dim)
+    train_target = np.array(train_target).reshape(-1, inp_dim)
+    test_target = np.array(test_target).reshape(-1, inp_dim)
 
     # Define the transition point
     split_index = len(train_predictions)
 
-    fig, axs = plt.subplots(3, sharex=True, figsize=(10, 6))
+    fig, axs = plt.subplots(inp_dim, sharex=True, figsize=(10, 6))
     
-    for i, label in enumerate(['x', 'y', 'z']):
+    for i in range(inp_dim):
         # Plot train predictions and targets
         axs[i].plot(range(split_index), train_predictions[:, i], label='Train Predictions', linestyle='dashed')
         axs[i].plot(range(split_index), train_target[:, i], label='Train Targets', linestyle='solid')
@@ -361,10 +352,10 @@ def plot_train_test_prediction_and_target(train_predictions, train_target, test_
         # Draw a vertical line at the transition point
         axs[i].axvline(x=split_index, color='black', linestyle='dotted', linewidth=1)
 
-        axs[i].set_title(label)
+        axs[i].set_title(f"Variable {i}")
     
-    axs[1].set(ylabel='Values')
-    axs[2].set(xlabel='Time steps')
+    axs[inp_dim//2].set(ylabel='Values')
+    axs[inp_dim-1].set(xlabel='Time steps')
 
     fig.legend(loc="upper right")
     plt.show()
