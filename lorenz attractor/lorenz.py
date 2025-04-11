@@ -46,8 +46,8 @@ parser.add_argument('--washout', type=int, default=250,
                     help='Number of washout iterations')
 parser.add_argument('--show_plot', action="store_true",
                     help='Whether to show the plot of the prediction compared to the actual function')
-parser.add_argument('--n_layers', type=int, default=1,
-                    help='Number of layers in the deep reservoir')
+parser.add_argument('--n_modules', type=int, default=1,
+                    help='Number of modules in the deep reservoir')
 parser.add_argument('--neighbour_scaling', type=float, default=1.,
                     help='ESN neighbour feedback scaling')
 parser.add_argument('--bigger_dataset', action="store_true",
@@ -70,12 +70,12 @@ main_folder = 'results'
 device = torch.device("cuda") if torch.cuda.is_available() and not args.cpu else torch.device("cpu")
 print("Using device ", device)
 n_inp = 3 # number of input features
-# n_out = 1
+n_out = 3
 washout = args.washout
 lag = args.lag
 show_plot = args.show_plot
 feedback_size = args.feedback_size
-n_layers = args.n_layers
+n_modules = args.n_modules
 neighbour_feedback_size = args.neighbour_feedback_size
 neighbour_scaling = args.neighbour_scaling if not(neighbour_feedback_size == 0) else 0
 bigger_dataset = args.bigger_dataset
@@ -85,7 +85,11 @@ use_self_loop = args.use_self_loop
 
 NRMSE = np.zeros(args.test_trials)
 for guess in range(args.test_trials):
-    model = DeepReservoir(input_size=n_inp, tot_units=args.n_hid, spectral_radius=args.rho, n_layers=n_layers, input_scaling=args.inp_scaling, connectivity_recurrent=args.n_hid, connectivity_input=args.n_hid, leaky=args.leaky).to(device)
+    model = DeepReservoir(
+        input_size=n_inp, output_size=n_out, n_modules=n_modules, # parameters
+        tot_units=args.n_hid, spectral_radius=args.rho, input_scaling=args.inp_scaling, leaky=args.leaky, # hyperparameters
+        connectivity_recurrent=args.n_hid, connectivity_input=args.n_hid
+    ).to(device)
 
     # no_grad means that the operations inside the block will not be added to the computation graph
     # since we never use torch.backward() we don't need to compute the gradient
@@ -111,74 +115,45 @@ for guess in range(args.test_trials):
         return nrmse
 
 
-    # columns = ['x', 'y', 'z']
-    dataset = train_dataset.unsqueeze(0).reshape(1, -1, 3).to(device) # reshape element to torch.Size([1, rows=len(train_dataset), columns=3])
-    # inp_scaler = preprocessing.MinMaxScaler() # standard scaler to scale the input
-    # dataset = torch.tensor(inp_scaler.fit_transform(dataset[0]).reshape(1, -1, 3), dtype=torch.float32) # scale the input
-    target = train_target.reshape(-1, 3).numpy() # reshape element to torch.Size([rows=len(train_target), columns=3])
-    # target = inp_scaler.transform(target) # scale the target
+    train_dataset = train_dataset.unsqueeze(0).reshape(1, -1, n_inp).to(device) # reshape element to torch.Size([1, rows=len(train_dataset), columns=n_inp])
+    train_target = train_target.reshape(-1, n_out).numpy() # reshape element to torch.Size([rows=len(train_target), columns=n_inp])
     
-    scalers, classifiers = model.train(dataset, target, args.washout, args.solver, args.regul) # train the model's Wout weights feeding it the training dataset
-    if n_layers > 1:
+
+
+    model.fit(
+        train_dataset, train_target, args.washout, args.solver, args.regul
+    ) # train the model's Wout weights feeding it the training dataset
+
+
+
+    if n_modules > 1:
         train_predictions = [None for _ in range(n_inp)]
-        for l in range(model.n_layers):
-            train_predictions[l] = classifiers[l].predict(scalers[l].transform(model.reservoir[l].activations))
-            # train_predictions[(l+1)%model.n_layers] = classifiers[l].predict(scalers[l].transform(model.reservoir[l].activations))
-        train_predictions = np.stack(train_predictions, axis=1)
+        for m in range(model.n_modules):
+            train_predictions[m] = model.reservoirs[m].classifier.predict(
+                model.reservoirs[m].scaler.transform(model.reservoirs[m].activations)
+            )
+        train_predictions = np.stack(train_predictions, axis=1) # stack predictions to torch.Size([rows=len(train_dataset), columns=n_out])
     else:
-        train_predictions = classifiers[0].predict(scalers[0].transform(model.reservoir[0].activations))
+        train_predictions = model.reservoirs[0].classifier.predict(
+            model.reservoirs[0].scaler.transform(model.reservoirs[0].activations)
+        )
 
-    train_target = target[washout:]
-    dataset = dataset[0][washout:] # remove the washout from the dataset
+    train_target = train_target[washout:]
+    train_dataset = train_dataset[0][washout:] # remove the washout from the dataset
 
-    # plot_variable_correlations(dataset)
-
-    # print(f"[INPUT] {dataset}")
-    # print(f"##########################")
-    # print(f"[TRAINING PREDICTION] {train_predictions}") # print the first 5 predictions
-    # print(f"\n\n\n##########################\n\n\n")
-    # print(f"[TRAINING GROUND TRUTH] {train_target}\n\n\n\n") # print the first 5 targets
-    plot_prediction_and_target(train_predictions, train_target, inp_dim=n_inp) if show_plot else None # plot the prediction
-    # print(f"[TRAINING PREDICTION] {train_predictions[-5:]}") # print the first 5 predictions
-    # print(f"[TRAINING GROUND TRUTH] {train_target[-5:]}") # print the first 5 targets
-    print("\n\n\n")
-    # print(f"[COEFFICIENTS] {classifiers[2].coef_}") # print the coefficients of the classifier
-    # print(f"[INTERCEPTS] {classifiers[2].intercept_}") # print the intercept of the classifier
+    plot_prediction_and_target(train_predictions, train_target, inp_dim=n_out) if show_plot else None # plot the prediction
 
 
-    print(f"###########################################################")
-    print(f"######################## DEBUG ############################")
-    print(f"###########################################################")
-    # print(f"Prediction of reservoir 0 on 2.2534: {model.reservoir[0].classifier.predict(model.reservoir[0].forward(torch.tensor([2.2534]).reshape(1, 1, 1)))}\n\n")
-
-
-    dataset = valid_dataset.unsqueeze(0).reshape(1, -1, n_inp).to(device)
-    # dataset = torch.tensor(inp_scaler.transform(dataset[0]).reshape(1, -1, 3), dtype=torch.float32)
-    target = valid_target.reshape(-1, n_inp).numpy()
-    # target = inp_scaler.transform(target)
-    # assert train_dataset[-1] == dataset[0][0]
+    test_dataset = valid_dataset.unsqueeze(0).reshape(1, -1, n_inp).to(device)
+    test_target = valid_target.reshape(-1, n_out).numpy()
 
     if use_self_loop:
-        n = target.shape[0]
-        # n = 5
-        # target = target[:n]
-        target = dataset[0:n].reshape(-1, n_inp).numpy() # reshape element to torch.Size([rows=len(train_target), columns=3])
-        # print(f"[GROUND TRUTH] {dataset[0:n]}")
-        # print(f"[TRAIN PRED] {train_predictions[-1]}")
-        predictions = model.predict(n, target[0, :]) # get the model's prediction for n iterations
-        # print(f"Predictions: {predictions[0:5]}")
-        # predictions = predictions[washout:] # remove the washout
-        # target = target[washout:] # remove the washout
-        NRMSE = [compute_nrmse(predictions, target)] # compute nrmse for each prediction
-        # print(f"\n\n\npredictions shape: {np.array(predictions).shape}\n\n")
-        # predictions = torch.stack(predictions)
-
-        test_predictions = predictions
-        test_target = target
-        plot_train_test_prediction_and_target(train_predictions, train_target, test_predictions, test_target, inp_dim=n_inp) if show_plot else None
-        # plot_error(predictions, target) if show_plot else None # plot the error
-        # plot_prediction(predictions) if show_plot else None
-        plot_prediction_and_target(predictions, target, inp_dim=n_inp) if show_plot else None # plot the prediction
+        n = test_target.shape[0]
+        test_target = torch.tensor(test_dataset[0:n], dtype=torch.float32).reshape(-1, n_out).numpy() # reshape element to torch.Size([rows=len(train_target), columns=3])
+        test_predictions = model.predict(n, test_target[0, :]).numpy() # get the model's prediction for n iterations
+        NRMSE = [compute_nrmse(test_predictions, test_target)] # compute nrmse for each prediction
+        plot_train_test_prediction_and_target(train_predictions, train_target, test_predictions, test_target, inp_dim=n_out) if show_plot else None
+        plot_prediction_and_target(test_predictions, test_target, inp_dim=n_out) if show_plot else None # plot the prediction
     
     
     
@@ -231,7 +206,7 @@ new_row = {
     "bias_scaling": args.bias_scaling,
     "solver": args.solver,
     "washout": washout,
-    "n_layers": n_layers,
+    "n_layers": n_modules,
     "NRMSE_mean": mean,
     "NRMSE_std": std
 }

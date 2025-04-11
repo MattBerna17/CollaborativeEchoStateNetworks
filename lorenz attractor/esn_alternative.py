@@ -112,13 +112,13 @@ def spectral_norm_scaling(W: torch.FloatTensor, rho_desired: float) -> torch.Flo
 
 
 class ReservoirCell(torch.nn.Module):
-    def __init__(self, input_size, output_size, units, index, n_layers=1, input_scaling=1., spectral_radius=0.99, leaky=1, connectivity_input=10, connectivity_recurrent=10):
+    def __init__(self, input_size, output_size, units, index, n_modules=1, input_scaling=1., spectral_radius=0.99, leaky=1, connectivity_input=10, connectivity_recurrent=10):
         """ Shallow reservoir to be used as cell of a Recurrent Neural Network.
 
         :param input_size: number of input units
         :param units: number of recurrent neurons in the reservoir
-        :param index: index of the reservoir in the ReservoirLayer list of the DeepReservoir
-        :param n_layers: number of layers created in the DeepReservoir
+        :param index: index of the reservoir in the ReservoirModule list of the DeepReservoir
+        :param n_modules: number of modules created in the DeepReservoir
         :param input_scaling: max abs value of a weight in the input-reservoir
             connections. Note that whis value also scales the unitary input bias
         :param spectral_radius: max abs eigenvalue of the recurrent matrix
@@ -178,11 +178,6 @@ class ReservoirCell(torch.nn.Module):
         state_part = torch.mm(h_prev, self.recurrent_kernel)
         output = torch.tanh(input_part + self.bias + state_part)
         leaky_output = h_prev * (1 - self.leaky) + output * self.leaky
-        # if self.verbose and self.index == 2:
-        #     print(f"[RESERVOIR CELL {self.index}] input: {ut}\n")
-        #     print(f"[RESERVOIR CELL {self.index}] output: {output}\n")
-        #     print(f"[RESERVOIR CELL {self.index}] prev: {h_prev}\n")
-        #     print(f"[RESERVOIR CELL {self.index}] final result: {leaky_output}\n\n\n")
 
         if self.save_new_state:
             return leaky_output, leaky_output
@@ -231,14 +226,14 @@ class ReservoirCell(torch.nn.Module):
 
 
 
-class ReservoirLayer(torch.nn.Module):
-    def __init__(self, input_size, output_size, units, index, n_layers=1, input_scaling=1., spectral_radius=0.99, leaky=1, connectivity_input=10, connectivity_recurrent=10):
-        """ Shallow reservoir to be used as Recurrent Neural Network layer.
+class ReservoirModule(torch.nn.Module):
+    def __init__(self, input_size, output_size, units, index, n_modules=1, input_scaling=1., spectral_radius=0.99, leaky=1, connectivity_input=10, connectivity_recurrent=10):
+        """ Shallow reservoir to be used as Recurrent Neural Network module.
 
         :param input_size: number of input units
         :param units: number of recurrent neurons in the reservoir
-        :param index: index of the layer (reservoir)
-        :param n_layers: number of layers (reservoirs) in the deep reservoir
+        :param index: index of the module (reservoir)
+        :param n_modules: number of modules (reservoirs) in the deep reservoir
         :param input_scaling: max abs value of a weight in the input-reservoir
             connections. Note that whis value also scales the unitary input bias
         :param spectral_radius: max abs eigenvalue of the recurrent matrix
@@ -249,7 +244,7 @@ class ReservoirLayer(torch.nn.Module):
             for each reservoir unit
         """
         super().__init__()
-        self.net = ReservoirCell(input_size, output_size, units, index, n_layers, input_scaling,
+        self.net = ReservoirCell(input_size, output_size, units, index, n_modules, input_scaling,
                                  spectral_radius, leaky, connectivity_input,
                                  connectivity_recurrent)
         # self.net.save_parameters(f"./params/cell_{index}_params.pth") # save the parameters of the reservoir
@@ -269,20 +264,17 @@ class ReservoirLayer(torch.nn.Module):
             h_prev = self.init_hidden(u.shape[0]).to(u.device)
 
         hs = []
-        # print(u.shape)
         for t in range(u.shape[1]):
-            # print(f"[RESERVOIR LAYER] doing stuff\n")
             ut = u[0, t, :].reshape(-1, self.net.input_size)
             _, h_prev = self.net(ut, h_prev=h_prev) # call to forward method
             hs.append(h_prev)
         hs = torch.stack(hs, dim=1)
-        # print(f"[RESERVOIR LAYER] stuff done\n\n\n")
         return hs, h_prev
     
 
-    def train(self, U, Y, washout=200, solver=None, regul=1e-3):
+    def fit(self, U, Y, washout=200, solver=None, regul=1e-3):
         """
-        Function to train the deep reservoir's readout layer (W_out matrix) given the dataset and the target.
+        Function to train the reservoir's readout module (W_out matrix) given the dataset and the target.
 
         :param U: dataset
         :param Y: target
@@ -290,52 +282,26 @@ class ReservoirLayer(torch.nn.Module):
         :param solver: solver of the ridge regression
         :param regul: regularization coefficient
         :return scaler: scaler used to scale the activations
-        :return classifier: trained readout layer
+        :return classifier: trained readout module
         """
-        # print(f"[RESERVOIR {self.net.index}] U[0][2331]: {U[0][2330:2335]}\n")
-        activations = self(U)[0].cpu().numpy() # train the reservoir layer to get the activations (activations = hs)
+        activations = self(U)[0].cpu().numpy() # train the reservoir module to get the activations (activations = hs)
         activations = activations.reshape(-1, self.net.units) # reshape the activations to torch.Size([rows=len(train_dataset), columns=args.n_hid])
         activations = activations[washout:] # remove washout elements
         scaler = preprocessing.StandardScaler().fit(activations) # train the scaler on the activations
         self.scaler = scaler
-        
-        # do not save the activations AFTER the scaler's application
         self.activations = activations # save the activations before scaling them (for each iteration in the test method, the activations are scaled with the same scaler)
-
-        # print(f"Activations max and min: {activations.max()} - {activations.min()}\n")
         activations = self.scaler.transform(self.activations) # scale the activations
-        # print(f"Scaled activations max and min: {activations.max()} - {activations.min()}\n\n")
-        # save_matrix_to_file(activations, "train_activations")
-
-        print(f"\n\nConditioning: {np.linalg.cond(activations)}\n\n")
-
+        # print(f"\n\nConditioning: {np.linalg.cond(activations)}\n\n")
         target = Y[washout:] # remove first washout elements
-        print(f"[RESERVOIR {self.net.index}] dataset[-1]: {U[0][-1]} \t target[-1]: {target[-1]}\n")
+
         if solver is None:
             classifier = Ridge(alpha=regul, max_iter=1000).fit(activations, target)
         elif solver == 'svd':
             classifier = Ridge(alpha=regul, solver='svd').fit(activations, target)
         else:
             classifier = Ridge(alpha=regul, solver=solver).fit(activations, target)
+        
         self.classifier = classifier
-
-        # if self.net.index == 0:
-        #     n = [2.16]
-        #     for el in n:
-        #         print(f"[RESERVOIR 0] classifying {el}...")
-        #         input = torch.tensor([el]).reshape(1, 1, 1)
-        #         nl = self(input, torch.tensor(self.activations[-1].reshape(1, -1), dtype=torch.float32))[0].reshape(1, -1)
-        #         nl = np.concat((self.activations, nl), axis=0)
-        #         self.activations = nl
-        #         nl = self.scaler.transform(nl)
-        #         nl = torch.tensor(nl, dtype=torch.float32)
-        #         p = self.classifier.predict(nl)[-1]
-        #         print(f"[RESERVOIR 0] prediction: {p}\n")
-        #         print(f"################\n")
-
-            
-
-        return scaler, classifier
 
     def predict(self, n_iter):
         """
@@ -345,13 +311,9 @@ class ReservoirLayer(torch.nn.Module):
         :return: predictions
         """
         activations = torch.tensor(self.activations, dtype=torch.float32)
-        # take the last training iteration's activations and predict the next state of the system (so, at time step dim_training + 1, i.e. first element in the validation/test dataset)
         scaled_activations = self.scaler.transform(activations)
-        # print(f"scaled activations dimensions: {scaled_activations.shape}\n\n")
         ot = torch.tensor(self.classifier.predict(scaled_activations)[-1].reshape(1, 1, self.net.input_size), dtype=torch.float32)
-        # print(f"First prediction: {ot}\n")
         predictions = [] # to store all the predictions
-        # use n_iter+1 because the first guess is the o(t-1), the first element in the dataset, so the second iteration predicts the first target
         for i in range(n_iter): # for each timestep
             # get new activations from the forward method, passing the previous activations and the prediction of the past iteration (i.e. h(t-1) and o(t-1))
             new_activation = self(ot, activations[-1].reshape(1, -1))[0].reshape(1, -1)
@@ -359,10 +321,14 @@ class ReservoirLayer(torch.nn.Module):
             self.activations = activations.numpy() # save the updated activations in numpy form
             scaled_activations = self.scaler.transform(activations) # scale the activations together (to avoid scaling the past activations multiple times)
             scaled_activations = torch.tensor(scaled_activations, dtype=torch.float32)
-            # print(f"Scaled activations dimension: {scaled_activations.shape}")
             ot = torch.tensor(self.classifier.predict(scaled_activations[-1].unsqueeze(0)).reshape(1, 1, self.net.input_size), dtype=torch.float32) # predict the next state (o(t))
             predictions.append(ot)
-        # self.activations = activations.numpy() # check if the type of activations is numpy ndarray first
+        print(f"[Reservoir {self.net.index}]: first 5 predictions {predictions[0:5]}")
+        # output:
+        # [Reservoir 0]: first 5 predictions [tensor([[[-7.7053]]]), tensor([[[-8.1681]]]), tensor([[[-8.6504]]]), tensor([[[-9.1490]]]), tensor([[[-9.6598]]])]
+        # [Reservoir 1]: first 5 predictions [tensor([[[-12.2610]]]), tensor([[[-12.9937]]]), tensor([[[-13.7560]]]), tensor([[[-14.5262]]]), tensor([[[-15.2691]]])]
+        # [Reservoir 2]: first 5 predictions [tensor([[[17.7287]]]), tensor([[[18.2368]]]), tensor([[[18.8421]]]), tensor([[[19.5554]]]), tensor([[[20.3863]]])]
+        
         return predictions
 
 
@@ -377,16 +343,16 @@ class ReservoirLayer(torch.nn.Module):
 
 
 class DeepReservoir(torch.nn.Module):
-    def __init__(self, input_size=1, tot_units=100, n_layers=1, concat=False,
+    def __init__(self, input_size=1, output_size=1, tot_units=100, n_modules=1, concat=False,
                  input_scaling=1, inter_scaling=1,
                  spectral_radius=0.99, leaky=1,
                  connectivity_recurrent=10,
                  connectivity_input=10,
                  connectivity_inter=10
                 ):
-        """ Deep Reservoir layer.
-        The implementation realizes a number of stacked RNN layers using the
-        ReservoirCell as core cell. All the reservoir layers share the same
+        """ Deep Reservoir module.
+        The implementation realizes a number of stacked RNN modules using the
+        ReservoirCell as core cell. All the reservoir modules share the same
         hyper-parameter values (i.e., same number of recurrent neurons, spectral
         radius, etc. ).
 
@@ -395,10 +361,10 @@ class DeepReservoir(torch.nn.Module):
             if concat == True this is the total number of units
             if concat == False this is the number of units for each
                 reservoir level
-        :param n_layers: number of layers (reservoirs)
+        :param n_modules: number of modules (reservoirs)
         :param concat: if True the returned state is given by the
             concatenation of all the states in the reservoir levels
-        :param input_scaling: scaling coeff. of the first reservoir layer
+        :param input_scaling: scaling coeff. of the first reservoir module
         :param inter_scaling: scaling coeff. of all the other levels (> 1)
         :param spectral_radius:
         :param leaky: leakage coefficient of all levels
@@ -408,31 +374,32 @@ class DeepReservoir(torch.nn.Module):
         """
         super().__init__()
         self.input_size = input_size
-        self.n_layers = n_layers
+        self.output_size = output_size
+        self.n_modules = n_modules
         self.tot_units = tot_units
         self.concat = concat
         self.batch_first = True  # DeepReservoir only supports batch_first
 
         input_scaling_others = inter_scaling
-        connectivity_input_1 = tot_units // n_layers
-        connectivity_input_others = tot_units // n_layers
-        connectivity_recurrent = tot_units // n_layers
-        layer_inputs = 1
-        layer_output = 1
-        self.layer_inputs = layer_inputs
-        self.layer_output = layer_output
+        connectivity_input_1 = tot_units // n_modules
+        connectivity_input_others = tot_units // n_modules
+        connectivity_recurrent = tot_units // n_modules
+        module_inputs = 1
+        module_output = 1
+        self.module_inputs = module_inputs
+        self.module_output = module_output
 
 
         if concat:
-            self.layers_units = int(tot_units / n_layers)
+            self.modules_units = int(tot_units / n_modules)
             # create the first reservoir:
-            reservoir_layers = [
-                ReservoirLayer(
-                    input_size=layer_inputs,
-                    output_size=layer_output,
-                    units=self.layers_units + tot_units % n_layers,
+            reservoir_modules = [
+                ReservoirModule(
+                    input_size=module_inputs,
+                    output_size=module_output,
+                    units=self.modules_units + tot_units % n_modules,
                     index=0,
-                    n_layers=n_layers,
+                    n_modules=n_modules,
                     input_scaling=input_scaling,
                     spectral_radius=spectral_radius,
                     leaky=leaky,
@@ -440,19 +407,19 @@ class DeepReservoir(torch.nn.Module):
                     connectivity_recurrent=connectivity_recurrent
                 )
             ]
-            # last_h_size may be different for the first layer
+            # last_h_size may be different for the first module
             # because of the remainder if concat=True
-            last_h_size = self.layers_units + tot_units % n_layers
+            last_h_size = self.modules_units + tot_units % n_modules
         else:
-            self.layers_units = tot_units // n_layers
+            self.modules_units = tot_units // n_modules
             # create the first reservoir:
-            reservoir_layers = [
-                ReservoirLayer(
-                    input_size=layer_inputs,
-                    output_size=layer_output,
-                    units=self.layers_units,
+            reservoir_modules = [
+                ReservoirModule(
+                    input_size=module_inputs,
+                    output_size=module_output,
+                    units=self.modules_units,
                     index=0, 
-                    n_layers=n_layers,
+                    n_modules=n_modules,
                     input_scaling=input_scaling,
                     spectral_radius=spectral_radius,
                     leaky=leaky,
@@ -460,24 +427,24 @@ class DeepReservoir(torch.nn.Module):
                     connectivity_recurrent=connectivity_recurrent
                 )
             ]
-            last_h_size = self.layers_units
+            last_h_size = self.modules_units
 
         # create all the other reservoirs:
-        for i in range(1, n_layers):
-            reservoir_layers.append(ReservoirLayer(
-                input_size=layer_inputs,
-                output_size=layer_output,
-                units=self.layers_units,
+        for i in range(1, n_modules):
+            reservoir_modules.append(ReservoirModule(
+                input_size=module_inputs,
+                output_size=module_output,
+                units=self.modules_units,
                 index=i,
-                n_layers=n_layers,
+                n_modules=n_modules,
                 input_scaling=input_scaling_others,
                 spectral_radius=spectral_radius,
                 leaky=leaky,
                 connectivity_input=connectivity_input_others,
                 connectivity_recurrent=connectivity_recurrent
             ))
-            last_h_size = self.layers_units
-        self.reservoir = torch.nn.ModuleList(reservoir_layers)
+            last_h_size = self.modules_units
+        self.reservoirs = torch.nn.ModuleList(reservoir_modules)
 
     
 
@@ -487,15 +454,15 @@ class DeepReservoir(torch.nn.Module):
         :param X:
         :return: hidden states (B, T, F), last state (L, B, F)
         """
-        states = []  # list of all the states in all the layers
-        states_last = []  # list of the states in all the layers for the last time step
+        states = []  # list of all the states in all the modules
+        states_last = []  # list of the states in all the modules for the last time step
         if h_prev is not None:
             states.append(h_prev)
-        # states_last is a list because different layers may have different size.
-        for res_idx, res_layer in enumerate(self.reservoir):
-            # right now, i pass the input to each layer, and also pass the states of the previous layers as neighbour values to the current layer.
+        # states_last is a list because different modules may have different size.
+        for res_idx, res_module in enumerate(self.reservoirs):
+            # right now, i pass the input to each module, and also pass the states of the previous modules as neighbour values to the current module.
 
-            [H, h_last] = res_layer(U, h_prev=h_prev)
+            [H, h_last] = res_module(U, h_prev=h_prev)
             
             states.append(H)
             states_last.append(h_last)
@@ -508,157 +475,39 @@ class DeepReservoir(torch.nn.Module):
         return states, states_last
     
 
-    def train(self, U, Y, washout=200, solver=None, regul=1e-3):
+    def fit(self, U, Y, washout=200, solver=None, regul=1e-3):
         """
-        Function to train the deep reservoir's readout layer (W_out matrix) given the dataset and the target.
+        Function to train the deep reservoir's readout module (W_out matrix) given the dataset and the target.
 
         :param U: dataset
         :param Y: target
         :param washout: number of elements to remove from the beginning of the dataset
         :param solver: solver of the ridge regression
         :param regul: regularization coefficient
-        :return scaler: scaler used to scale the activations
-        :return classifier: trained readout layer
         """
-        classifiers = []
-        scalers = []
-        if self.n_layers > 1:
-            for l in range(self.n_layers):
-                U_layer = U[:, :, l].reshape(1, -1, 1) # shape = [1, n_examples, 1]
-                # U_layer = U
-                Y_layer = Y[:, l].reshape(-1, self.layer_output) # shape = [n_examples, layer_output]
-                # Y_layer = Y[:, (l+1)%Y.shape[1]].reshape(-1, 1) # shape = [n_examples, 1]
-                scaler, classifier = self.reservoir[l].train(U_layer, Y_layer, washout, solver, regul) # train the reservoir layer
-                scalers.append(scaler)
-                classifiers.append(classifier)
+        if self.n_modules > 1:
+            for m in range(self.n_modules):
+                U_module = U[:, :, m].reshape(1, -1, self.module_inputs)
+                Y_module = Y[:, m].reshape(-1, self.module_output)
+                self.reservoirs[m].fit(U_module, Y_module, washout, solver, regul)
         else:
-            scaler, classifier = self.reservoir[0].train(U, Y, washout, solver, regul)
-            scalers.append(scaler)
-            classifiers.append(classifier)
-        
-        return scalers, classifiers
-
-    def predict(self, n_iter, y_init, Y):
-        """
-        Function to predict the next n_iter states of the dynamic system
-
-        :param n_iter: number of iterations to predict
-        :return: predictions
-        """
-        # exit(0)
-        if self.n_layers > 1:
-            # initialize first ot
-            # separate ot in 3 dims (x, y, z)
-            # predict for each layer the respective dimension
-            layers_activations = [torch.tensor(self.reservoir[l].activations, dtype=torch.float32) for l in range(self.n_layers)]
-            layers_scaled_activations = [self.reservoir[l].scaler.transform(layers_activations[l]) for l in range(self.n_layers)]
-            
-            
-            ot_unordered = [
-                torch.tensor(
-                    self.reservoir[l].classifier.predict(
-                        layers_scaled_activations[l][-1].reshape(1, -1)
-                    ).reshape(
-                        1, 1, self.reservoir[l].net.input_size
-                    ), dtype=torch.float32
-                )
-                for l in range(self.n_layers)
-            ]
-            # ot_unordered.append(torch.tensor(y_init[0]).reshape(1, 1, 1)) # add the first element of the target to the last layer
-            ot = torch.stack((ot_unordered[-1:] + ot_unordered[0:-1])) # reorder elements based on shift
-            # print(f"ot shape: {ot.shape}\n")
-            print(f"ot predicted n1: {ot}\n")
-            ot = torch.tensor(y_init, dtype=torch.float32).reshape(3, 1, 1, 1)
-            # # print(f"ot ordered: {ot}\n\n\n")
-            print(f"ot ground truth: {ot}\n")
-
-            predictions = []
-            for i in range(n_iter):
-                ot_unordered = [None for _ in range(self.n_layers)]
+            self.reservoirs[0].fit(U, Y, washout, solver, regul)
 
 
-                for l in range(self.n_layers):
-                    new_layer_activation = self.reservoir[l](ot[l], layers_activations[l][-1].reshape(1, -1))[0].reshape(1, -1) # expand input of the layer and obtain the new h(t)
-                    # print(f"[R {l}] new layer activation: {new_layer_activation}\n")
-                    # print(f"[R {l}] scaled new layer activation: {self.reservoir[l].scaler.transform(new_layer_activation)}\n")
-                    # print(f"layers activations: {layers_activations[l]}\n")
-                    layers_activations[l] = torch.cat((layers_activations[l], new_layer_activation), dim=0)
-                    self.reservoir[l].activations = layers_activations[l].numpy()
-                    layers_scaled_activations[l] = self.reservoir[l].scaler.transform(layers_activations[l])
-                    # print(f"layers activations transformed: {layers_scaled_activations[l]}\n\n")
-                    layers_scaled_activations[l] = torch.tensor(layers_scaled_activations[l], dtype=torch.float32)
-                    ot_unordered[l] = torch.tensor(self.reservoir[l].classifier.predict(layers_scaled_activations[l][-1].unsqueeze(0)).reshape(1, 1, self.reservoir[l].net.input_size), dtype=torch.float32)
-                    # print(f"[R {l}] prediction: {ot_unordered[l]}\n")
-                # print("\n")
-                # exit(0)
-                ot_unordered[self.n_layers-1] = torch.tensor(Y[i, 0]).reshape(1, 1, 1) if i < 300 else ot_unordered[self.n_layers-1] # add the first element of the target to the last layer
-                ot = torch.stack((ot_unordered[-1:] + ot_unordered[0:-1]))
-                # print(f"ot: {ot}\n")
-                predictions.append(ot)
-                # exit(0)
 
-            return predictions
-        else:
-            return self.reservoir[0].predict(n_iter)
-        
     def predict(self, n_iter, y_init=None):
-        if True:
-            for l in range(self.n_layers):
-                self.reservoir[l].net.verbose = True
-            predictions = []
-            layers_activations = {l: torch.tensor(self.reservoir[l].activations, dtype=torch.float32) for l in range(self.n_layers)}
-            layers_scaled_activations = {l: torch.tensor(self.reservoir[l].scaler.transform(layers_activations[l]), dtype=torch.float32) for l in range(self.n_layers)}
-            ot_unordered = [
-                torch.tensor(
-                    self.reservoir[l].classifier.predict(
-                        layers_scaled_activations[l][-1].reshape(1, -1)
-                    ).reshape(
-                        1, 1, self.reservoir[l].net.output_size
-                    ), dtype=torch.float32
-                )
-                for l in range(self.n_layers)
-            ]
-            # ot = torch.stack((ot_unordered[-1:] + ot_unordered[0:-1])) # only on shuffled outputs
-            ot = torch.tensor(ot_unordered, dtype=torch.float32).reshape(self.n_layers, 1, 1,1)
-            if y_init is not None:
-                ot = torch.tensor(y_init, dtype=torch.float32).reshape(self.n_layers, 1, 1, 1)
-            
-            for i in range(n_iter):
-                ot_unordered = [None for _ in range(self.n_layers)]
-                print(f"ot: {ot[0, 0]}\n")
-                for l in range(self.n_layers):
-                    new_layer_activation = self.reservoir[l](ot[l], layers_activations[l][-1].reshape(1, -1))[0].reshape(1, -1)
-                    layers_activations[l] = torch.cat((layers_activations[l], new_layer_activation), dim=0)
-                    layer_scaled_activ = torch.tensor(self.reservoir[l].scaler.transform(new_layer_activation), dtype=torch.float32)
-                    layers_scaled_activations[l] = torch.tensor(self.reservoir[l].scaler.transform(layers_activations[l]), dtype=torch.float32)
+        """
+        Function to predict the next n_iter timesteps
 
-                    ot_unordered[l] = torch.tensor(
-                        self.reservoir[l].classifier.predict(
-                            layer_scaled_activ.reshape(1, -1)
-                        ).reshape(
-                            1, 1, self.reservoir[l].net.output_size
-                        ), dtype=torch.float32
-                    )
-
-                    # ot_unordered[l] = torch.tensor(
-                    #     self.reservoir[l].classifier.predict(
-                    #         layers_scaled_activations[l]
-                    #     )[-1].reshape(
-                    #         1, 1, self.reservoir[l].net.output_size
-                    #     ), dtype=torch.float32
-                    # )
-                # ot = torch.stack((ot_unordered[-1:] + ot_unordered[0:-1])) # only on shuffled outputs
-                ot = torch.tensor(ot_unordered, dtype=torch.float32).reshape(self.n_layers, 1, 1, 1)
-                predictions.append(ot)
-                # exit(0)
+        :param n_iter: number of iterations to predict.
+        :param y_init: possible initial values to start predicting from.
+        """
+        if self.n_modules > 1:
+            predictions = [None for _ in range(self.n_modules)]
+            for m in range(self.n_modules):
+                predictions[m] = self.reservoirs[m].predict(n_iter)
+            predictions = torch.tensor(predictions, dtype=torch.float32).transpose(0, 1).reshape(-1, self.output_size)
+            print(f"\n\npreds: {predictions}")
             return predictions
         else:
-            if self.n_layers > 1:
-                preds = []
-                for l in range(self.n_layers):
-                    preds.append(self.reservoir[l].predict(n_iter))
-                preds = torch.stack(preds, dim=2)
-                preds = torch.cat(preds, dim=2)
-                return preds
-            else:
-                return self.reservoir[0].predict(n_iter)
+            return self.reservoirs[0].predict(n_iter)
