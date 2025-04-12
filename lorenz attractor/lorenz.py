@@ -133,6 +133,25 @@ for guess in range(args.test_trials):
                 model.reservoirs[m].scaler.transform(model.reservoirs[m].activations)
             )
         train_predictions = np.stack(train_predictions, axis=1) # stack predictions to torch.Size([rows=len(train_dataset), columns=n_out])
+        print(f"\n\n\n########################### READOUTS ##################################\n")
+        for m in range(model.n_modules):
+            print(f"\n\n\n########################### READOUTS MODULE {m} ##################################\n")
+            print(f"COEFFICIENTS: {np.median(model.reservoirs[m].classifier.coef_)}")
+            print(f"INTERCEPTS: {np.median(model.reservoirs[m].classifier.intercept_)}")
+        print(f"\n########################### READOUTS ##################################\n\n\n")
+        model.reservoirs[0].net.verbose = True
+        # print(f"\n\nFirst prediction: {
+        #     model.reservoirs[0].classifier.predict(
+        #         model.reservoirs[0].scaler.transform(
+        #             np.concat(
+        #                 (model.reservoirs[0].activations,
+        #                  model.reservoirs[0](torch.tensor([[[-7.70]]], dtype=torch.float32), torch.tensor(model.reservoirs[0].activations[-1], dtype=torch.float32).reshape(1, -1))[0][0]
+        #                 ), axis=0
+        #             )
+        #         )
+        #     )[-1]
+        # }")
+        # exit(0)
     else:
         train_predictions = model.reservoirs[0].classifier.predict(
             model.reservoirs[0].scaler.transform(model.reservoirs[0].activations)

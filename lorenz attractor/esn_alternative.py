@@ -140,8 +140,7 @@ class ReservoirCell(torch.nn.Module):
         self.leaky = leaky
         self.connectivity_input = connectivity_input
         self.connectivity_recurrent = connectivity_recurrent
-        self.verbose = False
-        self.save_new_state = True
+        self.verbose = True
 
         print(f"[RESERVOIR CELL {self.index}] created with {self.units} units.\n")
 
@@ -179,10 +178,15 @@ class ReservoirCell(torch.nn.Module):
         output = torch.tanh(input_part + self.bias + state_part)
         leaky_output = h_prev * (1 - self.leaky) + output * self.leaky
 
-        if self.save_new_state:
-            return leaky_output, leaky_output
-        else:
-            return h_prev, h_prev
+        if self.verbose:
+            print(f"[RESERVOIR CELL {self.index}] input: {ut}\n")
+            print(f"[RESERVOIR CELL {self.index}] h_prev: {torch.median(h_prev)}\n")
+            print(f"[RESERVOIR CELL {self.index}] input_part: {torch.median(input_part)}\n")
+            print(f"[RESERVOIR CELL {self.index}] state_part: {torch.median(state_part)}\n")
+            print(f"[RESERVOIR CELL {self.index}] output: {torch.median(output)}\n")
+            print(f"[RESERVOIR CELL {self.index}] leaky_output: {torch.median(leaky_output)}\n\n\n")
+
+        return leaky_output, leaky_output
     
     
 
@@ -265,6 +269,7 @@ class ReservoirModule(torch.nn.Module):
 
         hs = []
         for t in range(u.shape[1]):
+            print(f"TIMESTEP {t}")
             ut = u[0, t, :].reshape(-1, self.net.input_size)
             _, h_prev = self.net(ut, h_prev=h_prev) # call to forward method
             hs.append(h_prev)
@@ -377,7 +382,7 @@ class DeepReservoir(torch.nn.Module):
         self.concat = concat
         self.batch_first = True  # DeepReservoir only supports batch_first
 
-        input_scaling_others = inter_scaling
+        input_scaling_others = input_scaling
         connectivity_input_1 = tot_units // n_modules
         connectivity_input_others = tot_units // n_modules
         connectivity_recurrent = tot_units // n_modules
@@ -417,7 +422,7 @@ class DeepReservoir(torch.nn.Module):
                     units=self.modules_units,
                     index=0, 
                     n_modules=n_modules,
-                    input_scaling=input_scaling,
+                    input_scaling=0.3271,
                     spectral_radius=spectral_radius,
                     leaky=leaky,
                     connectivity_input=connectivity_input_1,
@@ -427,21 +432,47 @@ class DeepReservoir(torch.nn.Module):
             last_h_size = self.modules_units
 
         # create all the other reservoirs:
-        for i in range(1, n_modules):
-            reservoir_modules.append(ReservoirModule(
-                input_size=module_inputs,
-                output_size=module_output,
-                units=self.modules_units,
-                index=i,
-                n_modules=n_modules,
-                input_scaling=input_scaling_others,
-                spectral_radius=spectral_radius,
-                leaky=leaky,
-                connectivity_input=connectivity_input_others,
-                connectivity_recurrent=connectivity_recurrent
-            ))
-            last_h_size = self.modules_units
+        # for i in range(1, n_modules):
+        #     reservoir_modules.append(ReservoirModule(
+        #         input_size=module_inputs,
+        #         output_size=module_output,
+        #         units=self.modules_units,
+        #         index=i,
+        #         n_modules=n_modules,
+        #         input_scaling=input_scaling,
+        #         spectral_radius=spectral_radius,
+        #         leaky=leaky,
+        #         connectivity_input=connectivity_input_others,
+        #         connectivity_recurrent=connectivity_recurrent
+        #     ))
+        #     last_h_size = self.modules_units
+        reservoir_modules.append(ReservoirModule(
+            input_size=module_inputs,
+            output_size=module_output,
+            units=300,
+            index=1,
+            n_modules=n_modules,
+            input_scaling=0.9,
+            spectral_radius=spectral_radius,
+            leaky=leaky,
+            connectivity_input=connectivity_input_others,
+            connectivity_recurrent=connectivity_recurrent
+        ))
+        reservoir_modules.append(ReservoirModule(
+            input_size=module_inputs,
+            output_size=module_output,
+            units=500,
+            index=2,
+            n_modules=n_modules,
+            input_scaling=0.9,
+            spectral_radius=spectral_radius,
+            leaky=leaky,
+            connectivity_input=connectivity_input_others,
+            connectivity_recurrent=connectivity_recurrent
+        ))
         self.reservoirs = torch.nn.ModuleList(reservoir_modules)
+        for res_module in self.reservoirs:
+            res_module.net.verbose = False
 
     
 
@@ -483,8 +514,10 @@ class DeepReservoir(torch.nn.Module):
         :param regul: regularization coefficient
         """
         if self.n_modules > 1:
+            print("\n################## TRAINING ##################")
             if self.mode == "entangled":
                 for m in range(self.n_modules):
+                    print(f"\n\n\n################## TRAINING MODULE {m} ##################")
                     U_module = U[:, :, m].reshape(1, -1, self.module_inputs)
                     Y_module = Y[:, (m+1)%Y.shape[1]].reshape(-1, self.module_output)
                     self.reservoirs[m].fit(U_module, Y_module, washout, solver, regul)
@@ -498,6 +531,7 @@ class DeepReservoir(torch.nn.Module):
                     U_module = U[:, :, :m].reshape(1, -1, self.input_size)
                     Y_module = Y[:, m].reshape(-1, self.module_output)
                     self.reservoirs[m].fit(U_module, Y_module, washout, solver, regul)
+            print("################## TRAINING ##################\n")
         else:
             self.reservoirs[0].fit(U, Y, washout, solver, regul)
 
@@ -534,6 +568,11 @@ class DeepReservoir(torch.nn.Module):
         :param y_init: possible initial values to start predicting from.
         """
         if self.n_modules > 1:
+            for m in range(self.n_modules):
+                self.reservoirs[m].net.verbose = True
+            # print("\n######################################################")
+            # print(f"TIMESTEP {0}")
+            # print("######################################################\n")
             predictions = torch.tensor([], dtype=torch.float32)
             ot = [
                 self.reservoirs[m].classifier.predict(
@@ -545,11 +584,13 @@ class DeepReservoir(torch.nn.Module):
             ]
             ot = torch.tensor(ot, dtype=torch.float32).reshape(3, 1, 1, 1)
             ot = torch.cat([ot[-1:], ot[:-1]], dim=0)
-            print(ot)
             predictions = torch.cat([predictions, ot.reshape(1, 3)], dim=0)
             past_prediction = ot
             ot = []
-            for i in range(n_iter - 1):
+            for i in range(n_iter-1):
+                # print("\n\n\n######################################################")
+                # print(f"TIMESTEP {i+1}")
+                # print("######################################################\n")
                 for m in range(self.n_modules):
                     module_input = past_prediction[m]
                     new_activation = self.reservoirs[m](
@@ -566,7 +607,6 @@ class DeepReservoir(torch.nn.Module):
                     )
                 ot = torch.tensor(ot, dtype=torch.float32).reshape(3, 1, 1, 1)
                 ot = torch.cat([ot[-1:], ot[:-1]], dim=0)
-                print(ot)
                 predictions = torch.cat([predictions, ot.reshape(1, 3)], dim=0)
                 past_prediction = ot
                 ot = []
