@@ -86,7 +86,7 @@ use_self_loop = args.use_self_loop
 NRMSE = np.zeros(args.test_trials)
 for guess in range(args.test_trials):
     model = DeepReservoir(
-        input_size=n_inp, output_size=n_out, n_modules=n_modules, # parameters
+        input_size=n_inp, output_size=n_out, n_modules=n_modules, mode="entangled", # parameters
         tot_units=args.n_hid, spectral_radius=args.rho, input_scaling=args.inp_scaling, leaky=args.leaky, # hyperparameters
         connectivity_recurrent=args.n_hid, connectivity_input=args.n_hid
     ).to(device)
@@ -129,7 +129,7 @@ for guess in range(args.test_trials):
     if n_modules > 1:
         train_predictions = [None for _ in range(n_inp)]
         for m in range(model.n_modules):
-            train_predictions[m] = model.reservoirs[m].classifier.predict(
+            train_predictions[(m + (model.mode == "entangled"))%n_out] = model.reservoirs[m].classifier.predict(
                 model.reservoirs[m].scaler.transform(model.reservoirs[m].activations)
             )
         train_predictions = np.stack(train_predictions, axis=1) # stack predictions to torch.Size([rows=len(train_dataset), columns=n_out])
@@ -150,7 +150,8 @@ for guess in range(args.test_trials):
     if use_self_loop:
         n = test_target.shape[0]
         test_target = torch.tensor(test_dataset[0:n], dtype=torch.float32).reshape(-1, n_out).numpy() # reshape element to torch.Size([rows=len(train_target), columns=3])
-        test_predictions = model.predict(n, test_target[0, :]).numpy() # get the model's prediction for n iterations
+        # test_predictions = model.predict(n, test_target[0, :]).numpy() # get the model's prediction for n iterations
+        test_predictions = model.predict(n).numpy() # get the model's prediction for n iterations
         NRMSE = [compute_nrmse(test_predictions, test_target)] # compute nrmse for each prediction
         plot_train_test_prediction_and_target(train_predictions, train_target, test_predictions, test_target, inp_dim=n_out) if show_plot else None
         plot_prediction_and_target(test_predictions, test_target, inp_dim=n_out) if show_plot else None # plot the prediction
