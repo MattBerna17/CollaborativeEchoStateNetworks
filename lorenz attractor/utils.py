@@ -402,11 +402,11 @@ def separate_training_validation_test(dataset: torch.Tensor, washout=200, lag=1)
     train_dataset = dataset[:end_train-lag]
     train_target = dataset[lag:end_train]
 
-    val_dataset = dataset[end_train:end_val-lag]
-    val_target = dataset[end_train+lag:end_val]
+    val_dataset = dataset[end_train-1:end_val-lag]
+    val_target = dataset[end_train-1+lag:end_val]
 
-    test_dataset = dataset[end_val:end_test-lag]
-    test_target = dataset[end_val+lag:end_test]
+    test_dataset = dataset[end_val-1:end_test-lag]
+    test_target = dataset[end_val-1+lag:end_test]
 
     # print(f"\nDimensioni:\ntrain dataset: {(train_dataset.shape)}")
     # print(f"train target: {(train_target.shape)}")

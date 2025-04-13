@@ -54,11 +54,33 @@ parser.add_argument('--bigger_dataset', action="store_true",
                     help='If specified, uses the bigger dataset (lorenz_attractor_10000.csv) instead of the standard one (lorenz.csv)')
 parser.add_argument('--use_self_loop', action="store_true",
                     help='If specified, uses the feedback loop: the output at timestep t is given as input at timestep t+1 (i.e. o(t) = u(t+1))')
+parser.add_argument('--mode', type=str, default='entangled',
+                    help='Specifies the mode of training and prediction of the reservoir')
+parser.add_argument('--leaky1', type=float, default=1.,
+                    help='ESN leakage')
+parser.add_argument('--leaky2', type=float, default=1.,
+                    help='ESN leakage')
+parser.add_argument('--leaky3', type=float, default=1.,
+                    help='ESN leakage')
+parser.add_argument('--inp_scaling1', type=float, default=1.,
+                    help='ESN input scaling')
+parser.add_argument('--inp_scaling2', type=float, default=1.,
+                    help='ESN input scaling')
+parser.add_argument('--inp_scaling3', type=float, default=1.,
+                    help='ESN input scaling')
+parser.add_argument('--units1', type=int, default=1.,
+                    help='ESN units')
+parser.add_argument('--units2', type=int, default=1.,
+                    help='ESN units')
+parser.add_argument('--units3', type=int, default=1.,
+                    help='ESN units')
+parser.add_argument('--rescale_input', action="store_true",
+                    help='If specified, rescales the input between 0 and 1')
 
 
 
 args = parser.parse_args()
-print(args)
+# print(args)
 namefile = 'lorenz_log_ESN'
 
 if args.lag > 1:
@@ -68,7 +90,7 @@ if args.lag > 1:
 main_folder = 'results'
 
 device = torch.device("cuda") if torch.cuda.is_available() and not args.cpu else torch.device("cpu")
-print("Using device ", device)
+# print("Using device ", device)
 n_inp = 3 # number of input features
 n_out = 3
 washout = args.washout
@@ -80,15 +102,27 @@ neighbour_feedback_size = args.neighbour_feedback_size
 neighbour_scaling = args.neighbour_scaling if not(neighbour_feedback_size == 0) else 0
 bigger_dataset = args.bigger_dataset
 use_self_loop = args.use_self_loop
+mode = args.mode
+leakys = [args.leaky1, args.leaky2, args.leaky3]
+inp_scalings = [args.inp_scaling1, args.inp_scaling2, args.inp_scaling3]
+units = [args.units1, args.units2, args.units3]
+rescale_input = args.rescale_input
 
 (train_dataset, train_target), (valid_dataset, valid_target), (test_dataset, test_target) = get_lorenz_attractor(washout=washout, bigger_dataset=bigger_dataset)
+scaler = preprocessing.MinMaxScaler().fit(train_dataset)
+if rescale_input:
+    train_dataset = torch.tensor(scaler.transform(train_dataset), dtype=torch.float32)
+    train_target = torch.tensor(scaler.transform(train_target), dtype=torch.float32)
+    valid_dataset = torch.tensor(scaler.transform(valid_dataset), dtype=torch.float32)
+    valid_target = torch.tensor(scaler.transform(valid_target), dtype=torch.float32)
 
 NRMSE = np.zeros(args.test_trials)
 for guess in range(args.test_trials):
     model = DeepReservoir(
-        input_size=n_inp, output_size=n_out, n_modules=n_modules, mode="entangled", # parameters
+        input_size=n_inp, output_size=n_out, n_modules=n_modules, mode=mode, # parameters
         tot_units=args.n_hid, spectral_radius=args.rho, input_scaling=args.inp_scaling, leaky=args.leaky, # hyperparameters
-        connectivity_recurrent=args.n_hid, connectivity_input=args.n_hid
+        connectivity_recurrent=args.n_hid, connectivity_input=args.n_hid,
+        leakys=leakys, inp_scalings=inp_scalings, units=units # hyperparameters
     ).to(device)
 
     # no_grad means that the operations inside the block will not be added to the computation graph
@@ -133,13 +167,13 @@ for guess in range(args.test_trials):
                 model.reservoirs[m].scaler.transform(model.reservoirs[m].activations)
             )
         train_predictions = np.stack(train_predictions, axis=1) # stack predictions to torch.Size([rows=len(train_dataset), columns=n_out])
-        print(f"\n\n\n########################### READOUTS ##################################\n")
-        for m in range(model.n_modules):
-            print(f"\n\n\n########################### READOUTS MODULE {m} ##################################\n")
-            print(f"COEFFICIENTS: {np.median(model.reservoirs[m].classifier.coef_)}")
-            print(f"INTERCEPTS: {np.median(model.reservoirs[m].classifier.intercept_)}")
-        print(f"\n########################### READOUTS ##################################\n\n\n")
-        model.reservoirs[0].net.verbose = True
+        # print(f"\n\n\n########################### READOUTS ##################################\n")
+        # for m in range(model.n_modules):
+        #     print(f"\n\n\n########################### READOUTS MODULE {m} ##################################\n")
+        #     print(f"COEFFICIENTS: {np.median(model.reservoirs[m].classifier.coef_)}")
+        #     print(f"INTERCEPTS: {np.median(model.reservoirs[m].classifier.intercept_)}")
+        # print(f"\n########################### READOUTS ##################################\n\n\n")
+        # model.reservoirs[0].net.verbose = True
         # print(f"\n\nFirst prediction: {
         #     model.reservoirs[0].classifier.predict(
         #         model.reservoirs[0].scaler.transform(
@@ -160,7 +194,7 @@ for guess in range(args.test_trials):
     train_target = train_target[washout:]
     train_dataset = train_dataset[0][washout:] # remove the washout from the dataset
 
-    plot_prediction_and_target(train_predictions, train_target, inp_dim=n_out) if show_plot else None # plot the prediction
+    # plot_prediction_and_target(train_predictions, train_target, inp_dim=n_out) if show_plot else None # plot the prediction
 
 
     test_dataset = valid_dataset.unsqueeze(0).reshape(1, -1, n_inp).to(device)
@@ -169,8 +203,10 @@ for guess in range(args.test_trials):
     if use_self_loop:
         n = test_target.shape[0]
         test_target = torch.tensor(test_dataset[0:n], dtype=torch.float32).reshape(-1, n_out).numpy() # reshape element to torch.Size([rows=len(train_target), columns=3])
-        # test_predictions = model.predict(n, test_target[0, :]).numpy() # get the model's prediction for n iterations
-        test_predictions = model.predict(n).numpy() # get the model's prediction for n iterations
+        if n_modules > 1:
+            test_predictions = model.predict(n, Y=test_target).numpy() # get the model's prediction for n iterations
+        else:
+            test_predictions = np.array(model.predict(n, Y=test_target)) # get the model's prediction for n iterations
         NRMSE = [compute_nrmse(test_predictions, test_target)] # compute nrmse for each prediction
         plot_train_test_prediction_and_target(train_predictions, train_target, test_predictions, test_target, inp_dim=n_out) if show_plot else None
         plot_prediction_and_target(test_predictions, test_target, inp_dim=n_out) if show_plot else None # plot the prediction
