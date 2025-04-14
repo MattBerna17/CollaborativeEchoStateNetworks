@@ -1,0 +1,29 @@
+{
+    "n_modules": 3,
+    "use_self_loop": true,
+    "washout": 200,
+    "mode": "entangled",
+    "reservoirs": [
+      {
+        "leaky": 0.9,
+        "inp_scaling": 0.1,
+        "regul": 1e-6,
+        "units": 250,
+        "rho": 0.9
+      },
+      {
+        "leaky": 0.8,
+        "inp_scaling": 0.1,
+        "regul": 1e-5,
+        "units": 300,
+        "rho": 0.9
+      },
+      {
+        "leaky": 0.7,
+        "inp_scaling": 0.2,
+        "regul": 3e-6,
+        "units": 500,
+        "rho": 0.9
+      }
+    ]
+  }

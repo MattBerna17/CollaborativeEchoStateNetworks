@@ -12,8 +12,8 @@ sampler = qmc.LatinHypercube(d=9)
 sample = sampler.random(n=n_samples)
 
 # Scale to parameter ranges
-leaky_range = [0.5, 1.0]
-scaling_range = [0.1, 1.0]
+leaky_range = [0.9, 1.0]
+scaling_range = [0.0, 1.0]
 units_range = [200, 500]
 
 def scale(param, bounds):
@@ -46,7 +46,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 def run_experiment(config):
     l1, l2, l3 = config["leaky"]
     s1, s2, s3 = config["scaling"]
-    u1, u2, u3 = config["units"]
+    u1, u2, u3 = [512, 512, 1024]
 
     cmd = [
         "python3", "lorenz.py",
@@ -60,6 +60,7 @@ def run_experiment(config):
         "--washout", "200",
         "--use_self_loop",
         "--n_modules", "3",
+        "--rescale_input",
         "--mode", "entangled",
         f"--leaky1={l1}", f"--leaky2={l2}", f"--leaky3={l3}",
         f"--inp_scaling1={s1}", f"--inp_scaling2={s2}", f"--inp_scaling3={s3}",
