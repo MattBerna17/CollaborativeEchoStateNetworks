@@ -231,7 +231,7 @@ class ReservoirCell(torch.nn.Module):
 
 
 class ReservoirModule(torch.nn.Module):
-    def __init__(self, input_size, output_size, units, index, n_modules=1, input_scaling=1., spectral_radius=0.99, leaky=1, connectivity_input=10, connectivity_recurrent=10):
+    def __init__(self, input_size, output_size, units, index, solver=None, regul=1e-3, n_modules=1, input_scaling=1., spectral_radius=0.99, leaky=1, connectivity_input=10, connectivity_recurrent=10):
         """ Shallow reservoir to be used as Recurrent Neural Network module.
 
         :param input_size: number of input units
@@ -251,6 +251,8 @@ class ReservoirModule(torch.nn.Module):
         self.net = ReservoirCell(input_size, output_size, units, index, n_modules, input_scaling,
                                  spectral_radius, leaky, connectivity_input,
                                  connectivity_recurrent)
+        self.solver = solver
+        self.regul = regul
         # self.net.save_parameters(f"./params/cell_{index}_params.pth") # save the parameters of the reservoir
 
     def init_hidden(self, batch_size):
@@ -277,7 +279,7 @@ class ReservoirModule(torch.nn.Module):
         return hs, h_prev
     
 
-    def fit(self, U, Y, washout=200, solver=None, regul=1e-3):
+    def fit(self, U, Y, washout=200):
         """
         Function to train the reservoir's readout module (W_out matrix) given the dataset and the target.
 
@@ -299,12 +301,12 @@ class ReservoirModule(torch.nn.Module):
         # print(f"\n\nConditioning: {np.linalg.cond(activations)}\n\n")
         target = Y[washout:] # remove first washout elements
 
-        if solver is None:
-            classifier = Ridge(alpha=regul, max_iter=1000).fit(activations, target)
-        elif solver == 'svd':
-            classifier = Ridge(alpha=regul, solver='svd').fit(activations, target)
+        if self.solver is None:
+            classifier = Ridge(alpha=self.regul, max_iter=1000).fit(activations, target)
+        elif self.solver == 'svd':
+            classifier = Ridge(alpha=self.regul, solver='svd').fit(activations, target)
         else:
-            classifier = Ridge(alpha=regul, solver=solver).fit(activations, target)
+            classifier = Ridge(alpha=self.regul, solver=self.solver).fit(activations, target)
         
         self.classifier = classifier
 
@@ -344,150 +346,92 @@ class ReservoirModule(torch.nn.Module):
 
 
 class DeepReservoir(torch.nn.Module):
-    def __init__(self, input_size=1, output_size=1, tot_units=100, n_modules=1, mode="independent", concat=False,
-                 input_scaling=1, inter_scaling=1,
-                 spectral_radius=0.99, leaky=1,
-                 connectivity_recurrent=10,
-                 connectivity_input=10,
-                 connectivity_inter=10,
-                 leakys=[0.715, 0.715, 0.715],
-                 inp_scalings=[0.11, 0.11, 0.11],
-                 units=[250, 300, 400]
-                ):
+    def __init__(self, config):
         """ Deep Reservoir module.
         The implementation realizes a number of stacked RNN modules using the
         ReservoirCell as core cell. All the reservoir modules share the same
         hyper-parameter values (i.e., same number of recurrent neurons, spectral
         radius, etc. ).
 
-        :param input_size: dimension of the input
-        :param tot_units: number of recurrent units.
-            if concat == True this is the total number of units
-            if concat == False this is the number of units for each
-                reservoir level
-        :param n_modules: number of modules (reservoirs)
-        :param concat: if True the returned state is given by the
-            concatenation of all the states in the reservoir levels
-        :param input_scaling: scaling coeff. of the first reservoir module
-        :param inter_scaling: scaling coeff. of all the other levels (> 1)
-        :param spectral_radius:
-        :param leaky: leakage coefficient of all levels
-        :param connectivity_recurrent:
-        :param connectivity_input: input connectivity coefficient of the input weight matrix
-        :param connectivity_inter: input connectivity coefficient of all the inter-levels weight matrices
+        :param config: dictionary containing parameters
         """
         super().__init__()
-        self.input_size = input_size
-        self.output_size = output_size
-        self.n_modules = n_modules
-        self.tot_units = tot_units
-        self.mode = mode
-        self.concat = concat
+        self.input_size = config["input_size"]
+        self.output_size = config["output_size"]
+        self.n_modules = config["n_modules"]
+        self.mode = config["mode"]
+        self.concat = config["concat"]
         self.batch_first = True  # DeepReservoir only supports batch_first
+        self.tot_units = 0
+        for i in range(self.n_modules):
+            self.tot_units += config["reservoirs"][i]["units"]
 
-        input_scaling_others = input_scaling
-        connectivity_input_1 = tot_units // n_modules
-        connectivity_input_others = tot_units // n_modules
-        connectivity_recurrent = tot_units // n_modules
-        if self.n_modules > 1:
-            if self.mode == "entangled":
-                module_inputs = 1
-                module_output = 1
-            elif self.mode == "independent":
-                module_inputs = 1
-                module_output = 1
-            elif self.mode == "reinforced":
-                module_inputs = 2
-                module_output = 1
-        else:
-            module_inputs = 3
-            module_output = 3
-        self.module_inputs = module_inputs
-        self.module_output = module_output
-        units = units
-        leakys = leakys
-        inp_scalings = inp_scalings
+        connectivity_input_1 = self.tot_units // self.n_modules
+        connectivity_input_others = self.tot_units // self.n_modules
+        connectivity_recurrent = self.tot_units // self.n_modules
 
 
-        if concat:
-            self.modules_units = int(tot_units / n_modules)
+        if self.concat:
+            self.modules_units = int(self.tot_units / self.n_modules)
             # create the first reservoir:
+            module = config["reservoirs"][0]
             reservoir_modules = [
                 ReservoirModule(
-                    input_size=module_inputs,
-                    output_size=module_output,
-                    units=self.modules_units + tot_units % n_modules,
+                    input_size=module["input_size"],
+                    output_size=module["output_size"],
+                    units=module["units"],
                     index=0,
-                    n_modules=n_modules,
-                    input_scaling=input_scaling,
-                    spectral_radius=spectral_radius,
-                    leaky=leakys[0],
-                    connectivity_input=connectivity_input_1,
-                    connectivity_recurrent=connectivity_recurrent
+                    solver=module["solver"],
+                    regul=module["regul"],
+                    n_modules=config["n_modules"],
+                    input_scaling=module["inp_scaling"],
+                    spectral_radius=module["rho"],
+                    leaky=module["leaky"],
+                    connectivity_input=module["units"],
+                    connectivity_recurrent=module["units"]//self.n_modules
                 )
             ]
-            # last_h_size may be different for the first module
-            # because of the remainder if concat=True
-            last_h_size = self.modules_units + tot_units % n_modules
         else:
-            self.modules_units = tot_units // n_modules
+            self.modules_units = int(self.tot_units / self.n_modules)
             # create the first reservoir:
+            module = config["reservoirs"][0]
             reservoir_modules = [
                 ReservoirModule(
-                    input_size=module_inputs,
-                    output_size=module_output,
-                    units=units[0],
-                    index=0, 
-                    n_modules=n_modules,
-                    input_scaling=inp_scalings[0],
-                    spectral_radius=spectral_radius,
-                    leaky=leakys[0],
-                    connectivity_input=connectivity_input_1,
-                    connectivity_recurrent=connectivity_recurrent
+                    input_size=module["input_size"],
+                    output_size=module["output_size"],
+                    units=module["units"],
+                    index=0,
+                    solver=module["solver"],
+                    regul=module["regul"],
+                    n_modules=config["n_modules"],
+                    input_scaling=module["inp_scaling"],
+                    spectral_radius=module["rho"],
+                    leaky=module["leaky"],
+                    connectivity_input=module["units"],
+                    connectivity_recurrent=module["units"]//self.n_modules
                 )
             ]
-            last_h_size = self.modules_units
 
         # create all the other reservoirs:
-        # for i in range(1, n_modules):
-        #     reservoir_modules.append(ReservoirModule(
-        #         input_size=module_inputs,
-        #         output_size=module_output,
-        #         units=self.modules_units,
-        #         index=i,
-        #         n_modules=n_modules,
-        #         input_scaling=input_scaling,
-        #         spectral_radius=spectral_radius,
-        #         leaky=leaky,
-        #         connectivity_input=connectivity_input_others,
-        #         connectivity_recurrent=connectivity_recurrent
-        #     ))
-        #     last_h_size = self.modules_units
-        if self.n_modules > 1:
-            reservoir_modules.append(ReservoirModule(
-                input_size=module_inputs,
-                output_size=module_output,
-                units=units[1], ########
-                index=1,
-                n_modules=n_modules,
-                input_scaling=inp_scalings[1],
-                spectral_radius=spectral_radius,
-                leaky=leakys[1],
-                connectivity_input=connectivity_input_others,
-                connectivity_recurrent=connectivity_recurrent
-            ))
-            reservoir_modules.append(ReservoirModule(
-                input_size=2,
-                output_size=module_output,
-                units=units[2],
-                index=2,
-                n_modules=n_modules,
-                input_scaling=inp_scalings[2],
-                spectral_radius=spectral_radius,
-                leaky=leakys[2],
-                connectivity_input=connectivity_input_others,
-                connectivity_recurrent=connectivity_recurrent
-            ))
+        for i in range(1, self.n_modules):
+            module = config["reservoirs"][i]
+            reservoir_modules.append(
+                ReservoirModule(
+                    input_size=module["input_size"],
+                    output_size=module["output_size"],
+                    units=module["units"],
+                    index=i,
+                    solver=module["solver"],
+                    regul=module["regul"],
+                    n_modules=config["n_modules"],
+                    input_scaling=module["inp_scaling"],
+                    spectral_radius=module["rho"],
+                    leaky=module["leaky"],
+                    connectivity_input=module["units"],
+                    connectivity_recurrent=module["units"]//self.n_modules
+                )
+            )
+            
         self.reservoirs = torch.nn.ModuleList(reservoir_modules)
         for res_module in self.reservoirs:
             res_module.net.verbose = False
@@ -521,7 +465,7 @@ class DeepReservoir(torch.nn.Module):
         return states, states_last
     
 
-    def fit(self, U, Y, washout=200, solver=None, regul=1e-3):
+    def fit(self, U, Y, washout=200):
         """
         Function to train the deep reservoir's readout module (W_out matrix) given the dataset and the target.
 
@@ -536,25 +480,25 @@ class DeepReservoir(torch.nn.Module):
             if self.mode == "entangled":
                 for m in range(self.n_modules-1):
                     # print(f"\n\n\n################## TRAINING MODULE {m} ##################")
-                    U_module = U[:, :, m].reshape(1, -1, self.module_inputs)
-                    Y_module = Y[:, (m+1)%Y.shape[1]].reshape(-1, self.module_output)
-                    self.reservoirs[m].fit(U_module, Y_module, washout, solver, regul)
-                U_module = U[:, :, 1:3].reshape(1, -1, 2)
-                Y_module = Y[:, 0].reshape(-1, self.module_output)
-                self.reservoirs[2].fit(U_module, Y_module, washout, solver, regul)
+                    U_module = U[:, :, m].reshape(1, -1, self.reservoirs[m].net.input_size)
+                    Y_module = Y[:, (m+1)%Y.shape[1]].reshape(-1, self.reservoirs[m].net.output_size)
+                    self.reservoirs[m].fit(U_module, Y_module, washout)
+                U_module = U[:, :, 2:3].reshape(1, -1, self.reservoirs[2].net.input_size)
+                Y_module = Y[:, 0].reshape(-1, self.reservoirs[2].net.output_size)
+                self.reservoirs[2].fit(U_module, Y_module, washout)
             elif self.mode == "independent":
                 for m in range(self.n_modules):
-                    U_module = U[:, :, m].reshape(1, -1, self.module_inputs)
-                    Y_module = Y[:, m].reshape(-1, self.module_output)
-                    self.reservoirs[m].fit(U_module, Y_module, washout, solver, regul)
+                    U_module = U[:, :, m].reshape(1, -1, self.reservoirs[m].net.input_size)
+                    Y_module = Y[:, m].reshape(-1, self.reservoirs[m].net.output_size)
+                    self.reservoirs[m].fit(U_module, Y_module, washout)
             elif self.mode == "reinforced":
                 for m in range(self.n_modules):
-                    U_module = U[:, :, [m, ((m-1)%3)]].reshape(1, -1, self.module_inputs)
-                    Y_module = Y[:, (m+1)%Y.shape[1]].reshape(-1, self.module_output)
-                    self.reservoirs[m].fit(U_module, Y_module, washout, solver, regul)
+                    U_module = U[:, :, [m, ((m-1)%3)]].reshape(1, -1, self.reservoirs[m].net.input_size)
+                    Y_module = Y[:, (m+1)%Y.shape[1]].reshape(-1, self.reservoirs[m].net.output_size)
+                    self.reservoirs[m].fit(U_module, Y_module, washout)
             # print("################## TRAINING ##################\n")
         else:
-            self.reservoirs[0].fit(U, Y, washout, solver, regul)
+            self.reservoirs[0].fit(U, Y, washout)
 
 
 
@@ -609,7 +553,7 @@ class DeepReservoir(torch.nn.Module):
             ot = torch.cat([ot[-1:], ot[:-1]], dim=0)
 
 
-            ot[0] = torch.tensor(Y[0, 0], dtype=torch.float32).reshape(1, 1, 1)
+            # ot[0] = torch.tensor(Y[0, 0], dtype=torch.float32).reshape(1, 1, 1)
 
 
             predictions = torch.cat([predictions, ot.reshape(1, 3)], dim=0)
@@ -634,7 +578,7 @@ class DeepReservoir(torch.nn.Module):
                             self.reservoirs[m].scaler.transform(new_activation.detach().numpy().reshape(1, -1))
                         )[0]
                     )
-                module_input = past_prediction[1:3].reshape(1, 1, 2)
+                module_input = past_prediction[2:3].reshape(1, 1, self.reservoirs[2].net.input_size)
                 new_activation = self.reservoirs[2](
                     module_input, 
                     torch.tensor(self.reservoirs[2].activations[-1], dtype=torch.float32).reshape(1, -1)
@@ -695,7 +639,7 @@ class DeepReservoir(torch.nn.Module):
             for i in range(1, n_iter):
                 for m in range(self.n_modules):
                     # module_input = past_prediction[m]
-                    module_input = past_prediction[[m, ((m-1)%3)]].reshape(1, 1, self.module_inputs)
+                    module_input = past_prediction[[m, ((m-1)%3)]].reshape(1, 1, self.reservoirs[m].net.input_size)
                     new_activation = self.reservoirs[m](
                         module_input,
                         torch.tensor(self.reservoirs[m].activations[-1], dtype=torch.float32).reshape(1, -1)
