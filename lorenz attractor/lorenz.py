@@ -4,7 +4,7 @@ import argparse
 from esn_alternative import DeepReservoir
 from sklearn import preprocessing
 from sklearn.linear_model import Ridge
-from utils import get_lorenz_attractor, plot_lorenz_attractor_with_error, save_matrix_to_file, plot_prediction_and_target, compute_nrmse, plot_error, plot_train_test_prediction_and_target, plot_variable_correlations
+from utils import get_lorenz_attractor, plot_lorenz_attractor_with_error, save_matrix_to_file, plot_prediction_and_target, compute_nrmse, plot_error, plot_train_test_prediction_and_target, plot_variable_correlations, plot_reservoir_state_2d, plot_reservoirs_states
 import pandas as pd
 import matplotlib.pyplot as plt
 import torch
@@ -95,6 +95,9 @@ for guess in range(config["test_trials"]):
     model.fit(
         train_dataset, train_target, washout
     ) # train the model's Wout weights feeding it the training dataset
+    
+    
+    training_activations = [model.reservoirs[i].activations for i in range(model.n_modules)] # take the reservoirs' activations during training
 
 
 
@@ -105,25 +108,6 @@ for guess in range(config["test_trials"]):
                 model.reservoirs[m].scaler.transform(model.reservoirs[m].activations)
             )
         train_predictions = np.stack(train_predictions, axis=1) # stack predictions to torch.Size([rows=len(train_dataset), columns=n_out])
-        # print(f"\n\n\n########################### READOUTS ##################################\n")
-        # for m in range(model.n_modules):
-        #     print(f"\n\n\n########################### READOUTS MODULE {m} ##################################\n")
-        #     print(f"COEFFICIENTS: {np.median(model.reservoirs[m].classifier.coef_)}")
-        #     print(f"INTERCEPTS: {np.median(model.reservoirs[m].classifier.intercept_)}")
-        # print(f"\n########################### READOUTS ##################################\n\n\n")
-        # model.reservoirs[0].net.verbose = True
-        # print(f"\n\nFirst prediction: {
-        #     model.reservoirs[0].classifier.predict(
-        #         model.reservoirs[0].scaler.transform(
-        #             np.concat(
-        #                 (model.reservoirs[0].activations,
-        #                  model.reservoirs[0](torch.tensor([[[-7.70]]], dtype=torch.float32), torch.tensor(model.reservoirs[0].activations[-1], dtype=torch.float32).reshape(1, -1))[0][0]
-        #                 ), axis=0
-        #             )
-        #         )
-        #     )[-1]
-        # }")
-        # exit(0)
     else:
         train_predictions = model.reservoirs[0].classifier.predict(
             model.reservoirs[0].scaler.transform(model.reservoirs[0].activations)
@@ -137,33 +121,36 @@ for guess in range(config["test_trials"]):
 
     test_dataset = valid_dataset.unsqueeze(0).reshape(1, -1, n_inp).to(device)
     test_target = valid_target.reshape(-1, n_out).numpy()
-
-    if config["use_self_loop"]:
-        n = test_target.shape[0]
-        test_target = torch.tensor(test_dataset[0:n], dtype=torch.float32).reshape(-1, n_out).numpy() # reshape element to torch.Size([rows=len(train_target), columns=3])
-        if config["n_modules"] > 1:
-            test_predictions = model.predict(n, Y=test_target).numpy() # get the model's prediction for n iterations
-        else:
-            test_predictions = np.array(model.predict(n, Y=test_target)) # get the model's prediction for n iterations
-        NRMSE = [compute_nrmse(test_predictions, test_target)] # compute nrmse for each prediction
-        plot_train_test_prediction_and_target(train_predictions, train_target, test_predictions, test_target, inp_dim=n_out) if config["show_plot"] else None
-        plot_prediction_and_target(test_predictions, test_target, inp_dim=n_out) if config["show_plot"] else None # plot the prediction
-    
-    
-    
-    
+    n = test_target.shape[0]
+    test_target = torch.tensor(test_dataset[0:n], dtype=torch.float32).reshape(-1, n_out).numpy() # reshape element to torch.Size([rows=len(train_target), columns=3])
+    if config["n_modules"] > 1:
+        test_predictions = model.predict(n, Y=test_target).numpy() # get the model's prediction for n iterations
     else:
-        valid_nmse = test_esn(valid_dataset, valid_target, classifier, scaler, title="validation") # get nmse of the validation dataset
-        test_nmse = test_esn(test_dataset, test_target, classifier, scaler, title="test") if config.use_test else 0.0 # get nmse of the test dataset
-        NRMSE[guess] = test_nmse
-        f = open(f'{main_folder}/{namefile}.txt', 'a')
-        ar = ''
-        for k, v in vars(config).items():
-            ar += f'{str(k)}: {str(v)}, '
-        ar += f'valid: {str(round(valid_nmse, 5))}, test: {str(round(test_nmse, 5))}'
-        f.write(ar + '\n')
-        f.write('**************\n\n\n')
-        f.close()
+        test_predictions = np.array(model.predict(n, Y=test_target)) # get the model's prediction for n iterations
+    
+    testing_activations = [model.reservoirs[i].activations[-n:, :] for i in range(model.n_modules)] # take the reservoirs' activations during testing
+    for m in range(model.n_modules):
+        plot_reservoir_state_2d(training_activations[m], testing_activations[m], reservoir_index=m)
+    
+    
+    
+    NRMSE = [compute_nrmse(test_predictions, test_target)] # compute nrmse for each prediction
+    # plot_train_test_prediction_and_target(train_predictions, train_target, test_predictions, test_target, inp_dim=n_out, train_activations_list=training_activations, test_activations_list=testing_activations) if config["show_plot"] else None
+
+    plot_train_test_prediction_and_target(train_predictions, train_target, test_predictions, test_target, inp_dim=n_out) if config["show_plot"] else None
+    plot_prediction_and_target(test_predictions, test_target, inp_dim=n_out) if config["show_plot"] else None # plot the prediction
+
+    # valid_nmse = test_esn(valid_dataset, valid_target, classifier, scaler, title="validation") # get nmse of the validation dataset
+    # test_nmse = test_esn(test_dataset, test_target, classifier, scaler, title="test") if config.use_test else 0.0 # get nmse of the test dataset
+    # NRMSE[guess] = test_nmse
+    # f = open(f'{main_folder}/{namefile}.txt', 'a')
+    # ar = ''
+    # for k, v in vars(config).items():
+    #     ar += f'{str(k)}: {str(v)}, '
+    # ar += f'valid: {str(round(valid_nmse, 5))}, test: {str(round(test_nmse, 5))}'
+    # f.write(ar + '\n')
+    # f.write('**************\n\n\n')
+    # f.close()
 
 
 

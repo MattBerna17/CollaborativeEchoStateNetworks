@@ -320,44 +320,116 @@ def plot_prediction_and_target(predictions, target, inp_dim=3):
     plt.show()
 
 
-def plot_train_test_prediction_and_target(train_predictions, train_target, test_predictions, test_target, inp_dim=3):
+def plot_train_test_prediction_and_target(train_predictions, train_target, test_predictions, test_target,
+                                          train_activations_list=None, test_activations_list=None,
+                                          feature_index=200, inp_dim=3):
     """
-    Function to plot the predictions and the target for both train and test sets.
-    A vertical line marks the transition from train to test.
+    Plot predictions vs targets for 3 reservoirs with optional activations as overlay per subplot.
     
-    :param train_predictions: predictions for the training set
-    :param train_target: targets for the training set
-    :param test_predictions: predictions for the test set
-    :param test_target: targets for the test set
+    :param train_predictions: np.array [T_train, 3]
+    :param train_target: np.array [T_train, 3]
+    :param test_predictions: np.array [T_test, 3]
+    :param test_target: np.array [T_test, 3]
+    :param train_activations_list: list of np.arrays [T_train, units] per reservoir
+    :param test_activations_list: list of np.arrays [T_test, units] per reservoir
+    :param feature_index: which hidden feature to visualize per-reservoir
+    :param inp_dim: should be 3
     """
     train_predictions = np.array(train_predictions).reshape(-1, inp_dim)
     test_predictions = np.array(test_predictions).reshape(-1, inp_dim)
     train_target = np.array(train_target).reshape(-1, inp_dim)
     test_target = np.array(test_target).reshape(-1, inp_dim)
 
-    # Define the transition point
     split_index = len(train_predictions)
-
     fig, axs = plt.subplots(inp_dim, sharex=True, figsize=(10, 6))
-    
+
     for i in range(inp_dim):
-        # Plot train predictions and targets
         axs[i].plot(range(split_index), train_predictions[:, i], label='Train Predictions', linestyle='dashed')
         axs[i].plot(range(split_index), train_target[:, i], label='Train Targets', linestyle='solid')
-        
-        # Plot test predictions and targets
         axs[i].plot(range(split_index, split_index + len(test_predictions)), test_predictions[:, i], label='Test Predictions', linestyle='dashed')
         axs[i].plot(range(split_index, split_index + len(test_target)), test_target[:, i], label='Test Targets', linestyle='solid')
-        
-        # Draw a vertical line at the transition point
         axs[i].axvline(x=split_index, color='black', linestyle='dotted', linewidth=1)
-
         axs[i].set_title(f"Variable {i}")
-    
+
+        # Overlay per-reservoir feature activation
+        if train_activations_list is not None and i < len(train_activations_list):
+            ta = train_activations_list[(i+1) % inp_dim]
+            if ta.shape[1] > feature_index:
+                axs[i].scatter(range(split_index), ta[:split_index, feature_index],
+                               s=5, c='blue', alpha=0.3, label=f'Res {i} Feat {feature_index} (Train)')
+
+        if test_activations_list is not None and i < len(test_activations_list):
+            tta = test_activations_list[(i+1) % inp_dim]
+            if tta.shape[1] > feature_index:
+                axs[i].scatter(range(split_index, split_index + len(tta)),
+                               tta[:, feature_index],
+                               s=5, c='red', alpha=0.3, label=f'Res {i} Feat {feature_index} (Test)')
+
     axs[inp_dim//2].set(ylabel='Values')
     axs[inp_dim-1].set(xlabel='Time steps')
-
     fig.legend(loc="upper right")
+    plt.tight_layout()
+    plt.show()
+
+
+def plot_reservoir_state_2d(train_activations, test_activations, reservoir_index=0, seed=42):
+    """
+    Plot 2D scatter of two hidden state features from training and testing.
+    
+    :param train_activations: np.ndarray, shape [T_train, units]
+    :param test_activations: np.ndarray, shape [T_test, units]
+    :param reservoir_index: int, for labeling if multiple reservoirs
+    :param seed: int, random seed for reproducibility
+    """
+    assert train_activations.shape[1] >= 2, "Need at least 2 features to plot."
+    random.seed(seed)
+    # i, j = random.sample(range(train_activations.shape[1]), 2)
+    i = 53
+    j = 200
+
+    plt.figure(figsize=(8, 6))
+    plt.scatter(train_activations[:, i], train_activations[:, j], c='blue', alpha=0.5, label='Train')
+    plt.scatter(test_activations[:, i], test_activations[:, j], c='red', alpha=0.5, label='Test') # plot activations only from testing, after training.
+    # plt.scatter(test_activations[:, i], test_activations[:, j], c='red', alpha=0.5, label='Test')
+    plt.xlabel(f'Feature {i}')
+    plt.ylabel(f'Feature {j}')
+    plt.title(f'Reservoir {reservoir_index} - Hidden State Projection (2D)')
+    plt.legend()
+    plt.grid(True)
+    plt.tight_layout()
+    plt.show()
+
+
+def plot_reservoirs_states(train_activations: list, test_activations: list, seed=42):
+    """
+    Plot 2D scatter of two hidden state features from training and testing.
+    
+    :param train_activations: np.ndarray, shape [T_train, units]
+    :param test_activations: np.ndarray, shape [T_test, units]
+    :param reservoir_index: int, for labeling if multiple reservoirs
+    :param seed: int, random seed for reproducibility
+    """
+    # assert train_activations.shape[1] >= 2, "Need at least 2 features to plot."
+    random.seed(seed)
+    i, j = random.sample(range(train_activations[0].shape[1]), 2)
+
+    colors = {
+        "train": ["blue", "green", "purple"],
+        "test": ["red", "orange", "yellow"]
+    }
+
+    fig, axs = plt.subplots(len(train_activations), 1, figsize=(8, 6))
+    timestep = train_activations[0].shape[0]
+    for i in range(len(train_activations)):
+        axs[i].scatter(train_activations[i][-50:, 0], train_activations[i][-50:, 1], c=colors["train"][i], alpha=0.5, label='Train')
+        axs[i].scatter(test_activations[i][timestep:timestep+50, 0], test_activations[i][timestep:timestep+50, 1], c=colors["test"][i], alpha=0.5, label='Test')
+        axs[i].set_title(f'Module {i} - Hidden State Projection (2D)')
+        axs[i].legend()
+        axs[i].grid(True)
+        axs[i].set_xlabel(f'Feature {i}')
+        axs[i].set_ylabel(f'Feature {j}')
+
+    plt.tight_layout()
     plt.show()
 
 
