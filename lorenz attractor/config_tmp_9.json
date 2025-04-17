@@ -7,30 +7,30 @@
   "washout": 200,
   "mode": "entangled_with_z",
   "rescale_input": false,
-  "show_plot": true,
+  "show_plot": false,
   "input_size": 3,
   "output_size": 3,
   "concat": false,
   "skip_z": false,
   "reservoirs": [
     {
-      "input_size": 2,
+      "input_size": 1,
       "output_size": 1,
-      "leaky": 0.7,
-      "inp_scaling": 0.018,
-      "regul": 8e-3,
-      "units": 295,
-      "rho": 0.8,
+      "leaky": 1.0,
+      "inp_scaling": 0.1,
+      "regul": 0.0001,
+      "units": 300,
+      "rho": 0.9,
       "solver": null
     },
     {
-      "input_size": 2,
+      "input_size": 1,
       "output_size": 1,
-      "leaky": 0.65,
-      "inp_scaling": 0.018,
-      "regul": 8e-2,
-      "units": 275,
-      "rho": 1.1,
+      "leaky": 0.9,
+      "inp_scaling": 0.05,
+      "regul": 0.0001,
+      "units": 300,
+      "rho": 0.9,
       "solver": null
     }
   ]
