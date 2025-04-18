@@ -1,0 +1,1634 @@
+
+--- Config File: config_tmp_1.json ---
+{
+  "lag": 1,
+  "bigger_dataset": false,
+  "test_trials": 1,
+  "n_modules": 2,
+  "use_self_loop": true,
+  "washout": 200,
+  "mode": "entangled_with_z",
+  "rescale_input": false,
+  "show_plot": false,
+  "input_size": 3,
+  "output_size": 3,
+  "concat": false,
+  "skip_z": false,
+  "reservoirs": [
+    {
+      "input_size": 1,
+      "output_size": 1,
+      "leaky": 0.1,
+      "inp_scaling": 0.05,
+      "regul": 0.05,
+      "units": 250,
+      "rho": 1.1,
+      "solver": null
+    },
+    {
+      "input_size": 1,
+      "output_size": 1,
+      "leaky": 0.1,
+      "inp_scaling": 0.181,
+      "regul": 0.03,
+      "units": 500,
+      "rho": 1.1,
+      "solver": null
+    }
+  ]
+}
+{'lag': 1, 'bigger_dataset': False, 'test_trials': 1, 'n_modules': 2, 'use_self_loop': True, 'washout': 200, 'mode': 'entangled_with_z', 'rescale_input': False, 'show_plot': False, 'input_size': 3, 'output_size': 3, 'concat': False, 'skip_z': False, 'reservoirs': [{'input_size': 1, 'output_size': 1, 'leaky': 0.1, 'inp_scaling': 0.05, 'regul': 0.05, 'units': 250, 'rho': 1.1, 'solver': None}, {'input_size': 1, 'output_size': 1, 'leaky': 0.1, 'inp_scaling': 0.181, 'regul': 0.03, 'units': 500, 'rho': 1.1, 'solver': None}]}
+torch.Size([2499, 3])
+[RESERVOIR CELL 0] created with 250 units.
+
+[RESERVOIR CELL 1] created with 500 units.
+
+tensor([ -7.2642, -11.5611,  17.3183])
+ ##################################################################### 
+Mean NRMSE 1.3765056,    std 0.0
+ ##################################################################### 
+
+
+/Users/matt/Desktop/Tesi/Codice/.venv/lib/python3.13/site-packages/sklearn/linear_model/_ridge.py:215: LinAlgWarning: Ill-conditioned matrix (rcond=2.26322e-08): result may not be accurate.
+  return linalg.solve(A, Xy, assume_a="pos", overwrite_a=True).T
+/Users/matt/Desktop/Tesi/Codice/.venv/lib/python3.13/site-packages/sklearn/linear_model/_ridge.py:215: LinAlgWarning: Ill-conditioned matrix (rcond=8.77165e-09): result may not be accurate.
+  return linalg.solve(A, Xy, assume_a="pos", overwrite_a=True).T
+/Users/matt/Desktop/Tesi/Codice/ESN & attrattori/lorenz attractor/lorenz.py:146: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  test_target = torch.tensor(test_dataset[0:n], dtype=torch.float32).reshape(-1, n_out) # reshape element to torch.Size([rows=len(train_target), columns=3])
+/Users/matt/Desktop/Tesi/Codice/ESN & attrattori/lorenz attractor/esn_alternative.py:650: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  return torch.tensor(predictions, dtype=torch.float32)
+
+
+--- Config File: config_tmp_2.json ---
+{
+  "lag": 1,
+  "bigger_dataset": false,
+  "test_trials": 1,
+  "n_modules": 2,
+  "use_self_loop": true,
+  "washout": 200,
+  "mode": "entangled_with_z",
+  "rescale_input": false,
+  "show_plot": false,
+  "input_size": 3,
+  "output_size": 3,
+  "concat": false,
+  "skip_z": false,
+  "reservoirs": [
+    {
+      "input_size": 1,
+      "output_size": 1,
+      "leaky": 0.1,
+      "inp_scaling": 0.05,
+      "regul": 0.05,
+      "units": 250,
+      "rho": 1.1,
+      "solver": null
+    },
+    {
+      "input_size": 1,
+      "output_size": 1,
+      "leaky": 0.1,
+      "inp_scaling": 0.181,
+      "regul": 2e-06,
+      "units": 500,
+      "rho": 1.1,
+      "solver": null
+    }
+  ]
+}
+{'lag': 1, 'bigger_dataset': False, 'test_trials': 1, 'n_modules': 2, 'use_self_loop': True, 'washout': 200, 'mode': 'entangled_with_z', 'rescale_input': False, 'show_plot': False, 'input_size': 3, 'output_size': 3, 'concat': False, 'skip_z': False, 'reservoirs': [{'input_size': 1, 'output_size': 1, 'leaky': 0.1, 'inp_scaling': 0.05, 'regul': 0.05, 'units': 250, 'rho': 1.1, 'solver': None}, {'input_size': 1, 'output_size': 1, 'leaky': 0.1, 'inp_scaling': 0.181, 'regul': 2e-06, 'units': 500, 'rho': 1.1, 'solver': None}]}
+torch.Size([2499, 3])
+[RESERVOIR CELL 0] created with 250 units.
+
+[RESERVOIR CELL 1] created with 500 units.
+
+tensor([ -7.2642, -11.5611,  17.3183])
+ ##################################################################### 
+Mean NRMSE 1.3202746,    std 0.0
+ ##################################################################### 
+
+
+/Users/matt/Desktop/Tesi/Codice/.venv/lib/python3.13/site-packages/sklearn/linear_model/_ridge.py:215: LinAlgWarning: Ill-conditioned matrix (rcond=2.26322e-08): result may not be accurate.
+  return linalg.solve(A, Xy, assume_a="pos", overwrite_a=True).T
+/Users/matt/Desktop/Tesi/Codice/ESN & attrattori/lorenz attractor/lorenz.py:146: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  test_target = torch.tensor(test_dataset[0:n], dtype=torch.float32).reshape(-1, n_out) # reshape element to torch.Size([rows=len(train_target), columns=3])
+/Users/matt/Desktop/Tesi/Codice/ESN & attrattori/lorenz attractor/esn_alternative.py:650: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  return torch.tensor(predictions, dtype=torch.float32)
+
+
+--- Config File: config_tmp_3.json ---
+{
+  "lag": 1,
+  "bigger_dataset": false,
+  "test_trials": 1,
+  "n_modules": 2,
+  "use_self_loop": true,
+  "washout": 200,
+  "mode": "entangled_with_z",
+  "rescale_input": false,
+  "show_plot": false,
+  "input_size": 3,
+  "output_size": 3,
+  "concat": false,
+  "skip_z": false,
+  "reservoirs": [
+    {
+      "input_size": 1,
+      "output_size": 1,
+      "leaky": 0.1,
+      "inp_scaling": 0.05,
+      "regul": 0.05,
+      "units": 250,
+      "rho": 1.1,
+      "solver": null
+    },
+    {
+      "input_size": 1,
+      "output_size": 1,
+      "leaky": 0.1,
+      "inp_scaling": 0.181,
+      "regul": 0.009000000000000001,
+      "units": 500,
+      "rho": 1.1,
+      "solver": null
+    }
+  ]
+}
+{'lag': 1, 'bigger_dataset': False, 'test_trials': 1, 'n_modules': 2, 'use_self_loop': True, 'washout': 200, 'mode': 'entangled_with_z', 'rescale_input': False, 'show_plot': False, 'input_size': 3, 'output_size': 3, 'concat': False, 'skip_z': False, 'reservoirs': [{'input_size': 1, 'output_size': 1, 'leaky': 0.1, 'inp_scaling': 0.05, 'regul': 0.05, 'units': 250, 'rho': 1.1, 'solver': None}, {'input_size': 1, 'output_size': 1, 'leaky': 0.1, 'inp_scaling': 0.181, 'regul': 0.009000000000000001, 'units': 500, 'rho': 1.1, 'solver': None}]}
+torch.Size([2499, 3])
+[RESERVOIR CELL 0] created with 250 units.
+
+[RESERVOIR CELL 1] created with 500 units.
+
+tensor([ -7.2642, -11.5611,  17.3183])
+ ##################################################################### 
+Mean NRMSE 1.8696449,    std 0.0
+ ##################################################################### 
+
+
+/Users/matt/Desktop/Tesi/Codice/.venv/lib/python3.13/site-packages/sklearn/linear_model/_ridge.py:215: LinAlgWarning: Ill-conditioned matrix (rcond=2.26322e-08): result may not be accurate.
+  return linalg.solve(A, Xy, assume_a="pos", overwrite_a=True).T
+/Users/matt/Desktop/Tesi/Codice/.venv/lib/python3.13/site-packages/sklearn/linear_model/_ridge.py:215: LinAlgWarning: Ill-conditioned matrix (rcond=2.28823e-09): result may not be accurate.
+  return linalg.solve(A, Xy, assume_a="pos", overwrite_a=True).T
+/Users/matt/Desktop/Tesi/Codice/ESN & attrattori/lorenz attractor/lorenz.py:146: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  test_target = torch.tensor(test_dataset[0:n], dtype=torch.float32).reshape(-1, n_out) # reshape element to torch.Size([rows=len(train_target), columns=3])
+/Users/matt/Desktop/Tesi/Codice/ESN & attrattori/lorenz attractor/esn_alternative.py:650: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  return torch.tensor(predictions, dtype=torch.float32)
+
+
+--- Config File: config_tmp_4.json ---
+{
+  "lag": 1,
+  "bigger_dataset": false,
+  "test_trials": 1,
+  "n_modules": 2,
+  "use_self_loop": true,
+  "washout": 200,
+  "mode": "entangled_with_z",
+  "rescale_input": false,
+  "show_plot": false,
+  "input_size": 3,
+  "output_size": 3,
+  "concat": false,
+  "skip_z": false,
+  "reservoirs": [
+    {
+      "input_size": 1,
+      "output_size": 1,
+      "leaky": 0.1,
+      "inp_scaling": 0.05,
+      "regul": 0.05,
+      "units": 250,
+      "rho": 1.1,
+      "solver": null
+    },
+    {
+      "input_size": 1,
+      "output_size": 1,
+      "leaky": 0.1,
+      "inp_scaling": 0.181,
+      "regul": 4e-05,
+      "units": 500,
+      "rho": 1.1,
+      "solver": null
+    }
+  ]
+}
+{'lag': 1, 'bigger_dataset': False, 'test_trials': 1, 'n_modules': 2, 'use_self_loop': True, 'washout': 200, 'mode': 'entangled_with_z', 'rescale_input': False, 'show_plot': False, 'input_size': 3, 'output_size': 3, 'concat': False, 'skip_z': False, 'reservoirs': [{'input_size': 1, 'output_size': 1, 'leaky': 0.1, 'inp_scaling': 0.05, 'regul': 0.05, 'units': 250, 'rho': 1.1, 'solver': None}, {'input_size': 1, 'output_size': 1, 'leaky': 0.1, 'inp_scaling': 0.181, 'regul': 4e-05, 'units': 500, 'rho': 1.1, 'solver': None}]}
+torch.Size([2499, 3])
+[RESERVOIR CELL 0] created with 250 units.
+
+[RESERVOIR CELL 1] created with 500 units.
+
+tensor([ -7.2642, -11.5611,  17.3183])
+ ##################################################################### 
+Mean NRMSE 1.2653613,    std 0.0
+ ##################################################################### 
+
+
+/Users/matt/Desktop/Tesi/Codice/.venv/lib/python3.13/site-packages/sklearn/linear_model/_ridge.py:215: LinAlgWarning: Ill-conditioned matrix (rcond=2.26322e-08): result may not be accurate.
+  return linalg.solve(A, Xy, assume_a="pos", overwrite_a=True).T
+/Users/matt/Desktop/Tesi/Codice/ESN & attrattori/lorenz attractor/lorenz.py:146: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  test_target = torch.tensor(test_dataset[0:n], dtype=torch.float32).reshape(-1, n_out) # reshape element to torch.Size([rows=len(train_target), columns=3])
+/Users/matt/Desktop/Tesi/Codice/ESN & attrattori/lorenz attractor/esn_alternative.py:650: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  return torch.tensor(predictions, dtype=torch.float32)
+
+
+--- Config File: config_tmp_5.json ---
+{
+  "lag": 1,
+  "bigger_dataset": false,
+  "test_trials": 1,
+  "n_modules": 2,
+  "use_self_loop": true,
+  "washout": 200,
+  "mode": "entangled_with_z",
+  "rescale_input": false,
+  "show_plot": false,
+  "input_size": 3,
+  "output_size": 3,
+  "concat": false,
+  "skip_z": false,
+  "reservoirs": [
+    {
+      "input_size": 1,
+      "output_size": 1,
+      "leaky": 0.1,
+      "inp_scaling": 0.05,
+      "regul": 0.05,
+      "units": 250,
+      "rho": 1.1,
+      "solver": null
+    },
+    {
+      "input_size": 1,
+      "output_size": 1,
+      "leaky": 0.1,
+      "inp_scaling": 0.181,
+      "regul": 0.1,
+      "units": 500,
+      "rho": 1.1,
+      "solver": null
+    }
+  ]
+}
+{'lag': 1, 'bigger_dataset': False, 'test_trials': 1, 'n_modules': 2, 'use_self_loop': True, 'washout': 200, 'mode': 'entangled_with_z', 'rescale_input': False, 'show_plot': False, 'input_size': 3, 'output_size': 3, 'concat': False, 'skip_z': False, 'reservoirs': [{'input_size': 1, 'output_size': 1, 'leaky': 0.1, 'inp_scaling': 0.05, 'regul': 0.05, 'units': 250, 'rho': 1.1, 'solver': None}, {'input_size': 1, 'output_size': 1, 'leaky': 0.1, 'inp_scaling': 0.181, 'regul': 0.1, 'units': 500, 'rho': 1.1, 'solver': None}]}
+torch.Size([2499, 3])
+[RESERVOIR CELL 0] created with 250 units.
+
+[RESERVOIR CELL 1] created with 500 units.
+
+tensor([ -7.2642, -11.5611,  17.3183])
+ ##################################################################### 
+Mean NRMSE 1.2851192,    std 0.0
+ ##################################################################### 
+
+
+/Users/matt/Desktop/Tesi/Codice/.venv/lib/python3.13/site-packages/sklearn/linear_model/_ridge.py:215: LinAlgWarning: Ill-conditioned matrix (rcond=2.26322e-08): result may not be accurate.
+  return linalg.solve(A, Xy, assume_a="pos", overwrite_a=True).T
+/Users/matt/Desktop/Tesi/Codice/.venv/lib/python3.13/site-packages/sklearn/linear_model/_ridge.py:215: LinAlgWarning: Ill-conditioned matrix (rcond=2.42265e-08): result may not be accurate.
+  return linalg.solve(A, Xy, assume_a="pos", overwrite_a=True).T
+/Users/matt/Desktop/Tesi/Codice/ESN & attrattori/lorenz attractor/lorenz.py:146: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  test_target = torch.tensor(test_dataset[0:n], dtype=torch.float32).reshape(-1, n_out) # reshape element to torch.Size([rows=len(train_target), columns=3])
+/Users/matt/Desktop/Tesi/Codice/ESN & attrattori/lorenz attractor/esn_alternative.py:650: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  return torch.tensor(predictions, dtype=torch.float32)
+
+
+--- Config File: config_tmp_6.json ---
+{
+  "lag": 1,
+  "bigger_dataset": false,
+  "test_trials": 1,
+  "n_modules": 2,
+  "use_self_loop": true,
+  "washout": 200,
+  "mode": "entangled_with_z",
+  "rescale_input": false,
+  "show_plot": false,
+  "input_size": 3,
+  "output_size": 3,
+  "concat": false,
+  "skip_z": false,
+  "reservoirs": [
+    {
+      "input_size": 1,
+      "output_size": 1,
+      "leaky": 0.1,
+      "inp_scaling": 0.05,
+      "regul": 0.05,
+      "units": 250,
+      "rho": 1.1,
+      "solver": null
+    },
+    {
+      "input_size": 1,
+      "output_size": 1,
+      "leaky": 0.1,
+      "inp_scaling": 0.181,
+      "regul": 0.06,
+      "units": 500,
+      "rho": 1.1,
+      "solver": null
+    }
+  ]
+}
+{'lag': 1, 'bigger_dataset': False, 'test_trials': 1, 'n_modules': 2, 'use_self_loop': True, 'washout': 200, 'mode': 'entangled_with_z', 'rescale_input': False, 'show_plot': False, 'input_size': 3, 'output_size': 3, 'concat': False, 'skip_z': False, 'reservoirs': [{'input_size': 1, 'output_size': 1, 'leaky': 0.1, 'inp_scaling': 0.05, 'regul': 0.05, 'units': 250, 'rho': 1.1, 'solver': None}, {'input_size': 1, 'output_size': 1, 'leaky': 0.1, 'inp_scaling': 0.181, 'regul': 0.06, 'units': 500, 'rho': 1.1, 'solver': None}]}
+torch.Size([2499, 3])
+[RESERVOIR CELL 0] created with 250 units.
+
+[RESERVOIR CELL 1] created with 500 units.
+
+tensor([ -7.2642, -11.5611,  17.3183])
+ ##################################################################### 
+Mean NRMSE 1.4249871,    std 0.0
+ ##################################################################### 
+
+
+/Users/matt/Desktop/Tesi/Codice/.venv/lib/python3.13/site-packages/sklearn/linear_model/_ridge.py:215: LinAlgWarning: Ill-conditioned matrix (rcond=2.26322e-08): result may not be accurate.
+  return linalg.solve(A, Xy, assume_a="pos", overwrite_a=True).T
+/Users/matt/Desktop/Tesi/Codice/.venv/lib/python3.13/site-packages/sklearn/linear_model/_ridge.py:215: LinAlgWarning: Ill-conditioned matrix (rcond=1.53049e-08): result may not be accurate.
+  return linalg.solve(A, Xy, assume_a="pos", overwrite_a=True).T
+/Users/matt/Desktop/Tesi/Codice/ESN & attrattori/lorenz attractor/lorenz.py:146: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  test_target = torch.tensor(test_dataset[0:n], dtype=torch.float32).reshape(-1, n_out) # reshape element to torch.Size([rows=len(train_target), columns=3])
+/Users/matt/Desktop/Tesi/Codice/ESN & attrattori/lorenz attractor/esn_alternative.py:650: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  return torch.tensor(predictions, dtype=torch.float32)
+
+
+--- Config File: config_tmp_7.json ---
+{
+  "lag": 1,
+  "bigger_dataset": false,
+  "test_trials": 1,
+  "n_modules": 2,
+  "use_self_loop": true,
+  "washout": 200,
+  "mode": "entangled_with_z",
+  "rescale_input": false,
+  "show_plot": false,
+  "input_size": 3,
+  "output_size": 3,
+  "concat": false,
+  "skip_z": false,
+  "reservoirs": [
+    {
+      "input_size": 1,
+      "output_size": 1,
+      "leaky": 0.1,
+      "inp_scaling": 0.05,
+      "regul": 0.05,
+      "units": 250,
+      "rho": 1.1,
+      "solver": null
+    },
+    {
+      "input_size": 1,
+      "output_size": 1,
+      "leaky": 0.1,
+      "inp_scaling": 0.181,
+      "regul": 0.09,
+      "units": 500,
+      "rho": 1.1,
+      "solver": null
+    }
+  ]
+}
+{'lag': 1, 'bigger_dataset': False, 'test_trials': 1, 'n_modules': 2, 'use_self_loop': True, 'washout': 200, 'mode': 'entangled_with_z', 'rescale_input': False, 'show_plot': False, 'input_size': 3, 'output_size': 3, 'concat': False, 'skip_z': False, 'reservoirs': [{'input_size': 1, 'output_size': 1, 'leaky': 0.1, 'inp_scaling': 0.05, 'regul': 0.05, 'units': 250, 'rho': 1.1, 'solver': None}, {'input_size': 1, 'output_size': 1, 'leaky': 0.1, 'inp_scaling': 0.181, 'regul': 0.09, 'units': 500, 'rho': 1.1, 'solver': None}]}
+torch.Size([2499, 3])
+[RESERVOIR CELL 0] created with 250 units.
+
+[RESERVOIR CELL 1] created with 500 units.
+
+tensor([ -7.2642, -11.5611,  17.3183])
+ ##################################################################### 
+Mean NRMSE 1.3049845,    std 0.0
+ ##################################################################### 
+
+
+/Users/matt/Desktop/Tesi/Codice/.venv/lib/python3.13/site-packages/sklearn/linear_model/_ridge.py:215: LinAlgWarning: Ill-conditioned matrix (rcond=2.26322e-08): result may not be accurate.
+  return linalg.solve(A, Xy, assume_a="pos", overwrite_a=True).T
+/Users/matt/Desktop/Tesi/Codice/.venv/lib/python3.13/site-packages/sklearn/linear_model/_ridge.py:215: LinAlgWarning: Ill-conditioned matrix (rcond=2.22032e-08): result may not be accurate.
+  return linalg.solve(A, Xy, assume_a="pos", overwrite_a=True).T
+/Users/matt/Desktop/Tesi/Codice/ESN & attrattori/lorenz attractor/lorenz.py:146: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  test_target = torch.tensor(test_dataset[0:n], dtype=torch.float32).reshape(-1, n_out) # reshape element to torch.Size([rows=len(train_target), columns=3])
+/Users/matt/Desktop/Tesi/Codice/ESN & attrattori/lorenz attractor/esn_alternative.py:650: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  return torch.tensor(predictions, dtype=torch.float32)
+
+
+--- Config File: config_tmp_8.json ---
+{
+  "lag": 1,
+  "bigger_dataset": false,
+  "test_trials": 1,
+  "n_modules": 2,
+  "use_self_loop": true,
+  "washout": 200,
+  "mode": "entangled_with_z",
+  "rescale_input": false,
+  "show_plot": false,
+  "input_size": 3,
+  "output_size": 3,
+  "concat": false,
+  "skip_z": false,
+  "reservoirs": [
+    {
+      "input_size": 1,
+      "output_size": 1,
+      "leaky": 0.1,
+      "inp_scaling": 0.05,
+      "regul": 0.05,
+      "units": 250,
+      "rho": 1.1,
+      "solver": null
+    },
+    {
+      "input_size": 1,
+      "output_size": 1,
+      "leaky": 0.1,
+      "inp_scaling": 0.181,
+      "regul": 0.008,
+      "units": 500,
+      "rho": 1.1,
+      "solver": null
+    }
+  ]
+}
+{'lag': 1, 'bigger_dataset': False, 'test_trials': 1, 'n_modules': 2, 'use_self_loop': True, 'washout': 200, 'mode': 'entangled_with_z', 'rescale_input': False, 'show_plot': False, 'input_size': 3, 'output_size': 3, 'concat': False, 'skip_z': False, 'reservoirs': [{'input_size': 1, 'output_size': 1, 'leaky': 0.1, 'inp_scaling': 0.05, 'regul': 0.05, 'units': 250, 'rho': 1.1, 'solver': None}, {'input_size': 1, 'output_size': 1, 'leaky': 0.1, 'inp_scaling': 0.181, 'regul': 0.008, 'units': 500, 'rho': 1.1, 'solver': None}]}
+torch.Size([2499, 3])
+[RESERVOIR CELL 0] created with 250 units.
+
+[RESERVOIR CELL 1] created with 500 units.
+
+tensor([ -7.2642, -11.5611,  17.3183])
+ ##################################################################### 
+Mean NRMSE 1.6426518,    std 0.0
+ ##################################################################### 
+
+
+/Users/matt/Desktop/Tesi/Codice/.venv/lib/python3.13/site-packages/sklearn/linear_model/_ridge.py:215: LinAlgWarning: Ill-conditioned matrix (rcond=2.26322e-08): result may not be accurate.
+  return linalg.solve(A, Xy, assume_a="pos", overwrite_a=True).T
+/Users/matt/Desktop/Tesi/Codice/.venv/lib/python3.13/site-packages/sklearn/linear_model/_ridge.py:215: LinAlgWarning: Ill-conditioned matrix (rcond=1.98002e-09): result may not be accurate.
+  return linalg.solve(A, Xy, assume_a="pos", overwrite_a=True).T
+/Users/matt/Desktop/Tesi/Codice/ESN & attrattori/lorenz attractor/lorenz.py:146: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  test_target = torch.tensor(test_dataset[0:n], dtype=torch.float32).reshape(-1, n_out) # reshape element to torch.Size([rows=len(train_target), columns=3])
+/Users/matt/Desktop/Tesi/Codice/ESN & attrattori/lorenz attractor/esn_alternative.py:650: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  return torch.tensor(predictions, dtype=torch.float32)
+
+
+--- Config File: config_tmp_9.json ---
+{
+  "lag": 1,
+  "bigger_dataset": false,
+  "test_trials": 1,
+  "n_modules": 2,
+  "use_self_loop": true,
+  "washout": 200,
+  "mode": "entangled_with_z",
+  "rescale_input": false,
+  "show_plot": false,
+  "input_size": 3,
+  "output_size": 3,
+  "concat": false,
+  "skip_z": false,
+  "reservoirs": [
+    {
+      "input_size": 1,
+      "output_size": 1,
+      "leaky": 0.1,
+      "inp_scaling": 0.05,
+      "regul": 0.05,
+      "units": 250,
+      "rho": 1.1,
+      "solver": null
+    },
+    {
+      "input_size": 1,
+      "output_size": 1,
+      "leaky": 0.1,
+      "inp_scaling": 0.181,
+      "regul": 0.0009000000000000001,
+      "units": 500,
+      "rho": 1.1,
+      "solver": null
+    }
+  ]
+}
+{'lag': 1, 'bigger_dataset': False, 'test_trials': 1, 'n_modules': 2, 'use_self_loop': True, 'washout': 200, 'mode': 'entangled_with_z', 'rescale_input': False, 'show_plot': False, 'input_size': 3, 'output_size': 3, 'concat': False, 'skip_z': False, 'reservoirs': [{'input_size': 1, 'output_size': 1, 'leaky': 0.1, 'inp_scaling': 0.05, 'regul': 0.05, 'units': 250, 'rho': 1.1, 'solver': None}, {'input_size': 1, 'output_size': 1, 'leaky': 0.1, 'inp_scaling': 0.181, 'regul': 0.0009000000000000001, 'units': 500, 'rho': 1.1, 'solver': None}]}
+torch.Size([2499, 3])
+[RESERVOIR CELL 0] created with 250 units.
+
+[RESERVOIR CELL 1] created with 500 units.
+
+tensor([ -7.2642, -11.5611,  17.3183])
+ ##################################################################### 
+Mean NRMSE 1.4651148,    std 0.0
+ ##################################################################### 
+
+
+/Users/matt/Desktop/Tesi/Codice/.venv/lib/python3.13/site-packages/sklearn/linear_model/_ridge.py:215: LinAlgWarning: Ill-conditioned matrix (rcond=2.26322e-08): result may not be accurate.
+  return linalg.solve(A, Xy, assume_a="pos", overwrite_a=True).T
+/Users/matt/Desktop/Tesi/Codice/ESN & attrattori/lorenz attractor/lorenz.py:146: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  test_target = torch.tensor(test_dataset[0:n], dtype=torch.float32).reshape(-1, n_out) # reshape element to torch.Size([rows=len(train_target), columns=3])
+/Users/matt/Desktop/Tesi/Codice/ESN & attrattori/lorenz attractor/esn_alternative.py:650: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  return torch.tensor(predictions, dtype=torch.float32)
+
+
+--- Config File: config_tmp_10.json ---
+{
+  "lag": 1,
+  "bigger_dataset": false,
+  "test_trials": 1,
+  "n_modules": 2,
+  "use_self_loop": true,
+  "washout": 200,
+  "mode": "entangled_with_z",
+  "rescale_input": false,
+  "show_plot": false,
+  "input_size": 3,
+  "output_size": 3,
+  "concat": false,
+  "skip_z": false,
+  "reservoirs": [
+    {
+      "input_size": 1,
+      "output_size": 1,
+      "leaky": 0.1,
+      "inp_scaling": 0.05,
+      "regul": 0.05,
+      "units": 250,
+      "rho": 1.1,
+      "solver": null
+    },
+    {
+      "input_size": 1,
+      "output_size": 1,
+      "leaky": 0.1,
+      "inp_scaling": 0.181,
+      "regul": 6.000000000000001e-05,
+      "units": 500,
+      "rho": 1.1,
+      "solver": null
+    }
+  ]
+}
+{'lag': 1, 'bigger_dataset': False, 'test_trials': 1, 'n_modules': 2, 'use_self_loop': True, 'washout': 200, 'mode': 'entangled_with_z', 'rescale_input': False, 'show_plot': False, 'input_size': 3, 'output_size': 3, 'concat': False, 'skip_z': False, 'reservoirs': [{'input_size': 1, 'output_size': 1, 'leaky': 0.1, 'inp_scaling': 0.05, 'regul': 0.05, 'units': 250, 'rho': 1.1, 'solver': None}, {'input_size': 1, 'output_size': 1, 'leaky': 0.1, 'inp_scaling': 0.181, 'regul': 6.000000000000001e-05, 'units': 500, 'rho': 1.1, 'solver': None}]}
+torch.Size([2499, 3])
+[RESERVOIR CELL 0] created with 250 units.
+
+[RESERVOIR CELL 1] created with 500 units.
+
+tensor([ -7.2642, -11.5611,  17.3183])
+ ##################################################################### 
+Mean NRMSE 1.2123715,    std 0.0
+ ##################################################################### 
+
+
+/Users/matt/Desktop/Tesi/Codice/.venv/lib/python3.13/site-packages/sklearn/linear_model/_ridge.py:215: LinAlgWarning: Ill-conditioned matrix (rcond=2.26322e-08): result may not be accurate.
+  return linalg.solve(A, Xy, assume_a="pos", overwrite_a=True).T
+/Users/matt/Desktop/Tesi/Codice/ESN & attrattori/lorenz attractor/lorenz.py:146: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  test_target = torch.tensor(test_dataset[0:n], dtype=torch.float32).reshape(-1, n_out) # reshape element to torch.Size([rows=len(train_target), columns=3])
+/Users/matt/Desktop/Tesi/Codice/ESN & attrattori/lorenz attractor/esn_alternative.py:650: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  return torch.tensor(predictions, dtype=torch.float32)
+
+
+--- Config File: config_tmp_11.json ---
+{
+  "lag": 1,
+  "bigger_dataset": false,
+  "test_trials": 1,
+  "n_modules": 2,
+  "use_self_loop": true,
+  "washout": 200,
+  "mode": "entangled_with_z",
+  "rescale_input": false,
+  "show_plot": false,
+  "input_size": 3,
+  "output_size": 3,
+  "concat": false,
+  "skip_z": false,
+  "reservoirs": [
+    {
+      "input_size": 1,
+      "output_size": 1,
+      "leaky": 0.1,
+      "inp_scaling": 0.05,
+      "regul": 0.05,
+      "units": 250,
+      "rho": 1.1,
+      "solver": null
+    },
+    {
+      "input_size": 1,
+      "output_size": 1,
+      "leaky": 0.1,
+      "inp_scaling": 0.181,
+      "regul": 0.002,
+      "units": 500,
+      "rho": 1.1,
+      "solver": null
+    }
+  ]
+}
+{'lag': 1, 'bigger_dataset': False, 'test_trials': 1, 'n_modules': 2, 'use_self_loop': True, 'washout': 200, 'mode': 'entangled_with_z', 'rescale_input': False, 'show_plot': False, 'input_size': 3, 'output_size': 3, 'concat': False, 'skip_z': False, 'reservoirs': [{'input_size': 1, 'output_size': 1, 'leaky': 0.1, 'inp_scaling': 0.05, 'regul': 0.05, 'units': 250, 'rho': 1.1, 'solver': None}, {'input_size': 1, 'output_size': 1, 'leaky': 0.1, 'inp_scaling': 0.181, 'regul': 0.002, 'units': 500, 'rho': 1.1, 'solver': None}]}
+torch.Size([2499, 3])
+[RESERVOIR CELL 0] created with 250 units.
+
+[RESERVOIR CELL 1] created with 500 units.
+
+tensor([ -7.2642, -11.5611,  17.3183])
+ ##################################################################### 
+Mean NRMSE 1.2748926,    std 0.0
+ ##################################################################### 
+
+
+/Users/matt/Desktop/Tesi/Codice/.venv/lib/python3.13/site-packages/sklearn/linear_model/_ridge.py:215: LinAlgWarning: Ill-conditioned matrix (rcond=2.26322e-08): result may not be accurate.
+  return linalg.solve(A, Xy, assume_a="pos", overwrite_a=True).T
+/Users/matt/Desktop/Tesi/Codice/ESN & attrattori/lorenz attractor/lorenz.py:146: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  test_target = torch.tensor(test_dataset[0:n], dtype=torch.float32).reshape(-1, n_out) # reshape element to torch.Size([rows=len(train_target), columns=3])
+/Users/matt/Desktop/Tesi/Codice/ESN & attrattori/lorenz attractor/esn_alternative.py:650: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  return torch.tensor(predictions, dtype=torch.float32)
+
+
+--- Config File: config_tmp_12.json ---
+{
+  "lag": 1,
+  "bigger_dataset": false,
+  "test_trials": 1,
+  "n_modules": 2,
+  "use_self_loop": true,
+  "washout": 200,
+  "mode": "entangled_with_z",
+  "rescale_input": false,
+  "show_plot": false,
+  "input_size": 3,
+  "output_size": 3,
+  "concat": false,
+  "skip_z": false,
+  "reservoirs": [
+    {
+      "input_size": 1,
+      "output_size": 1,
+      "leaky": 0.1,
+      "inp_scaling": 0.05,
+      "regul": 0.05,
+      "units": 250,
+      "rho": 1.1,
+      "solver": null
+    },
+    {
+      "input_size": 1,
+      "output_size": 1,
+      "leaky": 0.1,
+      "inp_scaling": 0.181,
+      "regul": 0.02,
+      "units": 500,
+      "rho": 1.1,
+      "solver": null
+    }
+  ]
+}
+{'lag': 1, 'bigger_dataset': False, 'test_trials': 1, 'n_modules': 2, 'use_self_loop': True, 'washout': 200, 'mode': 'entangled_with_z', 'rescale_input': False, 'show_plot': False, 'input_size': 3, 'output_size': 3, 'concat': False, 'skip_z': False, 'reservoirs': [{'input_size': 1, 'output_size': 1, 'leaky': 0.1, 'inp_scaling': 0.05, 'regul': 0.05, 'units': 250, 'rho': 1.1, 'solver': None}, {'input_size': 1, 'output_size': 1, 'leaky': 0.1, 'inp_scaling': 0.181, 'regul': 0.02, 'units': 500, 'rho': 1.1, 'solver': None}]}
+torch.Size([2499, 3])
+[RESERVOIR CELL 0] created with 250 units.
+
+[RESERVOIR CELL 1] created with 500 units.
+
+tensor([ -7.2642, -11.5611,  17.3183])
+ ##################################################################### 
+Mean NRMSE 1.5944059,    std 0.0
+ ##################################################################### 
+
+
+/Users/matt/Desktop/Tesi/Codice/.venv/lib/python3.13/site-packages/sklearn/linear_model/_ridge.py:215: LinAlgWarning: Ill-conditioned matrix (rcond=2.26322e-08): result may not be accurate.
+  return linalg.solve(A, Xy, assume_a="pos", overwrite_a=True).T
+/Users/matt/Desktop/Tesi/Codice/.venv/lib/python3.13/site-packages/sklearn/linear_model/_ridge.py:215: LinAlgWarning: Ill-conditioned matrix (rcond=5.76435e-09): result may not be accurate.
+  return linalg.solve(A, Xy, assume_a="pos", overwrite_a=True).T
+/Users/matt/Desktop/Tesi/Codice/ESN & attrattori/lorenz attractor/lorenz.py:146: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  test_target = torch.tensor(test_dataset[0:n], dtype=torch.float32).reshape(-1, n_out) # reshape element to torch.Size([rows=len(train_target), columns=3])
+/Users/matt/Desktop/Tesi/Codice/ESN & attrattori/lorenz attractor/esn_alternative.py:650: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  return torch.tensor(predictions, dtype=torch.float32)
+
+
+--- Config File: config_tmp_13.json ---
+{
+  "lag": 1,
+  "bigger_dataset": false,
+  "test_trials": 1,
+  "n_modules": 2,
+  "use_self_loop": true,
+  "washout": 200,
+  "mode": "entangled_with_z",
+  "rescale_input": false,
+  "show_plot": false,
+  "input_size": 3,
+  "output_size": 3,
+  "concat": false,
+  "skip_z": false,
+  "reservoirs": [
+    {
+      "input_size": 1,
+      "output_size": 1,
+      "leaky": 0.1,
+      "inp_scaling": 0.05,
+      "regul": 0.05,
+      "units": 250,
+      "rho": 1.1,
+      "solver": null
+    },
+    {
+      "input_size": 1,
+      "output_size": 1,
+      "leaky": 0.1,
+      "inp_scaling": 0.181,
+      "regul": 9e-05,
+      "units": 500,
+      "rho": 1.1,
+      "solver": null
+    }
+  ]
+}
+{'lag': 1, 'bigger_dataset': False, 'test_trials': 1, 'n_modules': 2, 'use_self_loop': True, 'washout': 200, 'mode': 'entangled_with_z', 'rescale_input': False, 'show_plot': False, 'input_size': 3, 'output_size': 3, 'concat': False, 'skip_z': False, 'reservoirs': [{'input_size': 1, 'output_size': 1, 'leaky': 0.1, 'inp_scaling': 0.05, 'regul': 0.05, 'units': 250, 'rho': 1.1, 'solver': None}, {'input_size': 1, 'output_size': 1, 'leaky': 0.1, 'inp_scaling': 0.181, 'regul': 9e-05, 'units': 500, 'rho': 1.1, 'solver': None}]}
+torch.Size([2499, 3])
+[RESERVOIR CELL 0] created with 250 units.
+
+[RESERVOIR CELL 1] created with 500 units.
+
+tensor([ -7.2642, -11.5611,  17.3183])
+ ##################################################################### 
+Mean NRMSE 1.2485318,    std 0.0
+ ##################################################################### 
+
+
+/Users/matt/Desktop/Tesi/Codice/.venv/lib/python3.13/site-packages/sklearn/linear_model/_ridge.py:215: LinAlgWarning: Ill-conditioned matrix (rcond=2.26322e-08): result may not be accurate.
+  return linalg.solve(A, Xy, assume_a="pos", overwrite_a=True).T
+/Users/matt/Desktop/Tesi/Codice/ESN & attrattori/lorenz attractor/lorenz.py:146: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  test_target = torch.tensor(test_dataset[0:n], dtype=torch.float32).reshape(-1, n_out) # reshape element to torch.Size([rows=len(train_target), columns=3])
+/Users/matt/Desktop/Tesi/Codice/ESN & attrattori/lorenz attractor/esn_alternative.py:650: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  return torch.tensor(predictions, dtype=torch.float32)
+
+
+--- Config File: config_tmp_14.json ---
+{
+  "lag": 1,
+  "bigger_dataset": false,
+  "test_trials": 1,
+  "n_modules": 2,
+  "use_self_loop": true,
+  "washout": 200,
+  "mode": "entangled_with_z",
+  "rescale_input": false,
+  "show_plot": false,
+  "input_size": 3,
+  "output_size": 3,
+  "concat": false,
+  "skip_z": false,
+  "reservoirs": [
+    {
+      "input_size": 1,
+      "output_size": 1,
+      "leaky": 0.1,
+      "inp_scaling": 0.05,
+      "regul": 0.05,
+      "units": 250,
+      "rho": 1.1,
+      "solver": null
+    },
+    {
+      "input_size": 1,
+      "output_size": 1,
+      "leaky": 0.1,
+      "inp_scaling": 0.181,
+      "regul": 1e-06,
+      "units": 500,
+      "rho": 1.1,
+      "solver": null
+    }
+  ]
+}
+{'lag': 1, 'bigger_dataset': False, 'test_trials': 1, 'n_modules': 2, 'use_self_loop': True, 'washout': 200, 'mode': 'entangled_with_z', 'rescale_input': False, 'show_plot': False, 'input_size': 3, 'output_size': 3, 'concat': False, 'skip_z': False, 'reservoirs': [{'input_size': 1, 'output_size': 1, 'leaky': 0.1, 'inp_scaling': 0.05, 'regul': 0.05, 'units': 250, 'rho': 1.1, 'solver': None}, {'input_size': 1, 'output_size': 1, 'leaky': 0.1, 'inp_scaling': 0.181, 'regul': 1e-06, 'units': 500, 'rho': 1.1, 'solver': None}]}
+torch.Size([2499, 3])
+[RESERVOIR CELL 0] created with 250 units.
+
+[RESERVOIR CELL 1] created with 500 units.
+
+tensor([ -7.2642, -11.5611,  17.3183])
+ ##################################################################### 
+Mean NRMSE 1.3154286,    std 0.0
+ ##################################################################### 
+
+
+/Users/matt/Desktop/Tesi/Codice/.venv/lib/python3.13/site-packages/sklearn/linear_model/_ridge.py:215: LinAlgWarning: Ill-conditioned matrix (rcond=2.26322e-08): result may not be accurate.
+  return linalg.solve(A, Xy, assume_a="pos", overwrite_a=True).T
+/Users/matt/Desktop/Tesi/Codice/ESN & attrattori/lorenz attractor/lorenz.py:146: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  test_target = torch.tensor(test_dataset[0:n], dtype=torch.float32).reshape(-1, n_out) # reshape element to torch.Size([rows=len(train_target), columns=3])
+/Users/matt/Desktop/Tesi/Codice/ESN & attrattori/lorenz attractor/esn_alternative.py:650: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  return torch.tensor(predictions, dtype=torch.float32)
+
+
+--- Config File: config_tmp_15.json ---
+{
+  "lag": 1,
+  "bigger_dataset": false,
+  "test_trials": 1,
+  "n_modules": 2,
+  "use_self_loop": true,
+  "washout": 200,
+  "mode": "entangled_with_z",
+  "rescale_input": false,
+  "show_plot": false,
+  "input_size": 3,
+  "output_size": 3,
+  "concat": false,
+  "skip_z": false,
+  "reservoirs": [
+    {
+      "input_size": 1,
+      "output_size": 1,
+      "leaky": 0.1,
+      "inp_scaling": 0.05,
+      "regul": 0.05,
+      "units": 250,
+      "rho": 1.1,
+      "solver": null
+    },
+    {
+      "input_size": 1,
+      "output_size": 1,
+      "leaky": 0.1,
+      "inp_scaling": 0.181,
+      "regul": 2e-05,
+      "units": 500,
+      "rho": 1.1,
+      "solver": null
+    }
+  ]
+}
+{'lag': 1, 'bigger_dataset': False, 'test_trials': 1, 'n_modules': 2, 'use_self_loop': True, 'washout': 200, 'mode': 'entangled_with_z', 'rescale_input': False, 'show_plot': False, 'input_size': 3, 'output_size': 3, 'concat': False, 'skip_z': False, 'reservoirs': [{'input_size': 1, 'output_size': 1, 'leaky': 0.1, 'inp_scaling': 0.05, 'regul': 0.05, 'units': 250, 'rho': 1.1, 'solver': None}, {'input_size': 1, 'output_size': 1, 'leaky': 0.1, 'inp_scaling': 0.181, 'regul': 2e-05, 'units': 500, 'rho': 1.1, 'solver': None}]}
+torch.Size([2499, 3])
+[RESERVOIR CELL 0] created with 250 units.
+
+[RESERVOIR CELL 1] created with 500 units.
+
+tensor([ -7.2642, -11.5611,  17.3183])
+ ##################################################################### 
+Mean NRMSE 1.2386202,    std 0.0
+ ##################################################################### 
+
+
+/Users/matt/Desktop/Tesi/Codice/.venv/lib/python3.13/site-packages/sklearn/linear_model/_ridge.py:215: LinAlgWarning: Ill-conditioned matrix (rcond=2.26322e-08): result may not be accurate.
+  return linalg.solve(A, Xy, assume_a="pos", overwrite_a=True).T
+/Users/matt/Desktop/Tesi/Codice/ESN & attrattori/lorenz attractor/lorenz.py:146: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  test_target = torch.tensor(test_dataset[0:n], dtype=torch.float32).reshape(-1, n_out) # reshape element to torch.Size([rows=len(train_target), columns=3])
+/Users/matt/Desktop/Tesi/Codice/ESN & attrattori/lorenz attractor/esn_alternative.py:650: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  return torch.tensor(predictions, dtype=torch.float32)
+
+
+--- Config File: config_tmp_16.json ---
+{
+  "lag": 1,
+  "bigger_dataset": false,
+  "test_trials": 1,
+  "n_modules": 2,
+  "use_self_loop": true,
+  "washout": 200,
+  "mode": "entangled_with_z",
+  "rescale_input": false,
+  "show_plot": false,
+  "input_size": 3,
+  "output_size": 3,
+  "concat": false,
+  "skip_z": false,
+  "reservoirs": [
+    {
+      "input_size": 1,
+      "output_size": 1,
+      "leaky": 0.1,
+      "inp_scaling": 0.05,
+      "regul": 0.05,
+      "units": 250,
+      "rho": 1.1,
+      "solver": null
+    },
+    {
+      "input_size": 1,
+      "output_size": 1,
+      "leaky": 0.1,
+      "inp_scaling": 0.181,
+      "regul": 0.001,
+      "units": 500,
+      "rho": 1.1,
+      "solver": null
+    }
+  ]
+}
+{'lag': 1, 'bigger_dataset': False, 'test_trials': 1, 'n_modules': 2, 'use_self_loop': True, 'washout': 200, 'mode': 'entangled_with_z', 'rescale_input': False, 'show_plot': False, 'input_size': 3, 'output_size': 3, 'concat': False, 'skip_z': False, 'reservoirs': [{'input_size': 1, 'output_size': 1, 'leaky': 0.1, 'inp_scaling': 0.05, 'regul': 0.05, 'units': 250, 'rho': 1.1, 'solver': None}, {'input_size': 1, 'output_size': 1, 'leaky': 0.1, 'inp_scaling': 0.181, 'regul': 0.001, 'units': 500, 'rho': 1.1, 'solver': None}]}
+torch.Size([2499, 3])
+[RESERVOIR CELL 0] created with 250 units.
+
+[RESERVOIR CELL 1] created with 500 units.
+
+tensor([ -7.2642, -11.5611,  17.3183])
+ ##################################################################### 
+Mean NRMSE 1.3913144,    std 0.0
+ ##################################################################### 
+
+
+/Users/matt/Desktop/Tesi/Codice/.venv/lib/python3.13/site-packages/sklearn/linear_model/_ridge.py:215: LinAlgWarning: Ill-conditioned matrix (rcond=2.26322e-08): result may not be accurate.
+  return linalg.solve(A, Xy, assume_a="pos", overwrite_a=True).T
+/Users/matt/Desktop/Tesi/Codice/ESN & attrattori/lorenz attractor/lorenz.py:146: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  test_target = torch.tensor(test_dataset[0:n], dtype=torch.float32).reshape(-1, n_out) # reshape element to torch.Size([rows=len(train_target), columns=3])
+/Users/matt/Desktop/Tesi/Codice/ESN & attrattori/lorenz attractor/esn_alternative.py:650: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  return torch.tensor(predictions, dtype=torch.float32)
+
+
+--- Config File: config_tmp_17.json ---
+{
+  "lag": 1,
+  "bigger_dataset": false,
+  "test_trials": 1,
+  "n_modules": 2,
+  "use_self_loop": true,
+  "washout": 200,
+  "mode": "entangled_with_z",
+  "rescale_input": false,
+  "show_plot": false,
+  "input_size": 3,
+  "output_size": 3,
+  "concat": false,
+  "skip_z": false,
+  "reservoirs": [
+    {
+      "input_size": 1,
+      "output_size": 1,
+      "leaky": 0.1,
+      "inp_scaling": 0.05,
+      "regul": 0.05,
+      "units": 250,
+      "rho": 1.1,
+      "solver": null
+    },
+    {
+      "input_size": 1,
+      "output_size": 1,
+      "leaky": 0.1,
+      "inp_scaling": 0.181,
+      "regul": 0.0004,
+      "units": 500,
+      "rho": 1.1,
+      "solver": null
+    }
+  ]
+}
+{'lag': 1, 'bigger_dataset': False, 'test_trials': 1, 'n_modules': 2, 'use_self_loop': True, 'washout': 200, 'mode': 'entangled_with_z', 'rescale_input': False, 'show_plot': False, 'input_size': 3, 'output_size': 3, 'concat': False, 'skip_z': False, 'reservoirs': [{'input_size': 1, 'output_size': 1, 'leaky': 0.1, 'inp_scaling': 0.05, 'regul': 0.05, 'units': 250, 'rho': 1.1, 'solver': None}, {'input_size': 1, 'output_size': 1, 'leaky': 0.1, 'inp_scaling': 0.181, 'regul': 0.0004, 'units': 500, 'rho': 1.1, 'solver': None}]}
+torch.Size([2499, 3])
+[RESERVOIR CELL 0] created with 250 units.
+
+[RESERVOIR CELL 1] created with 500 units.
+
+tensor([ -7.2642, -11.5611,  17.3183])
+ ##################################################################### 
+Mean NRMSE 1.3045083,    std 0.0
+ ##################################################################### 
+
+
+/Users/matt/Desktop/Tesi/Codice/.venv/lib/python3.13/site-packages/sklearn/linear_model/_ridge.py:215: LinAlgWarning: Ill-conditioned matrix (rcond=2.26322e-08): result may not be accurate.
+  return linalg.solve(A, Xy, assume_a="pos", overwrite_a=True).T
+/Users/matt/Desktop/Tesi/Codice/ESN & attrattori/lorenz attractor/lorenz.py:146: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  test_target = torch.tensor(test_dataset[0:n], dtype=torch.float32).reshape(-1, n_out) # reshape element to torch.Size([rows=len(train_target), columns=3])
+/Users/matt/Desktop/Tesi/Codice/ESN & attrattori/lorenz attractor/esn_alternative.py:650: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  return torch.tensor(predictions, dtype=torch.float32)
+
+
+--- Config File: config_tmp_18.json ---
+{
+  "lag": 1,
+  "bigger_dataset": false,
+  "test_trials": 1,
+  "n_modules": 2,
+  "use_self_loop": true,
+  "washout": 200,
+  "mode": "entangled_with_z",
+  "rescale_input": false,
+  "show_plot": false,
+  "input_size": 3,
+  "output_size": 3,
+  "concat": false,
+  "skip_z": false,
+  "reservoirs": [
+    {
+      "input_size": 1,
+      "output_size": 1,
+      "leaky": 0.1,
+      "inp_scaling": 0.05,
+      "regul": 0.05,
+      "units": 250,
+      "rho": 1.1,
+      "solver": null
+    },
+    {
+      "input_size": 1,
+      "output_size": 1,
+      "leaky": 0.1,
+      "inp_scaling": 0.181,
+      "regul": 0.4,
+      "units": 500,
+      "rho": 1.1,
+      "solver": null
+    }
+  ]
+}
+{'lag': 1, 'bigger_dataset': False, 'test_trials': 1, 'n_modules': 2, 'use_self_loop': True, 'washout': 200, 'mode': 'entangled_with_z', 'rescale_input': False, 'show_plot': False, 'input_size': 3, 'output_size': 3, 'concat': False, 'skip_z': False, 'reservoirs': [{'input_size': 1, 'output_size': 1, 'leaky': 0.1, 'inp_scaling': 0.05, 'regul': 0.05, 'units': 250, 'rho': 1.1, 'solver': None}, {'input_size': 1, 'output_size': 1, 'leaky': 0.1, 'inp_scaling': 0.181, 'regul': 0.4, 'units': 500, 'rho': 1.1, 'solver': None}]}
+torch.Size([2499, 3])
+[RESERVOIR CELL 0] created with 250 units.
+
+[RESERVOIR CELL 1] created with 500 units.
+
+tensor([ -7.2642, -11.5611,  17.3183])
+ ##################################################################### 
+Mean NRMSE 1.2787113,    std 0.0
+ ##################################################################### 
+
+
+/Users/matt/Desktop/Tesi/Codice/.venv/lib/python3.13/site-packages/sklearn/linear_model/_ridge.py:215: LinAlgWarning: Ill-conditioned matrix (rcond=2.26322e-08): result may not be accurate.
+  return linalg.solve(A, Xy, assume_a="pos", overwrite_a=True).T
+/Users/matt/Desktop/Tesi/Codice/ESN & attrattori/lorenz attractor/lorenz.py:146: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  test_target = torch.tensor(test_dataset[0:n], dtype=torch.float32).reshape(-1, n_out) # reshape element to torch.Size([rows=len(train_target), columns=3])
+/Users/matt/Desktop/Tesi/Codice/ESN & attrattori/lorenz attractor/esn_alternative.py:650: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  return torch.tensor(predictions, dtype=torch.float32)
+
+
+--- Config File: config_tmp_19.json ---
+{
+  "lag": 1,
+  "bigger_dataset": false,
+  "test_trials": 1,
+  "n_modules": 2,
+  "use_self_loop": true,
+  "washout": 200,
+  "mode": "entangled_with_z",
+  "rescale_input": false,
+  "show_plot": false,
+  "input_size": 3,
+  "output_size": 3,
+  "concat": false,
+  "skip_z": false,
+  "reservoirs": [
+    {
+      "input_size": 1,
+      "output_size": 1,
+      "leaky": 0.1,
+      "inp_scaling": 0.05,
+      "regul": 0.05,
+      "units": 250,
+      "rho": 1.1,
+      "solver": null
+    },
+    {
+      "input_size": 1,
+      "output_size": 1,
+      "leaky": 0.1,
+      "inp_scaling": 0.181,
+      "regul": 1e-05,
+      "units": 500,
+      "rho": 1.1,
+      "solver": null
+    }
+  ]
+}
+{'lag': 1, 'bigger_dataset': False, 'test_trials': 1, 'n_modules': 2, 'use_self_loop': True, 'washout': 200, 'mode': 'entangled_with_z', 'rescale_input': False, 'show_plot': False, 'input_size': 3, 'output_size': 3, 'concat': False, 'skip_z': False, 'reservoirs': [{'input_size': 1, 'output_size': 1, 'leaky': 0.1, 'inp_scaling': 0.05, 'regul': 0.05, 'units': 250, 'rho': 1.1, 'solver': None}, {'input_size': 1, 'output_size': 1, 'leaky': 0.1, 'inp_scaling': 0.181, 'regul': 1e-05, 'units': 500, 'rho': 1.1, 'solver': None}]}
+torch.Size([2499, 3])
+[RESERVOIR CELL 0] created with 250 units.
+
+[RESERVOIR CELL 1] created with 500 units.
+
+tensor([ -7.2642, -11.5611,  17.3183])
+ ##################################################################### 
+Mean NRMSE 1.2920889,    std 0.0
+ ##################################################################### 
+
+
+/Users/matt/Desktop/Tesi/Codice/.venv/lib/python3.13/site-packages/sklearn/linear_model/_ridge.py:215: LinAlgWarning: Ill-conditioned matrix (rcond=2.26322e-08): result may not be accurate.
+  return linalg.solve(A, Xy, assume_a="pos", overwrite_a=True).T
+/Users/matt/Desktop/Tesi/Codice/ESN & attrattori/lorenz attractor/lorenz.py:146: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  test_target = torch.tensor(test_dataset[0:n], dtype=torch.float32).reshape(-1, n_out) # reshape element to torch.Size([rows=len(train_target), columns=3])
+/Users/matt/Desktop/Tesi/Codice/ESN & attrattori/lorenz attractor/esn_alternative.py:650: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  return torch.tensor(predictions, dtype=torch.float32)
+
+
+--- Config File: config_tmp_20.json ---
+{
+  "lag": 1,
+  "bigger_dataset": false,
+  "test_trials": 1,
+  "n_modules": 2,
+  "use_self_loop": true,
+  "washout": 200,
+  "mode": "entangled_with_z",
+  "rescale_input": false,
+  "show_plot": false,
+  "input_size": 3,
+  "output_size": 3,
+  "concat": false,
+  "skip_z": false,
+  "reservoirs": [
+    {
+      "input_size": 1,
+      "output_size": 1,
+      "leaky": 0.1,
+      "inp_scaling": 0.05,
+      "regul": 0.05,
+      "units": 250,
+      "rho": 1.1,
+      "solver": null
+    },
+    {
+      "input_size": 1,
+      "output_size": 1,
+      "leaky": 0.1,
+      "inp_scaling": 0.181,
+      "regul": 5e-05,
+      "units": 500,
+      "rho": 1.1,
+      "solver": null
+    }
+  ]
+}
+{'lag': 1, 'bigger_dataset': False, 'test_trials': 1, 'n_modules': 2, 'use_self_loop': True, 'washout': 200, 'mode': 'entangled_with_z', 'rescale_input': False, 'show_plot': False, 'input_size': 3, 'output_size': 3, 'concat': False, 'skip_z': False, 'reservoirs': [{'input_size': 1, 'output_size': 1, 'leaky': 0.1, 'inp_scaling': 0.05, 'regul': 0.05, 'units': 250, 'rho': 1.1, 'solver': None}, {'input_size': 1, 'output_size': 1, 'leaky': 0.1, 'inp_scaling': 0.181, 'regul': 5e-05, 'units': 500, 'rho': 1.1, 'solver': None}]}
+torch.Size([2499, 3])
+[RESERVOIR CELL 0] created with 250 units.
+
+[RESERVOIR CELL 1] created with 500 units.
+
+tensor([ -7.2642, -11.5611,  17.3183])
+ ##################################################################### 
+Mean NRMSE 1.2374485,    std 0.0
+ ##################################################################### 
+
+
+/Users/matt/Desktop/Tesi/Codice/.venv/lib/python3.13/site-packages/sklearn/linear_model/_ridge.py:215: LinAlgWarning: Ill-conditioned matrix (rcond=2.26322e-08): result may not be accurate.
+  return linalg.solve(A, Xy, assume_a="pos", overwrite_a=True).T
+/Users/matt/Desktop/Tesi/Codice/ESN & attrattori/lorenz attractor/lorenz.py:146: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  test_target = torch.tensor(test_dataset[0:n], dtype=torch.float32).reshape(-1, n_out) # reshape element to torch.Size([rows=len(train_target), columns=3])
+/Users/matt/Desktop/Tesi/Codice/ESN & attrattori/lorenz attractor/esn_alternative.py:650: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  return torch.tensor(predictions, dtype=torch.float32)
+
+
+--- Config File: config_tmp_21.json ---
+{
+  "lag": 1,
+  "bigger_dataset": false,
+  "test_trials": 1,
+  "n_modules": 2,
+  "use_self_loop": true,
+  "washout": 200,
+  "mode": "entangled_with_z",
+  "rescale_input": false,
+  "show_plot": false,
+  "input_size": 3,
+  "output_size": 3,
+  "concat": false,
+  "skip_z": false,
+  "reservoirs": [
+    {
+      "input_size": 1,
+      "output_size": 1,
+      "leaky": 0.1,
+      "inp_scaling": 0.05,
+      "regul": 8e-06,
+      "units": 250,
+      "rho": 1.1,
+      "solver": null
+    },
+    {
+      "input_size": 1,
+      "output_size": 1,
+      "leaky": 0.1,
+      "inp_scaling": 0.181,
+      "regul": 0.03,
+      "units": 500,
+      "rho": 1.1,
+      "solver": null
+    }
+  ]
+}
+{'lag': 1, 'bigger_dataset': False, 'test_trials': 1, 'n_modules': 2, 'use_self_loop': True, 'washout': 200, 'mode': 'entangled_with_z', 'rescale_input': False, 'show_plot': False, 'input_size': 3, 'output_size': 3, 'concat': False, 'skip_z': False, 'reservoirs': [{'input_size': 1, 'output_size': 1, 'leaky': 0.1, 'inp_scaling': 0.05, 'regul': 8e-06, 'units': 250, 'rho': 1.1, 'solver': None}, {'input_size': 1, 'output_size': 1, 'leaky': 0.1, 'inp_scaling': 0.181, 'regul': 0.03, 'units': 500, 'rho': 1.1, 'solver': None}]}
+torch.Size([2499, 3])
+[RESERVOIR CELL 0] created with 250 units.
+
+[RESERVOIR CELL 1] created with 500 units.
+
+tensor([ -7.2642, -11.5611,  17.3183])
+ ##################################################################### 
+Mean NRMSE 1.7511055,    std 0.0
+ ##################################################################### 
+
+
+/Users/matt/Desktop/Tesi/Codice/.venv/lib/python3.13/site-packages/sklearn/linear_model/_ridge.py:215: LinAlgWarning: Ill-conditioned matrix (rcond=8.77165e-09): result may not be accurate.
+  return linalg.solve(A, Xy, assume_a="pos", overwrite_a=True).T
+/Users/matt/Desktop/Tesi/Codice/ESN & attrattori/lorenz attractor/lorenz.py:146: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  test_target = torch.tensor(test_dataset[0:n], dtype=torch.float32).reshape(-1, n_out) # reshape element to torch.Size([rows=len(train_target), columns=3])
+/Users/matt/Desktop/Tesi/Codice/ESN & attrattori/lorenz attractor/esn_alternative.py:650: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  return torch.tensor(predictions, dtype=torch.float32)
+
+
+--- Config File: config_tmp_22.json ---
+{
+  "lag": 1,
+  "bigger_dataset": false,
+  "test_trials": 1,
+  "n_modules": 2,
+  "use_self_loop": true,
+  "washout": 200,
+  "mode": "entangled_with_z",
+  "rescale_input": false,
+  "show_plot": false,
+  "input_size": 3,
+  "output_size": 3,
+  "concat": false,
+  "skip_z": false,
+  "reservoirs": [
+    {
+      "input_size": 1,
+      "output_size": 1,
+      "leaky": 0.1,
+      "inp_scaling": 0.05,
+      "regul": 8e-06,
+      "units": 250,
+      "rho": 1.1,
+      "solver": null
+    },
+    {
+      "input_size": 1,
+      "output_size": 1,
+      "leaky": 0.1,
+      "inp_scaling": 0.181,
+      "regul": 2e-06,
+      "units": 500,
+      "rho": 1.1,
+      "solver": null
+    }
+  ]
+}
+{'lag': 1, 'bigger_dataset': False, 'test_trials': 1, 'n_modules': 2, 'use_self_loop': True, 'washout': 200, 'mode': 'entangled_with_z', 'rescale_input': False, 'show_plot': False, 'input_size': 3, 'output_size': 3, 'concat': False, 'skip_z': False, 'reservoirs': [{'input_size': 1, 'output_size': 1, 'leaky': 0.1, 'inp_scaling': 0.05, 'regul': 8e-06, 'units': 250, 'rho': 1.1, 'solver': None}, {'input_size': 1, 'output_size': 1, 'leaky': 0.1, 'inp_scaling': 0.181, 'regul': 2e-06, 'units': 500, 'rho': 1.1, 'solver': None}]}
+torch.Size([2499, 3])
+[RESERVOIR CELL 0] created with 250 units.
+
+[RESERVOIR CELL 1] created with 500 units.
+
+tensor([ -7.2642, -11.5611,  17.3183])
+ ##################################################################### 
+Mean NRMSE 1.2124391,    std 0.0
+ ##################################################################### 
+
+
+/Users/matt/Desktop/Tesi/Codice/ESN & attrattori/lorenz attractor/lorenz.py:146: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  test_target = torch.tensor(test_dataset[0:n], dtype=torch.float32).reshape(-1, n_out) # reshape element to torch.Size([rows=len(train_target), columns=3])
+/Users/matt/Desktop/Tesi/Codice/ESN & attrattori/lorenz attractor/esn_alternative.py:650: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  return torch.tensor(predictions, dtype=torch.float32)
+
+
+--- Config File: config_tmp_23.json ---
+{
+  "lag": 1,
+  "bigger_dataset": false,
+  "test_trials": 1,
+  "n_modules": 2,
+  "use_self_loop": true,
+  "washout": 200,
+  "mode": "entangled_with_z",
+  "rescale_input": false,
+  "show_plot": false,
+  "input_size": 3,
+  "output_size": 3,
+  "concat": false,
+  "skip_z": false,
+  "reservoirs": [
+    {
+      "input_size": 1,
+      "output_size": 1,
+      "leaky": 0.1,
+      "inp_scaling": 0.05,
+      "regul": 8e-06,
+      "units": 250,
+      "rho": 1.1,
+      "solver": null
+    },
+    {
+      "input_size": 1,
+      "output_size": 1,
+      "leaky": 0.1,
+      "inp_scaling": 0.181,
+      "regul": 0.009000000000000001,
+      "units": 500,
+      "rho": 1.1,
+      "solver": null
+    }
+  ]
+}
+{'lag': 1, 'bigger_dataset': False, 'test_trials': 1, 'n_modules': 2, 'use_self_loop': True, 'washout': 200, 'mode': 'entangled_with_z', 'rescale_input': False, 'show_plot': False, 'input_size': 3, 'output_size': 3, 'concat': False, 'skip_z': False, 'reservoirs': [{'input_size': 1, 'output_size': 1, 'leaky': 0.1, 'inp_scaling': 0.05, 'regul': 8e-06, 'units': 250, 'rho': 1.1, 'solver': None}, {'input_size': 1, 'output_size': 1, 'leaky': 0.1, 'inp_scaling': 0.181, 'regul': 0.009000000000000001, 'units': 500, 'rho': 1.1, 'solver': None}]}
+torch.Size([2499, 3])
+[RESERVOIR CELL 0] created with 250 units.
+
+[RESERVOIR CELL 1] created with 500 units.
+
+tensor([ -7.2642, -11.5611,  17.3183])
+ ##################################################################### 
+Mean NRMSE 2.1082735,    std 0.0
+ ##################################################################### 
+
+
+/Users/matt/Desktop/Tesi/Codice/.venv/lib/python3.13/site-packages/sklearn/linear_model/_ridge.py:215: LinAlgWarning: Ill-conditioned matrix (rcond=2.28823e-09): result may not be accurate.
+  return linalg.solve(A, Xy, assume_a="pos", overwrite_a=True).T
+/Users/matt/Desktop/Tesi/Codice/ESN & attrattori/lorenz attractor/lorenz.py:146: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  test_target = torch.tensor(test_dataset[0:n], dtype=torch.float32).reshape(-1, n_out) # reshape element to torch.Size([rows=len(train_target), columns=3])
+/Users/matt/Desktop/Tesi/Codice/ESN & attrattori/lorenz attractor/esn_alternative.py:650: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  return torch.tensor(predictions, dtype=torch.float32)
+
+
+--- Config File: config_tmp_24.json ---
+{
+  "lag": 1,
+  "bigger_dataset": false,
+  "test_trials": 1,
+  "n_modules": 2,
+  "use_self_loop": true,
+  "washout": 200,
+  "mode": "entangled_with_z",
+  "rescale_input": false,
+  "show_plot": false,
+  "input_size": 3,
+  "output_size": 3,
+  "concat": false,
+  "skip_z": false,
+  "reservoirs": [
+    {
+      "input_size": 1,
+      "output_size": 1,
+      "leaky": 0.1,
+      "inp_scaling": 0.05,
+      "regul": 8e-06,
+      "units": 250,
+      "rho": 1.1,
+      "solver": null
+    },
+    {
+      "input_size": 1,
+      "output_size": 1,
+      "leaky": 0.1,
+      "inp_scaling": 0.181,
+      "regul": 4e-05,
+      "units": 500,
+      "rho": 1.1,
+      "solver": null
+    }
+  ]
+}
+{'lag': 1, 'bigger_dataset': False, 'test_trials': 1, 'n_modules': 2, 'use_self_loop': True, 'washout': 200, 'mode': 'entangled_with_z', 'rescale_input': False, 'show_plot': False, 'input_size': 3, 'output_size': 3, 'concat': False, 'skip_z': False, 'reservoirs': [{'input_size': 1, 'output_size': 1, 'leaky': 0.1, 'inp_scaling': 0.05, 'regul': 8e-06, 'units': 250, 'rho': 1.1, 'solver': None}, {'input_size': 1, 'output_size': 1, 'leaky': 0.1, 'inp_scaling': 0.181, 'regul': 4e-05, 'units': 500, 'rho': 1.1, 'solver': None}]}
+torch.Size([2499, 3])
+[RESERVOIR CELL 0] created with 250 units.
+
+[RESERVOIR CELL 1] created with 500 units.
+
+tensor([ -7.2642, -11.5611,  17.3183])
+ ##################################################################### 
+Mean NRMSE 1.5115902,    std 0.0
+ ##################################################################### 
+
+
+/Users/matt/Desktop/Tesi/Codice/ESN & attrattori/lorenz attractor/lorenz.py:146: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  test_target = torch.tensor(test_dataset[0:n], dtype=torch.float32).reshape(-1, n_out) # reshape element to torch.Size([rows=len(train_target), columns=3])
+/Users/matt/Desktop/Tesi/Codice/ESN & attrattori/lorenz attractor/esn_alternative.py:650: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  return torch.tensor(predictions, dtype=torch.float32)
+
+
+--- Config File: config_tmp_25.json ---
+{
+  "lag": 1,
+  "bigger_dataset": false,
+  "test_trials": 1,
+  "n_modules": 2,
+  "use_self_loop": true,
+  "washout": 200,
+  "mode": "entangled_with_z",
+  "rescale_input": false,
+  "show_plot": false,
+  "input_size": 3,
+  "output_size": 3,
+  "concat": false,
+  "skip_z": false,
+  "reservoirs": [
+    {
+      "input_size": 1,
+      "output_size": 1,
+      "leaky": 0.1,
+      "inp_scaling": 0.05,
+      "regul": 8e-06,
+      "units": 250,
+      "rho": 1.1,
+      "solver": null
+    },
+    {
+      "input_size": 1,
+      "output_size": 1,
+      "leaky": 0.1,
+      "inp_scaling": 0.181,
+      "regul": 0.1,
+      "units": 500,
+      "rho": 1.1,
+      "solver": null
+    }
+  ]
+}
+{'lag': 1, 'bigger_dataset': False, 'test_trials': 1, 'n_modules': 2, 'use_self_loop': True, 'washout': 200, 'mode': 'entangled_with_z', 'rescale_input': False, 'show_plot': False, 'input_size': 3, 'output_size': 3, 'concat': False, 'skip_z': False, 'reservoirs': [{'input_size': 1, 'output_size': 1, 'leaky': 0.1, 'inp_scaling': 0.05, 'regul': 8e-06, 'units': 250, 'rho': 1.1, 'solver': None}, {'input_size': 1, 'output_size': 1, 'leaky': 0.1, 'inp_scaling': 0.181, 'regul': 0.1, 'units': 500, 'rho': 1.1, 'solver': None}]}
+torch.Size([2499, 3])
+[RESERVOIR CELL 0] created with 250 units.
+
+[RESERVOIR CELL 1] created with 500 units.
+
+tensor([ -7.2642, -11.5611,  17.3183])
+ ##################################################################### 
+Mean NRMSE 1.9236169,    std 0.0
+ ##################################################################### 
+
+
+/Users/matt/Desktop/Tesi/Codice/.venv/lib/python3.13/site-packages/sklearn/linear_model/_ridge.py:215: LinAlgWarning: Ill-conditioned matrix (rcond=2.42265e-08): result may not be accurate.
+  return linalg.solve(A, Xy, assume_a="pos", overwrite_a=True).T
+/Users/matt/Desktop/Tesi/Codice/ESN & attrattori/lorenz attractor/lorenz.py:146: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  test_target = torch.tensor(test_dataset[0:n], dtype=torch.float32).reshape(-1, n_out) # reshape element to torch.Size([rows=len(train_target), columns=3])
+/Users/matt/Desktop/Tesi/Codice/ESN & attrattori/lorenz attractor/esn_alternative.py:650: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  return torch.tensor(predictions, dtype=torch.float32)
+
+
+--- Config File: config_tmp_26.json ---
+{
+  "lag": 1,
+  "bigger_dataset": false,
+  "test_trials": 1,
+  "n_modules": 2,
+  "use_self_loop": true,
+  "washout": 200,
+  "mode": "entangled_with_z",
+  "rescale_input": false,
+  "show_plot": false,
+  "input_size": 3,
+  "output_size": 3,
+  "concat": false,
+  "skip_z": false,
+  "reservoirs": [
+    {
+      "input_size": 1,
+      "output_size": 1,
+      "leaky": 0.1,
+      "inp_scaling": 0.05,
+      "regul": 8e-06,
+      "units": 250,
+      "rho": 1.1,
+      "solver": null
+    },
+    {
+      "input_size": 1,
+      "output_size": 1,
+      "leaky": 0.1,
+      "inp_scaling": 0.181,
+      "regul": 0.06,
+      "units": 500,
+      "rho": 1.1,
+      "solver": null
+    }
+  ]
+}
+{'lag': 1, 'bigger_dataset': False, 'test_trials': 1, 'n_modules': 2, 'use_self_loop': True, 'washout': 200, 'mode': 'entangled_with_z', 'rescale_input': False, 'show_plot': False, 'input_size': 3, 'output_size': 3, 'concat': False, 'skip_z': False, 'reservoirs': [{'input_size': 1, 'output_size': 1, 'leaky': 0.1, 'inp_scaling': 0.05, 'regul': 8e-06, 'units': 250, 'rho': 1.1, 'solver': None}, {'input_size': 1, 'output_size': 1, 'leaky': 0.1, 'inp_scaling': 0.181, 'regul': 0.06, 'units': 500, 'rho': 1.1, 'solver': None}]}
+torch.Size([2499, 3])
+[RESERVOIR CELL 0] created with 250 units.
+
+[RESERVOIR CELL 1] created with 500 units.
+
+tensor([ -7.2642, -11.5611,  17.3183])
+ ##################################################################### 
+Mean NRMSE 1.9013424,    std 0.0
+ ##################################################################### 
+
+
+/Users/matt/Desktop/Tesi/Codice/.venv/lib/python3.13/site-packages/sklearn/linear_model/_ridge.py:215: LinAlgWarning: Ill-conditioned matrix (rcond=1.53049e-08): result may not be accurate.
+  return linalg.solve(A, Xy, assume_a="pos", overwrite_a=True).T
+/Users/matt/Desktop/Tesi/Codice/ESN & attrattori/lorenz attractor/lorenz.py:146: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  test_target = torch.tensor(test_dataset[0:n], dtype=torch.float32).reshape(-1, n_out) # reshape element to torch.Size([rows=len(train_target), columns=3])
+/Users/matt/Desktop/Tesi/Codice/ESN & attrattori/lorenz attractor/esn_alternative.py:650: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  return torch.tensor(predictions, dtype=torch.float32)
+
+
+--- Config File: config_tmp_27.json ---
+{
+  "lag": 1,
+  "bigger_dataset": false,
+  "test_trials": 1,
+  "n_modules": 2,
+  "use_self_loop": true,
+  "washout": 200,
+  "mode": "entangled_with_z",
+  "rescale_input": false,
+  "show_plot": false,
+  "input_size": 3,
+  "output_size": 3,
+  "concat": false,
+  "skip_z": false,
+  "reservoirs": [
+    {
+      "input_size": 1,
+      "output_size": 1,
+      "leaky": 0.1,
+      "inp_scaling": 0.05,
+      "regul": 8e-06,
+      "units": 250,
+      "rho": 1.1,
+      "solver": null
+    },
+    {
+      "input_size": 1,
+      "output_size": 1,
+      "leaky": 0.1,
+      "inp_scaling": 0.181,
+      "regul": 0.09,
+      "units": 500,
+      "rho": 1.1,
+      "solver": null
+    }
+  ]
+}
+{'lag': 1, 'bigger_dataset': False, 'test_trials': 1, 'n_modules': 2, 'use_self_loop': True, 'washout': 200, 'mode': 'entangled_with_z', 'rescale_input': False, 'show_plot': False, 'input_size': 3, 'output_size': 3, 'concat': False, 'skip_z': False, 'reservoirs': [{'input_size': 1, 'output_size': 1, 'leaky': 0.1, 'inp_scaling': 0.05, 'regul': 8e-06, 'units': 250, 'rho': 1.1, 'solver': None}, {'input_size': 1, 'output_size': 1, 'leaky': 0.1, 'inp_scaling': 0.181, 'regul': 0.09, 'units': 500, 'rho': 1.1, 'solver': None}]}
+torch.Size([2499, 3])
+[RESERVOIR CELL 0] created with 250 units.
+
+[RESERVOIR CELL 1] created with 500 units.
+
+tensor([ -7.2642, -11.5611,  17.3183])
+ ##################################################################### 
+Mean NRMSE 1.6228838,    std 0.0
+ ##################################################################### 
+
+
+/Users/matt/Desktop/Tesi/Codice/.venv/lib/python3.13/site-packages/sklearn/linear_model/_ridge.py:215: LinAlgWarning: Ill-conditioned matrix (rcond=2.22032e-08): result may not be accurate.
+  return linalg.solve(A, Xy, assume_a="pos", overwrite_a=True).T
+/Users/matt/Desktop/Tesi/Codice/ESN & attrattori/lorenz attractor/lorenz.py:146: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  test_target = torch.tensor(test_dataset[0:n], dtype=torch.float32).reshape(-1, n_out) # reshape element to torch.Size([rows=len(train_target), columns=3])
+/Users/matt/Desktop/Tesi/Codice/ESN & attrattori/lorenz attractor/esn_alternative.py:650: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  return torch.tensor(predictions, dtype=torch.float32)
+
+
+--- Config File: config_tmp_28.json ---
+{
+  "lag": 1,
+  "bigger_dataset": false,
+  "test_trials": 1,
+  "n_modules": 2,
+  "use_self_loop": true,
+  "washout": 200,
+  "mode": "entangled_with_z",
+  "rescale_input": false,
+  "show_plot": false,
+  "input_size": 3,
+  "output_size": 3,
+  "concat": false,
+  "skip_z": false,
+  "reservoirs": [
+    {
+      "input_size": 1,
+      "output_size": 1,
+      "leaky": 0.1,
+      "inp_scaling": 0.05,
+      "regul": 8e-06,
+      "units": 250,
+      "rho": 1.1,
+      "solver": null
+    },
+    {
+      "input_size": 1,
+      "output_size": 1,
+      "leaky": 0.1,
+      "inp_scaling": 0.181,
+      "regul": 0.008,
+      "units": 500,
+      "rho": 1.1,
+      "solver": null
+    }
+  ]
+}
+{'lag': 1, 'bigger_dataset': False, 'test_trials': 1, 'n_modules': 2, 'use_self_loop': True, 'washout': 200, 'mode': 'entangled_with_z', 'rescale_input': False, 'show_plot': False, 'input_size': 3, 'output_size': 3, 'concat': False, 'skip_z': False, 'reservoirs': [{'input_size': 1, 'output_size': 1, 'leaky': 0.1, 'inp_scaling': 0.05, 'regul': 8e-06, 'units': 250, 'rho': 1.1, 'solver': None}, {'input_size': 1, 'output_size': 1, 'leaky': 0.1, 'inp_scaling': 0.181, 'regul': 0.008, 'units': 500, 'rho': 1.1, 'solver': None}]}
+torch.Size([2499, 3])
+[RESERVOIR CELL 0] created with 250 units.
+
+[RESERVOIR CELL 1] created with 500 units.
+
+tensor([ -7.2642, -11.5611,  17.3183])
+ ##################################################################### 
+Mean NRMSE 2.3823767,    std 0.0
+ ##################################################################### 
+
+
+/Users/matt/Desktop/Tesi/Codice/.venv/lib/python3.13/site-packages/sklearn/linear_model/_ridge.py:215: LinAlgWarning: Ill-conditioned matrix (rcond=1.98002e-09): result may not be accurate.
+  return linalg.solve(A, Xy, assume_a="pos", overwrite_a=True).T
+/Users/matt/Desktop/Tesi/Codice/ESN & attrattori/lorenz attractor/lorenz.py:146: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  test_target = torch.tensor(test_dataset[0:n], dtype=torch.float32).reshape(-1, n_out) # reshape element to torch.Size([rows=len(train_target), columns=3])
+/Users/matt/Desktop/Tesi/Codice/ESN & attrattori/lorenz attractor/esn_alternative.py:650: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  return torch.tensor(predictions, dtype=torch.float32)
+

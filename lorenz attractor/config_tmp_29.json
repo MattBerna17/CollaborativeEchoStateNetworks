@@ -7,7 +7,7 @@
   "washout": 200,
   "mode": "entangled_with_z",
   "rescale_input": false,
-  "show_plot": true,
+  "show_plot": false,
   "input_size": 3,
   "output_size": 3,
   "concat": false,
@@ -16,9 +16,9 @@
     {
       "input_size": 1,
       "output_size": 1,
-      "leaky": 0.2,
+      "leaky": 0.1,
       "inp_scaling": 0.05,
-      "regul": 7e-1,
+      "regul": 8e-06,
       "units": 250,
       "rho": 1.1,
       "solver": null
@@ -26,9 +26,9 @@
     {
       "input_size": 1,
       "output_size": 1,
-      "leaky": 0.2,
+      "leaky": 0.1,
       "inp_scaling": 0.181,
-      "regul": 4e-3,
+      "regul": 0.0009000000000000001,
       "units": 500,
       "rho": 1.1,
       "solver": null

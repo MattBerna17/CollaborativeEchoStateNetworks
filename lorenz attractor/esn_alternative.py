@@ -498,10 +498,10 @@ class DeepReservoir(torch.nn.Module):
                     self.reservoirs[m].fit(U_module, Y_module, washout)
             elif self.mode == "entangled_with_z":
                 # print(f"\n\n\n################## TRAINING MODULE {m} ##################")
-                U_module = U[:, :, [2, 0]].reshape(1, -1, 2)
+                U_module = U[:, :, 0].reshape(1, -1, 1)
                 Y_module = Y[:, 1].reshape(-1, 1)
                 self.reservoirs[0].fit(U_module, Y_module, washout)
-                U_module = U[:, :, [2, 1]].reshape(1, -1, 2)
+                U_module = U[:, :, 1].reshape(1, -1, 1)
                 Y_module = Y[:, 0].reshape(-1, 1)
                 self.reservoirs[1].fit(U_module, Y_module, washout)
             # print("################## TRAINING ##################\n")
@@ -613,8 +613,7 @@ class DeepReservoir(torch.nn.Module):
                 for m in range(self.n_modules)
             ]
             ot = torch.tensor(ot, dtype=torch.float32).reshape(2, 1, 1, 1)
-            ot = torch.cat([ot[-1:], ot[:-1]], dim=0)
-
+            ot = torch.cat([ot[1], ot[0]], dim=0).reshape(2, 1, 1, 1)
 
             # ot[0] = torch.tensor(Y[0, 0], dtype=torch.float32).reshape(1, 1, 1)
 
@@ -626,7 +625,7 @@ class DeepReservoir(torch.nn.Module):
                 for m in range(self.n_modules):
                     # module_input = past_prediction[m]
                     # print(Y[i, 2])
-                    module_input = torch.cat((past_prediction[m], Y[i, 2].reshape(1, 1, 1)), dim=2).reshape(1, 1, 2)
+                    module_input = past_prediction[m]
                     new_activation = self.reservoirs[m](
                         module_input,
                         torch.tensor(self.reservoirs[m].activations[-1], dtype=torch.float32).reshape(1, -1)
@@ -640,9 +639,9 @@ class DeepReservoir(torch.nn.Module):
                         )[0]
                     )
                 ot = torch.tensor(ot, dtype=torch.float32).reshape(2, 1, 1, 1)
-                ot = torch.cat([ot[-1:], ot[:-1]], dim=0)
+                ot = torch.cat([ot[1], ot[0]], dim=0).reshape(2, 1, 1, 1)
 
-                # ot[0] = torch.tensor(Y[i, 0], dtype=torch.float32).reshape(1, 1, 1)
+                # ot[1] = torch.tensor(Y[i, 1], dtype=torch.float32).reshape(1, 1, 1)
 
 
                 predictions = torch.cat([predictions, ot.reshape(1, 2)], dim=0)
