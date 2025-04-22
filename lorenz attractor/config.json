@@ -2,7 +2,7 @@
   "lag": 1,
   "bigger_dataset": false,
   "test_trials": 1,
-  "n_modules": 3,
+  "n_modules": 2,
   "use_self_loop": true,
   "washout": 200,
   "mode": "entangled_with_z",
@@ -17,9 +17,9 @@
       "input_size": 2,
       "output_size": 1,
       "leaky": 0.2,
-      "inp_scaling": 0.05,
-      "regul": 8e-3,
-      "units": 300,
+      "inp_scaling": 0.181,
+      "regul": 8e-2,
+      "units": 400,
       "rho": 1.1,
       "solver": null
     },
@@ -27,19 +27,9 @@
       "input_size": 2,
       "output_size": 1,
       "leaky": 0.2,
-      "inp_scaling": 0.181,
+      "inp_scaling": 0.121,
       "regul": 2e-3,
       "units": 400,
-      "rho": 1.1,
-      "solver": null
-    },
-    {
-      "input_size": 1,
-      "output_size": 1,
-      "leaky": 0.75,
-      "inp_scaling": 0.195,
-      "regul": 4e-3,
-      "units": 500,
       "rho": 1.1,
       "solver": null
     }
