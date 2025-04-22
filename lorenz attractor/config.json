@@ -14,22 +14,22 @@
   "skip_z": false,
   "reservoirs": [
     {
-      "input_size": 1,
+      "input_size": 2,
       "output_size": 1,
       "leaky": 0.2,
       "inp_scaling": 0.05,
-      "regul": 7e-1,
-      "units": 250,
+      "regul": 8e-3,
+      "units": 300,
       "rho": 1.1,
       "solver": null
     },
     {
-      "input_size": 1,
+      "input_size": 2,
       "output_size": 1,
       "leaky": 0.2,
       "inp_scaling": 0.181,
-      "regul": 4e-3,
-      "units": 500,
+      "regul": 2e-3,
+      "units": 400,
       "rho": 1.1,
       "solver": null
     },

@@ -497,17 +497,15 @@ class DeepReservoir(torch.nn.Module):
                     Y_module = Y[:, (m+1)%Y.shape[1]].reshape(-1, self.reservoirs[m].net.output_size)
                     self.reservoirs[m].fit(U_module, Y_module, washout)
             elif self.mode == "entangled_with_z":
-                # print(f"\n\n\n################## TRAINING MODULE {m} ##################")
-                U_module = U[:, :, 0].reshape(1, -1, 1)
+                U_module = U[:, :, [2, 0]].reshape(1, -1, 2)
                 Y_module = Y[:, 1].reshape(-1, 1)
                 self.reservoirs[0].fit(U_module, Y_module, washout)
-                U_module = U[:, :, 1].reshape(1, -1, 1)
+                U_module = U[:, :, [2, 1]].reshape(1, -1, 2)
                 Y_module = Y[:, 0].reshape(-1, 1)
                 self.reservoirs[1].fit(U_module, Y_module, washout)
                 U_module = U[:, :, 2].reshape(1, -1, 1)
                 Y_module = Y[:, 2].reshape(-1, 1)
                 self.reservoirs[2].fit(U_module, Y_module, washout)
-            # print("################## TRAINING ##################\n")
         else:
             self.reservoirs[0].fit(U, Y, washout)
 
@@ -628,7 +626,10 @@ class DeepReservoir(torch.nn.Module):
                 for m in range(self.n_modules):
                     # module_input = past_prediction[m]
                     # print(Y[i, 2])
-                    module_input = past_prediction[m]
+                    if m == 2:
+                        module_input = past_prediction[m]
+                    else:
+                        module_input = torch.cat((past_prediction[2], past_prediction[m]), dim=1).reshape(1, 1, 2)
                     new_activation = self.reservoirs[m](
                         module_input,
                         torch.tensor(self.reservoirs[m].activations[-1], dtype=torch.float32).reshape(1, -1)
