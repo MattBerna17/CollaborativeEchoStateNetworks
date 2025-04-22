@@ -116,12 +116,15 @@ for guess in range(config["test_trials"]):
     if config["n_modules"] > 1:
         train_predictions = [None for _ in range(n_out)]
         if model.mode == "entangled_with_z":
-            train_predictions = [None, None]
+            train_predictions = [None, None, None]
             train_predictions[1] = model.reservoirs[0].classifier.predict(
                 model.reservoirs[0].scaler.transform(model.reservoirs[0].activations)
             )
             train_predictions[0] = model.reservoirs[1].classifier.predict(
                 model.reservoirs[1].scaler.transform(model.reservoirs[1].activations)
+            )
+            train_predictions[2] = model.reservoirs[2].classifier.predict(
+                model.reservoirs[2].scaler.transform(model.reservoirs[2].activations)
             )
         for m in range(model.n_modules):
             if model.mode == "entangled":
@@ -155,12 +158,12 @@ for guess in range(config["test_trials"]):
     #     plot_reservoir_state_2d(training_activations[m], testing_activations[m], reservoir_index=m)
     
     
-    test_target = test_target[:, 0:2].numpy()
-    train_target = train_target[:, 0:2]
+    test_target = test_target.numpy()
+    # train_target = train_target[:, 0:2]
     NRMSE = [compute_nrmse(test_predictions, test_target)] # compute nrmse for each prediction
     # plot_train_test_prediction_and_target(train_predictions, train_target, test_predictions, test_target, inp_dim=n_out, train_activations_list=training_activations, test_activations_list=testing_activations) if config["show_plot"] else None
 
-    plot_train_test_prediction_and_target(train_predictions, train_target, test_predictions, test_target, inp_dim=2) if config["show_plot"] else None
+    plot_train_test_prediction_and_target(train_predictions, train_target, test_predictions, test_target, inp_dim=3) if config["show_plot"] else None
     # plot_prediction_and_target(test_predictions, test_target, inp_dim=2) if config["show_plot"] else None # plot the prediction
 
     # valid_nmse = test_esn(valid_dataset, valid_target, classifier, scaler, title="validation") # get nmse of the validation dataset

@@ -504,6 +504,9 @@ class DeepReservoir(torch.nn.Module):
                 U_module = U[:, :, 1].reshape(1, -1, 1)
                 Y_module = Y[:, 0].reshape(-1, 1)
                 self.reservoirs[1].fit(U_module, Y_module, washout)
+                U_module = U[:, :, 2].reshape(1, -1, 1)
+                Y_module = Y[:, 2].reshape(-1, 1)
+                self.reservoirs[2].fit(U_module, Y_module, washout)
             # print("################## TRAINING ##################\n")
         else:
             self.reservoirs[0].fit(U, Y, washout)
@@ -612,13 +615,13 @@ class DeepReservoir(torch.nn.Module):
                 )[0]
                 for m in range(self.n_modules)
             ]
-            ot = torch.tensor(ot, dtype=torch.float32).reshape(2, 1, 1, 1)
-            ot = torch.cat([ot[1], ot[0]], dim=0).reshape(2, 1, 1, 1)
+            ot = torch.tensor(ot, dtype=torch.float32).reshape(3, 1, 1, 1)
+            ot = torch.cat([ot[1], ot[0], ot[2]], dim=0).reshape(3, 1, 1, 1)
 
             # ot[0] = torch.tensor(Y[0, 0], dtype=torch.float32).reshape(1, 1, 1)
 
 
-            predictions = torch.cat([predictions, ot.reshape(1, 2)], dim=0)
+            predictions = torch.cat([predictions, ot.reshape(1, 3)], dim=0)
             past_prediction = ot
             ot = []
             for i in range(1, n_iter):
@@ -638,13 +641,13 @@ class DeepReservoir(torch.nn.Module):
                             self.reservoirs[m].scaler.transform(new_activation.detach().numpy().reshape(1, -1))
                         )[0]
                     )
-                ot = torch.tensor(ot, dtype=torch.float32).reshape(2, 1, 1, 1)
-                ot = torch.cat([ot[1], ot[0]], dim=0).reshape(2, 1, 1, 1)
+                ot = torch.tensor(ot, dtype=torch.float32).reshape(3, 1, 1, 1)
+                ot = torch.cat([ot[1], ot[0], ot[2]], dim=0).reshape(3, 1, 1, 1)
 
                 # ot[1] = torch.tensor(Y[i, 1], dtype=torch.float32).reshape(1, 1, 1)
 
 
-                predictions = torch.cat([predictions, ot.reshape(1, 2)], dim=0)
+                predictions = torch.cat([predictions, ot.reshape(1, 3)], dim=0)
                 past_prediction = ot
                 ot = []
             return torch.tensor(predictions, dtype=torch.float32)
