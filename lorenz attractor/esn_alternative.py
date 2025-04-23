@@ -140,7 +140,6 @@ class ReservoirCell(torch.nn.Module):
         self.leaky = leaky
         self.connectivity_input = connectivity_input
         self.connectivity_recurrent = connectivity_recurrent
-        self.verbose = True
 
         print(f"[RESERVOIR CELL {self.index}] created with {self.units} units.\n")
 
@@ -177,14 +176,6 @@ class ReservoirCell(torch.nn.Module):
         state_part = torch.mm(h_prev, self.recurrent_kernel)
         output = torch.tanh(input_part + self.bias + state_part)
         leaky_output = h_prev * (1 - self.leaky) + output * self.leaky
-
-        if self.verbose:
-            print(f"[RESERVOIR CELL {self.index}] input: {ut}\n")
-            print(f"[RESERVOIR CELL {self.index}] h_prev: {torch.median(h_prev)}\n")
-            print(f"[RESERVOIR CELL {self.index}] input_part: {torch.median(input_part)}\n")
-            print(f"[RESERVOIR CELL {self.index}] state_part: {torch.median(state_part)}\n")
-            print(f"[RESERVOIR CELL {self.index}] output: {torch.median(output)}\n")
-            print(f"[RESERVOIR CELL {self.index}] leaky_output: {torch.median(leaky_output)}\n\n\n")
 
         return leaky_output, leaky_output
     
@@ -253,7 +244,6 @@ class ReservoirModule(torch.nn.Module):
                                  connectivity_recurrent)
         self.solver = solver
         self.regul = regul
-        # self.net.save_parameters(f"./params/cell_{index}_params.pth") # save the parameters of the reservoir
 
     def init_hidden(self, batch_size):
         return torch.zeros(batch_size, self.net.units)
@@ -298,7 +288,6 @@ class ReservoirModule(torch.nn.Module):
         self.scaler = scaler
         self.activations = activations # save the activations before scaling them (for each iteration in the test method, the activations are scaled with the same scaler)
         activations = self.scaler.transform(self.activations) # scale the activations
-        # print(f"\n\nConditioning: {np.linalg.cond(activations)}\n\n")
         target = Y[washout:] # remove first washout elements
 
         if self.solver is None:
@@ -330,7 +319,6 @@ class ReservoirModule(torch.nn.Module):
             scaled_activations = torch.tensor(scaled_activations, dtype=torch.float32)
             ot = torch.tensor(self.classifier.predict(scaled_activations[-1].unsqueeze(0)).reshape(1, 1, self.net.input_size), dtype=torch.float32) # predict the next state (o(t))
             predictions.append(ot)
-        # print(f"[Reservoir {self.net.index}]: first 5 predictions {predictions[0:5]}")
         
         return predictions
 
@@ -365,10 +353,6 @@ class DeepReservoir(torch.nn.Module):
         self.tot_units = 0
         for i in range(self.n_modules):
             self.tot_units += config["reservoirs"][i]["units"]
-
-        connectivity_input_1 = self.tot_units // self.n_modules
-        connectivity_input_others = self.tot_units // self.n_modules
-        connectivity_recurrent = self.tot_units // self.n_modules
 
 
         if self.concat:
@@ -433,8 +417,6 @@ class DeepReservoir(torch.nn.Module):
             )
             
         self.reservoirs = torch.nn.ModuleList(reservoir_modules)
-        for res_module in self.reservoirs:
-            res_module.net.verbose = False
 
     
 
@@ -475,250 +457,135 @@ class DeepReservoir(torch.nn.Module):
         :param solver: solver of the ridge regression
         :param regul: regularization coefficient
         """
-        if self.n_modules > 1:
-            # print("\n################## TRAINING ##################")
-            if self.mode == "entangled":
-                for m in range(self.n_modules):
-                    # print(f"\n\n\n################## TRAINING MODULE {m} ##################")
-                    U_module = U[:, :, m].reshape(1, -1, self.reservoirs[m].net.input_size)
-                    Y_module = Y[:, (m+1)%Y.shape[1]].reshape(-1, self.reservoirs[m].net.output_size)
-                    self.reservoirs[m].fit(U_module, Y_module, washout)
-                # U_module = U[:, :, 2:3].reshape(1, -1, self.reservoirs[2].net.input_size)
-                # Y_module = Y[:, 0].reshape(-1, self.reservoirs[2].net.output_size)
-                # self.reservoirs[2].fit(U_module, Y_module, washout)
-            elif self.mode == "independent":
-                for m in range(self.n_modules):
-                    U_module = U[:, :, m].reshape(1, -1, self.reservoirs[m].net.input_size)
-                    Y_module = Y[:, m].reshape(-1, self.reservoirs[m].net.output_size)
-                    self.reservoirs[m].fit(U_module, Y_module, washout)
-            elif self.mode == "reinforced":
-                for m in range(self.n_modules):
-                    U_module = U[:, :, [m, ((m-1)%3)]].reshape(1, -1, self.reservoirs[m].net.input_size)
-                    Y_module = Y[:, (m+1)%Y.shape[1]].reshape(-1, self.reservoirs[m].net.output_size)
-                    self.reservoirs[m].fit(U_module, Y_module, washout)
-            elif self.mode == "entangled_with_z":
-                U_module = U[:, :, [2, 0]].reshape(1, -1, 2)
-                Y_module = Y[:, 1].reshape(-1, 1)
-                self.reservoirs[0].fit(U_module, Y_module, washout)
-                U_module = U[:, :, [2, 1]].reshape(1, -1, 2)
-                Y_module = Y[:, 0].reshape(-1, 1)
-                self.reservoirs[1].fit(U_module, Y_module, washout)
-        else:
+        if self.mode == "URP":
+            assert self.n_modules == 1, f"[ERROR] for URP mode, the number of modules, must be 1, instead, it's {self.n_modules}"
             self.reservoirs[0].fit(U, Y, washout)
+        elif self.mode == "EMP-3":
+            for m in range(self.n_modules):
+                U_module = U[:, :, m].reshape(1, -1, self.reservoirs[m].net.input_size)
+                Y_module = Y[:, (m+1)%Y.shape[1]].reshape(-1, self.reservoirs[m].net.output_size)
+                self.reservoirs[m].fit(U_module, Y_module, washout)
+        elif self.mode == "CDR":
+            U_module = U[:, :, 0].reshape(1, -1, self.reservoirs[0].net.input_size)
+            Y_module = Y[:, 1].reshape(-1, self.reservoirs[0].net.output_size)
+            self.reservoirs[0].fit(U_module, Y_module, washout)
+            U_module = U[:, :, 1].reshape(1, -1, self.reservoirs[1].net.input_size)
+            Y_module = Y[:, 0].reshape(-1, self.reservoirs[1].net.output_size)
+            self.reservoirs[1].fit(U_module, Y_module, washout)
+        elif self.mode == "ZCDR":
+            U_module = U[:, :, [2, 0]].reshape(1, -1, self.reservoirs[0].net.input_size)
+            Y_module = Y[:, 1].reshape(-1, self.reservoirs[0].net.output_size)
+            self.reservoirs[0].fit(U_module, Y_module, washout)
+            U_module = U[:, :, [2, 1]].reshape(1, -1, self.reservoirs[1].net.input_size)
+            Y_module = Y[:, 0].reshape(-1, self.reservoirs[1].net.output_size)
+            self.reservoirs[1].fit(U_module, Y_module, washout)
 
 
 
-    def predict(self, n_iter, y_init=None, Y=None):
+    def predict(self, n_iter, Y=None):
         """
         Function to predict the next n_iter timesteps
 
         :param n_iter: number of iterations to predict.
         :param y_init: possible initial values to start predicting from.
         """
-        if self.n_modules > 1:
-            if self.mode == "entangled":
-                return self.predict_entangled(n_iter, y_init, Y)
-            
-            elif self.mode == "independent":
-                predictions = [None for _ in range(self.n_modules)]
-                for m in range(self.n_modules):
-                    predictions[m] = self.reservoirs[m].predict(n_iter)
-                    # print(f"Module [{m}] predictions: {predictions[m][0:10]}\n\n")
-                predictions = torch.tensor(predictions, dtype=torch.float32).transpose(0, 1).reshape(-1, self.output_size)
-                # print(f"\n\nFINAL PREDICTIONS: {predictions[0:10]}\n\n")
-                return predictions
-            
-            elif self.mode == "reinforced":
-                return self.predict_reinforced(n_iter, y_init, Y)
-            
-            elif self.mode == "entangled_with_z":
-                return self.predict_entangled_with_z(n_iter, Y, y_init)
-        else:
+        if self.mode == "URP":
             return self.reservoirs[0].predict(n_iter)
+
+        elif self.mode == "EMP-3":
+            return self.predict_entangled(n_iter, Y)
+        
+        elif self.mode == "CDR" or self.mode == "ZCDR":
+            return self.predict_entangled_with_z(n_iter, Y)
+
     
-    def predict_entangled(self, n_iter, y_init=None, Y=None):
+    def predict_entangled(self, n_iter, Y=None):
         """
         Function to predict the next n_iter timesteps
 
         :param n_iter: number of iterations to predict.
         :param y_init: possible initial values to start predicting from.
         """
-        if self.n_modules > 1:
-            predictions = torch.tensor([], dtype=torch.float32)
-            ot = [
-                self.reservoirs[m].classifier.predict(
-                    self.reservoirs[m].scaler.transform(
-                        self.reservoirs[m].activations[-1].reshape(1, -1)
-                    )
-                )[0]
-                for m in range(self.n_modules)
-            ]
+        predictions = torch.tensor([], dtype=torch.float32)
+        ot = [
+            self.reservoirs[m].classifier.predict(
+                self.reservoirs[m].scaler.transform(
+                    self.reservoirs[m].activations[-1].reshape(1, -1)
+                )
+            )[0]
+            for m in range(self.n_modules)
+        ]
+        ot = torch.tensor(ot, dtype=torch.float32).reshape(self.output_size, 1, 1, 1)
+        ot = torch.cat([ot[-1:], ot[:-1]], dim=0)
+
+        predictions = torch.cat([predictions, ot.reshape(1, self.output_size)], dim=0)
+        past_prediction = ot
+        ot = []
+        for i in range(1, n_iter):
+            for m in range(self.n_modules):
+                module_input = past_prediction[m].reshape(1, 1, 1)
+                new_activation = self.reservoirs[m](
+                    module_input,
+                    torch.tensor(self.reservoirs[m].activations[-1], dtype=torch.float32).reshape(1, -1)
+                )[0][0]
+                self.reservoirs[m].activations = np.concatenate(
+                    [self.reservoirs[m].activations, new_activation.detach().numpy()], axis=0
+                )
+                ot.append(
+                    self.reservoirs[m].classifier.predict(
+                        self.reservoirs[m].scaler.transform(new_activation.detach().numpy().reshape(1, -1))
+                    )[0]
+                )
             ot = torch.tensor(ot, dtype=torch.float32).reshape(self.output_size, 1, 1, 1)
             ot = torch.cat([ot[-1:], ot[:-1]], dim=0)
-
-
-            # ot[0] = torch.tensor(Y[0, 0], dtype=torch.float32).reshape(1, 1, 1)
-
-
             predictions = torch.cat([predictions, ot.reshape(1, self.output_size)], dim=0)
             past_prediction = ot
             ot = []
-            for i in range(1, n_iter):
-                for m in range(self.n_modules):
-                    # module_input = past_prediction[m]
-                    module_input = past_prediction[m].reshape(1, 1, 1)
-                    new_activation = self.reservoirs[m](
-                        module_input,
-                        torch.tensor(self.reservoirs[m].activations[-1], dtype=torch.float32).reshape(1, -1)
-                    )[0][0]
-                    self.reservoirs[m].activations = np.concatenate(
-                        [self.reservoirs[m].activations, new_activation.detach().numpy()], axis=0
-                    )
-                    ot.append(
-                        self.reservoirs[m].classifier.predict(
-                            self.reservoirs[m].scaler.transform(new_activation.detach().numpy().reshape(1, -1))
-                        )[0]
-                    )
-                ot = torch.tensor(ot, dtype=torch.float32).reshape(self.output_size, 1, 1, 1)
-                ot = torch.cat([ot[-1:], ot[:-1]], dim=0)
-
-                # ot[0] = torch.tensor(Y[i, 0], dtype=torch.float32).reshape(1, 1, 1)
-
-
-                predictions = torch.cat([predictions, ot.reshape(1, self.output_size)], dim=0)
-                past_prediction = ot
-                ot = []
-            return torch.tensor(predictions, dtype=torch.float32)
-        else:
-            return self.reservoirs[0].predict(n_iter)
+        return torch.tensor(predictions, dtype=torch.float32)
         
 
-    def predict_entangled_with_z(self, n_iter, Y, y_init=None):
+    def predict_entangled_with_z(self, n_iter, Y=None):
         """
         Function to predict the next n_iter timesteps
 
         :param n_iter: number of iterations to predict.
         :param y_init: possible initial values to start predicting from.
         """
-        if self.n_modules > 1:
-            predictions = torch.tensor([], dtype=torch.float32)
-            ot = [
-                self.reservoirs[m].classifier.predict(
-                    self.reservoirs[m].scaler.transform(
-                        self.reservoirs[m].activations[-1].reshape(1, -1)
-                    )
-                )[0]
-                for m in range(self.n_modules)
-            ]
+        predictions = torch.tensor([], dtype=torch.float32)
+        ot = [
+            self.reservoirs[m].classifier.predict(
+                self.reservoirs[m].scaler.transform(
+                    self.reservoirs[m].activations[-1].reshape(1, -1)
+                )
+            )[0]
+            for m in range(self.n_modules)
+        ]
+        ot = torch.tensor(ot, dtype=torch.float32).reshape(2, 1, 1, 1)
+        ot = torch.cat([ot[1], ot[0]], dim=0).reshape(2, 1, 1, 1)
+        predictions = torch.cat([predictions, ot.reshape(1, 2)], dim=0)
+        past_prediction = ot
+        ot = []
+        for i in range(1, n_iter):
+            for m in range(self.n_modules):
+                if self.mode == "CDR":
+                    module_input = past_prediction[m].reshape(1, 1, 1)
+                elif self.mode == "ZCDR":
+                    module_input = torch.cat((torch.tensor(Y[i-1, 2], dtype=torch.float32).reshape(1, 1, 1), past_prediction[m]), dim=1).reshape(1, 1, 2)
+                new_activation = self.reservoirs[m](
+                    module_input,
+                    torch.tensor(self.reservoirs[m].activations[-1], dtype=torch.float32).reshape(1, -1)
+                )[0][0]
+                self.reservoirs[m].activations = np.concatenate(
+                    [self.reservoirs[m].activations, new_activation.detach().numpy()], axis=0
+                )
+                ot.append(
+                    self.reservoirs[m].classifier.predict(
+                        self.reservoirs[m].scaler.transform(new_activation.detach().numpy().reshape(1, -1))
+                    )[0]
+                )
             ot = torch.tensor(ot, dtype=torch.float32).reshape(2, 1, 1, 1)
             ot = torch.cat([ot[1], ot[0]], dim=0).reshape(2, 1, 1, 1)
-
-            # ot[0] = torch.tensor(Y[0, 0], dtype=torch.float32).reshape(1, 1, 1)
-
-
             predictions = torch.cat([predictions, ot.reshape(1, 2)], dim=0)
             past_prediction = ot
             ot = []
-            for i in range(1, n_iter):
-                for m in range(self.n_modules):
-                    # module_input = past_prediction[m]
-                    # print(Y[i, 2])
-                    module_input = torch.cat((torch.tensor(Y[i-1, 2], dtype=torch.float32).reshape(1, 1, 1), past_prediction[m]), dim=1).reshape(1, 1, 2)
-                    new_activation = self.reservoirs[m](
-                        module_input,
-                        torch.tensor(self.reservoirs[m].activations[-1], dtype=torch.float32).reshape(1, -1)
-                    )[0][0]
-                    self.reservoirs[m].activations = np.concatenate(
-                        [self.reservoirs[m].activations, new_activation.detach().numpy()], axis=0
-                    )
-                    ot.append(
-                        self.reservoirs[m].classifier.predict(
-                            self.reservoirs[m].scaler.transform(new_activation.detach().numpy().reshape(1, -1))
-                        )[0]
-                    )
-                ot = torch.tensor(ot, dtype=torch.float32).reshape(2, 1, 1, 1)
-                ot = torch.cat([ot[1], ot[0]], dim=0).reshape(2, 1, 1, 1)
-
-                # ot[1] = torch.tensor(Y[i, 1], dtype=torch.float32).reshape(1, 1, 1)
-
-
-                predictions = torch.cat([predictions, ot.reshape(1, 2)], dim=0)
-                past_prediction = ot
-                ot = []
-            return torch.tensor(predictions, dtype=torch.float32)
-        else:
-            return self.reservoirs[0].predict(n_iter)
-    
-    def predict_reinforced(self, n_iter, y_init=None, Y=None):
-        """
-        Function to predict the next n_iter timesteps
-
-        :param n_iter: number of iterations to predict.
-        :param y_init: possible initial values to start predicting from.
-        """
-        if self.n_modules > 1:
-            # for m in range(self.n_modules):
-            #     self.reservoirs[m].net.verbose = True
-            # print("\n######################################################")
-            # print(f"TIMESTEP {0}")
-            # print("######################################################\n")
-            predictions = torch.tensor([], dtype=torch.float32)
-            ot = [
-                self.reservoirs[m].classifier.predict(
-                    self.reservoirs[m].scaler.transform(
-                        self.reservoirs[m].activations[-1].reshape(1, -1)
-                    )
-                )[0]
-                for m in range(self.n_modules)
-            ]
-            ot = torch.tensor(ot, dtype=torch.float32).reshape(3, 1, 1, 1)
-            ot = torch.cat([ot[-1:], ot[:-1]], dim=0)
-
-
-            # ot[0] = torch.tensor(Y[0, 0], dtype=torch.float32).reshape(1, 1, 1)
-
-
-            predictions = torch.cat([predictions, ot.reshape(1, 3)], dim=0)
-            past_prediction = ot
-            ot = []
-            for i in range(1, n_iter):
-                for m in range(self.n_modules):
-                    # module_input = past_prediction[m]
-                    module_input = past_prediction[[m, ((m-1)%3)]].reshape(1, 1, self.reservoirs[m].net.input_size)
-                    new_activation = self.reservoirs[m](
-                        module_input,
-                        torch.tensor(self.reservoirs[m].activations[-1], dtype=torch.float32).reshape(1, -1)
-                    )[0][0]
-                    self.reservoirs[m].activations = np.concatenate(
-                        [self.reservoirs[m].activations, new_activation.detach().numpy()], axis=0
-                    )
-                    ot.append(
-                        self.reservoirs[m].classifier.predict(
-                            self.reservoirs[m].scaler.transform(new_activation.detach().numpy().reshape(1, -1))
-                        )[0]
-                    )
-                # module_input = past_prediction[0:3].reshape(1, 1, 3)
-                # new_activation = self.reservoirs[2](
-                #     module_input, 
-                #     torch.tensor(self.reservoirs[2].activations[-1], dtype=torch.float32).reshape(1, -1)
-                # )[0][0]
-                # self.reservoirs[2].activations = np.concatenate(
-                #     [self.reservoirs[2].activations, new_activation.detach().numpy()], axis=0
-                # )
-                # ot.append(
-                #     self.reservoirs[2].classifier.predict(
-                #         self.reservoirs[2].scaler.transform(new_activation.detach().numpy().reshape(1, -1))
-                #     )[0]
-                # )
-                ot = torch.tensor(ot, dtype=torch.float32).reshape(3, 1, 1, 1)
-                ot = torch.cat([ot[-1:], ot[:-1]], dim=0)
-
-                # ot[0] = torch.tensor(Y[i, 0], dtype=torch.float32).reshape(1, 1, 1)
-
-
-                predictions = torch.cat([predictions, ot.reshape(1, 3)], dim=0)
-                past_prediction = ot
-                ot = []
-            return torch.tensor(predictions, dtype=torch.float32)
-        else:
-            return self.reservoirs[0].predict(n_iter)
+        return torch.tensor(predictions, dtype=torch.float32)

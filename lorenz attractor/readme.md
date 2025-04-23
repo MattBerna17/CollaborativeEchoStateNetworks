@@ -1,21 +1,70 @@
-# ESNs for predicting Lorenz Attractor
-## Run
-The following command is used to execute the lorenz attractor predictor using Echo State Networks with only 1 reservoir (layer in the following) to predict the next state of the attractor:
+# 🌀 Deep Echo State Networks for Lorenz Attractor Forecasting
+
+This repository explores different architectural paradigms of **Echo State Networks (ESNs)** to model and predict the chaotic **Lorenz attractor** system. The implementations are based on modular PyTorch components and are designed for high configurability and experimentation.
+
+---
+
+## 📦 Project Structure
+
+> The models are implemented using a `DeepReservoir` class composed of one or more `ReservoirModule` units. Each mode offers a different view of the input-output structure for predicting the system's future states.
+
+---
+
+## 🚀 Execution Modes
+
+### 🔹 V1. **Unified Reservoir Prediction (URP)**
+
+> A single reservoir receives all three components of the Lorenz system $[x(t), y(t), z(t)]$ as input and is trained to output the next step for all dimensions $[x(t+1), y(t+1), z(t+1)]$.
+
+- ✅ Simple and compact
+- 📉 Best suited for quick prototyping
+
+---
+
+### 🔹 V2. **Entangled Modular Prediction (EMP-3)**
+
+> Three reservoirs operate independently:
+- R0: input = $x(t)$ → output = $y(t+1)$
+- R1: input = $y(t)$ → output = $z(t+1)$
+- R2: input = $z(t)$ → output = $x(t+1)$
+
+Each module specializes in learning a transition in a cycle, forming a predictive loop over the dimensions.
+
+- 🔄 Cyclical dependencies
+- 🧠 Good for modular interpretation
+
+---
+
+### 🔹 V3. **Cross-Dual Reservoirs (CDR)**
+
+> Two reservoirs form a cross-prediction setup:
+- R0: input = $x(t)$ → output = $y(t+1)$
+- R1: input = $y(t)$ → output = $x(t+1)$
+
+Dimension $z$ is completely ignored in this configuration.
+
+- 🔍 Focused on the $x \leftrightarrow y$ subspace
+- 🚫 Ignores $z(t)$, faster training
+
+---
+
+### 🔹 V4. **Z-Aided Cross-Dual Reservoirs (ZCDR)**
+
+> Builds on the `CDR` architecture, but **injects ground-truth $z(t)$** as an auxiliary input:
+- R0: input = $[x(t), z(t)]$ → output = $y(t+1)$
+- R1: input = $[y(t), z(t)]$ → output = $x(t+1)$
+
+This allows the network to maintain sensitivity to the full 3D state, even if only predicting two dimensions.
+
+- 🧭 Uses $z(t)$ as a stabilizing input
+- ⚠️ Can bias the network if $z(t)$ dominates
+
+---
+
+## ⚙️ Configuration
+
+All modes are controlled through a JSON-based configuration file passed via:
 
 ```bash
-python3 lorenz.py --test_trials=1 --use_test --rho 0.9 --leaky 0.9 --regul 0.000003 --n_hid 256 --inp_scaling 0.014 --washout 200 --n_layers 1 --use_self_loop --show_plot
+python3 lorenz.py --config_file=config.json
 ```
-
-## Versions
-### Version 1.0 - Single reservoir
-In the first version of this project, we tried to use only 1 reservoir, that took as inputs all the dimensions at time $t$, i.e. $u(t) = [x(t), y(t), z(t)]$ to predict the values for $u(t+1) = [x(t+1), y(t+1), z(t+1)]$ using a 256-dimensional representation of the input applying non-linear transformations. During training, it is given, at each timestep, the ground truth values, but during testing it takes as input the past prediction, and starts this generative loop.
-
-This version works perfectly and is capable of reproducing the climate of the attractor, which means that, even though it does not predict exactly the ground truth value during test, it keeps behaving like the original lorenz attractor.
-
-
-### Version 2.0 - Deep reservoir
-In the second version, the single reservoir of the original code is split into 3 reservoir (layers), each one taking as input the $i$-th dimension of the lorenz attractor and predicting the $i+1$-th (i.e. the first reservoir takes as input $x(t)$ and predicts $y(t+1)$, and so on).
-
-During training, each reservoir is fed with the ground truth values, and during testing it takes as input the prediction of the previous (in a circular way) reservoir.
-
-This version does not work correctly: during training we can see that the last reservoir (input $z(t)$ output $x(t+1)$) cannot reproduce the correct values of $x(t+1)$, and that causes the quick explosion of activations during testing.
