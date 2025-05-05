@@ -1,0 +1,64 @@
+{
+    "total_dimensions": 4,
+    "lag": 1,
+    "bigger_dataset": false,
+    "test_trials": 1,
+    "n_modules": 4,
+    "use_self_loop": true,
+    "washout": 200,
+    "rescale_input": false,
+    "show_plot": true,
+    "input_size": 4,
+    "output_size": 4,
+    "concat": false,
+    "reservoirs": [
+        {
+            "input_size": 1,
+            "output_size": 1,
+            "input_dimensions": [0],
+            "output_dimensions": [1],
+            "leaky": 0.055,
+            "inp_scaling": 0.1,
+            "regul": 1e-1,
+            "units": 180,
+            "rho": 1.1,
+            "solver": null
+        },
+        {
+            "input_size": 1,
+            "output_size": 1,
+            "input_dimensions": [1],
+            "output_dimensions": [2],
+            "leaky": 0.055,
+            "inp_scaling": 0.05,
+            "regul": 1e-1,
+            "units": 270,
+            "rho": 1.1,
+            "solver": null
+        },
+        {
+            "input_size": 1,
+            "output_size": 1,
+            "input_dimensions": [2],
+            "output_dimensions": [3],
+            "leaky": 0.055,
+            "inp_scaling": 0.181,
+            "regul": 1e1,
+            "units": 180,
+            "rho": 1.1,
+            "solver": null
+        },
+        {
+            "input_size": 1,
+            "output_size": 1,
+            "input_dimensions": [3],
+            "output_dimensions": [0],
+            "leaky": 0.055,
+            "inp_scaling": 0.181,
+            "regul": 1e1,
+            "units": 250,
+            "rho": 1.1,
+            "solver": null
+        }
+    ]
+  }

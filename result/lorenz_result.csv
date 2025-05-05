@@ -1,3 +1,0 @@
-n_hid,inp_scaling,rho,leaky,regul,lag,bias_scaling,solver,washout,feedback_size,"NRMSE_mean, NRMSE_std",NRMSE_mean,NRMSE_std
-512,0.8,0.9,0.1,0.05,1,,,200,64,,0.0008854464977048,0.0001401432375073
-512,0.8,0.9,0.1,0.05,1,,,200,64,,0.0008788682636804879,0.00012760994551888193
