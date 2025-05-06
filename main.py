@@ -2,7 +2,7 @@ import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from esn_alternative import DeepReservoir
-from utils import get_rossler_attractor, compute_nrmse, plot_train_test_prediction_and_target, plot_prediction_distribution, plot_error, plot_prediction_3d, plot_variable_correlations
+from utils import get_lorenz_attractor, get_lorenz96, get_rossler_attractor, compute_nrmse, plot_train_test_prediction_and_target, plot_prediction_distribution, plot_error, plot_prediction_3d, plot_variable_correlations
 import numpy as np
 import argparse
 from sklearn import preprocessing
@@ -10,8 +10,8 @@ import torch
 
 
 # Try running with the following line:
-# python3 lorenz.py --config_file=config.json
-
+# python3 main.py --system={system} --config_file=config.json
+# where {system} = "lorenz" or "lorenz96" or "rossler"
 
 
 import argparse
@@ -19,9 +19,11 @@ import json
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--config_file', type=str, default=None, help='Path to JSON config file')
+parser.add_argument('--system', type=str, default="lorenz", help='Dynamic system to simulate: "lorenz", "lorenz96" or "rossler"')
 
 
 args = parser.parse_args()
+SYSTEM = args.system
 
 # If JSON file is provided, override args
 if args.config_file is not None:
@@ -33,13 +35,13 @@ if args.config_file is not None:
 
 print(config)
 
-namefile = 'rossler_log_ESN'
+namefile = f'{SYSTEM}_log_ESN'
 
 if config["lag"] > 1:
     stepahead = '_lag' + str(config["lag"])
     namefile += stepahead
 
-main_folder = 'results'
+main_folder = f'{SYSTEM}/results'
 
 device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
 
@@ -57,8 +59,12 @@ for i in range(config["n_modules"]):
 input_dims = sorted(list(set(input_dims)))
 predicted_dims = sorted(list(set(predicted_dims)))
 
-(train_dataset, train_target), (valid_dataset, valid_target), (test_dataset, test_target) = get_rossler_attractor(washout=washout)
-# plot_variable_correlations(train_dataset)
+if SYSTEM == "lorenz":
+    (train_dataset, train_target), (valid_dataset, valid_target), (test_dataset, test_target) = get_lorenz_attractor(washout=washout, bigger_dataset=config["bigger_dataset"])
+elif SYSTEM == "lorenz96":
+    (train_dataset, train_target), (valid_dataset, valid_target), (test_dataset, test_target) = get_lorenz96(washout=washout)
+elif SYSTEM == "rossler":
+    (train_dataset, train_target), (valid_dataset, valid_target), (test_dataset, test_target) = get_rossler_attractor(washout=washout)
 
 if config["rescale_input"]:
     scaler = preprocessing.MinMaxScaler().fit(train_dataset)
@@ -73,6 +79,8 @@ for guess in range(config["test_trials"]):
 
     train_dataset = train_dataset.unsqueeze(0).reshape(1, -1, tot_dims).to(device) # reshape element to torch.Size([1, rows=len(train_dataset), columns=n_inp])
     train_target = train_target.numpy() # reshape element to torch.Size([rows=len(train_target), columns=n_inp])
+
+    # plot_variable_correlations(train_dataset, labels=[f"x{i}" for i in range(tot_dims)])
 
 
     model.fit(
@@ -118,12 +126,14 @@ for guess in range(config["test_trials"]):
     train_target = train_target[:, predicted_dims]
     test_target = test_target[:, predicted_dims]
 
+    labels = [f"x{i}" for i in predicted_dims] if SYSTEM == "lorenz96" else ["x", "y", "z"]
 
-    plot_train_test_prediction_and_target(train_predictions, train_target, test_predictions, test_target, inp_dim=len(predicted_dims)) if config["show_plot"] else None
-    plot_error(test_predictions, test_target, n_dim=len(predicted_dims)) if config["show_plot"] else None
-    plot_prediction_distribution(train_predictions, train_target, "Train") if config["show_plot"] else None
-    plot_prediction_distribution(test_predictions, test_target, "Test") if config["show_plot"] else None
-    plot_prediction_3d(test_predictions, test_target, title="Rossler Attractor") if config["show_plot"] and len(predicted_dims) == 3 else None
+
+    plot_train_test_prediction_and_target(train_predictions, train_target, test_predictions, test_target, inp_dim=len(predicted_dims), labels=labels) if config["show_plot"] else None
+    plot_error(test_predictions, test_target, n_dim=len(predicted_dims), labels=labels) if config["show_plot"] else None
+    plot_prediction_distribution(train_predictions, train_target, "Train", labels=labels) if config["show_plot"] else None
+    plot_prediction_distribution(test_predictions, test_target, "Test", labels=labels) if config["show_plot"] else None
+    plot_prediction_3d(test_predictions, test_target, title=f"{SYSTEM.capitalize()} Attractor", labels=labels) if config["show_plot"] and len(predicted_dims) == 3 else None
 
 
 

@@ -1,7 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 
-def generate_rossler_dataset(a=0.2, b=0.2, c=5.7, dt=0.01, steps=5000, x0=0., y0=1., z0=0.):
+def generate_rossler_dataset(a=0.2, b=0.2, c=5.7, dt=0.01, steps=10000, x0=0., y0=1., z0=0.):
     """
     Generate the Rössler attractor data using the Runge-Kutta 4th order method.
     """

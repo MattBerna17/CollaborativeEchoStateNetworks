@@ -196,21 +196,21 @@ def get_cifar_data(bs_train,bs_test):
 
 
 def get_lorenz_attractor(lag=1, washout=200, bigger_dataset=False):
-    dataset = pd.read_csv("data/lorenz.csv", index_col="t").drop(columns=["Unnamed: 0"]) if not bigger_dataset else pd.read_csv("lorenz_attractor_10000.csv", index_col="t").drop(columns=["Unnamed: 0"])
+    dataset = pd.read_csv("lorenz/data/lorenz.csv", index_col="t").drop(columns=["Unnamed: 0"]) if not bigger_dataset else pd.read_csv("lorenz_attractor_10000.csv", index_col="t").drop(columns=["Unnamed: 0"])
     dataset = torch.tensor(dataset.values).float()
     (train_dataset, train_target), (val_dataset, val_target), (test_dataset, test_target) = separate_training_validation_test(dataset, washout, lag)
     return (train_dataset, train_target), (val_dataset, val_target), (test_dataset, test_target)
 
 
 def get_rossler_attractor(lag=1, washout=200):
-    dataset = pd.read_csv("data/rossler_dataset.csv", index_col="t")
+    dataset = pd.read_csv("rossler/data/rossler_dataset.csv", index_col="t")
     dataset = torch.tensor(dataset.values).float()
     (train_dataset, train_target), (val_dataset, val_target), (test_dataset, test_target) = separate_training_validation_test(dataset, washout, lag)
     return (train_dataset, train_target), (val_dataset, val_target), (test_dataset, test_target)
 
 
 def get_lorenz96(lag=1, washout=200):
-    dataset = pd.read_csv("data/lorenz96.csv")
+    dataset = pd.read_csv("lorenz96/data/lorenz96.csv")
     # Drop metadata columns like batch and time if present
     dataset = dataset.drop(columns=["batch", "time"], errors="ignore")
     dataset = torch.tensor(dataset.values).float()
@@ -252,39 +252,34 @@ def plot_prediction_distribution(predictions, targets, title_prefix="", labels=[
     plt.tight_layout()
     plt.show()
 
-def plot_variable_correlations(train_dataset):
-    """
-    Plots the pairwise correlations (scatter plots) between x, y, z in the training dataset.
+import matplotlib.pyplot as plt
+import torch
+import numpy as np
+import seaborn as sns
+import pandas as pd
 
-    :param train_dataset: a NumPy or Torch tensor of shape (n_samples, 3)
+def plot_variable_correlations(train_dataset, labels=None):
     """
+    Plots pairwise scatter plots of all variable combinations in the training dataset.
+
+    :param train_dataset: a NumPy or Torch tensor of shape (n_samples, n_features)
+    :param labels: Optional list of variable names. If None, uses generic x0, x1, ..., xn
+    """
+    train_dataset = train_dataset.reshape(-1, train_dataset.shape[-1])
     # Convert to numpy if it's a tensor
-    if hasattr(train_dataset, 'numpy'):
+    if isinstance(train_dataset, torch.Tensor):
         data = train_dataset.cpu().numpy()
     else:
         data = train_dataset
 
-    x = data[:, 0]
-    y = data[:, 1]
-    z = data[:, 2]
+    n_features = data.shape[1]
+    if labels is None:
+        labels = [f'x{i}' for i in range(n_features)]
 
-    fig, axs = plt.subplots(1, 3, figsize=(15, 5))
-    
-    axs[0].scatter(x, y, alpha=0.5)
-    axs[0].set_title('x vs y')
-    axs[0].set_xlabel('x')
-    axs[0].set_ylabel('y')
+    df = pd.DataFrame(data, columns=labels)
 
-    axs[1].scatter(y, z, alpha=0.5)
-    axs[1].set_title('y vs z')
-    axs[1].set_xlabel('y')
-    axs[1].set_ylabel('z')
-
-    axs[2].scatter(z, x, alpha=0.5)
-    axs[2].set_title('z vs x')
-    axs[2].set_xlabel('z')
-    axs[2].set_ylabel('x')
-
+    sns.pairplot(df, corner=True, plot_kws={'alpha': 0.5, 's': 10})
+    plt.suptitle("Pairwise Variable Correlations", y=1.02)
     plt.tight_layout()
     plt.show()
 
@@ -385,7 +380,7 @@ def plot_train_test_prediction_and_target(train_predictions, train_target, test_
     test_predictions = np.array(test_predictions).reshape(-1, inp_dim)
     train_target = np.array(train_target).reshape(-1, inp_dim)
     test_target = np.array(test_target).reshape(-1, inp_dim)
-    assert len(labels) == inp_dim
+    # assert len(labels) == inp_dim
 
     split_index = len(train_predictions)
     fig, axs = plt.subplots(inp_dim, sharex=True, figsize=(10, 6))

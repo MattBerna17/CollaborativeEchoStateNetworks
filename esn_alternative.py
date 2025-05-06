@@ -269,7 +269,7 @@ class ReservoirModule(torch.nn.Module):
         return hs, h_prev
     
 
-    def fit(self, U, Y, washout=200):
+    def fit(self, U, Y, washout=200, use_h2=False):
         """
         Function to train the reservoir's readout module (W_out matrix) given the dataset and the target.
 
@@ -284,10 +284,14 @@ class ReservoirModule(torch.nn.Module):
         activations = self(U)[0].cpu().numpy() # train the reservoir module to get the activations (activations = hs)
         activations = activations.reshape(-1, self.net.units) # reshape the activations to torch.Size([rows=len(train_dataset), columns=args.n_hid])
         activations = activations[washout:] # remove washout elements
+        self.activations = activations # save the activations before scaling them (for each iteration in the test method, the activations are scaled with the same scaler)
+        if use_h2:
+            # elevate the hidden states to the power of 2
+            h2_activations = np.power(activations, 2)
+            activations = np.concatenate([activations, h2_activations], axis=1)
         scaler = preprocessing.StandardScaler().fit(activations) # train the scaler on the activations
         self.scaler = scaler
-        self.activations = activations # save the activations before scaling them (for each iteration in the test method, the activations are scaled with the same scaler)
-        activations = self.scaler.transform(self.activations) # scale the activations
+        activations = self.scaler.transform(activations) # scale the activations
         target = Y[washout:] # remove first washout elements
 
         if self.solver is None:
@@ -299,7 +303,7 @@ class ReservoirModule(torch.nn.Module):
         
         self.classifier = classifier
 
-    def predict(self, n_iter):
+    def predict(self, n_iter, use_h2=False):
         """
         Function to predict the next n_iter states of the dynamic system
 
@@ -315,6 +319,10 @@ class ReservoirModule(torch.nn.Module):
             new_activation = self(ot, activations[-1].reshape(1, -1))[0].reshape(1, -1)
             activations = torch.cat((activations, new_activation), dim=0) # add the new activation to the activations
             self.activations = activations.numpy() # save the updated activations in numpy form
+            if use_h2:
+                # elevate the hidden states to the power of 2
+                h2_activations = np.power(activations, 2)
+                activations = np.concatenate([activations, h2_activations], axis=1)
             scaled_activations = self.scaler.transform(activations) # scale the activations together (to avoid scaling the past activations multiple times)
             scaled_activations = torch.tensor(scaled_activations, dtype=torch.float32)
             ot = torch.tensor(self.classifier.predict(scaled_activations[-1].unsqueeze(0)).reshape(1, 1, self.net.input_size), dtype=torch.float32) # predict the next state (o(t))
@@ -351,6 +359,7 @@ class DeepReservoir(torch.nn.Module):
         self.tot_dims = config["total_dimensions"]
         self.batch_first = True  # DeepReservoir only supports batch_first
         self.tot_units = 0
+        self.use_h2 = config["use_h2"] if "use_h2" in config else False
         for i in range(self.n_modules):
             self.tot_units += config["reservoirs"][i]["units"]
 
@@ -466,7 +475,7 @@ class DeepReservoir(torch.nn.Module):
         for m in range(self.n_modules):
             U_module = U[:, :, self.reservoirs[m].net.input_dimensions].reshape(1, -1, self.reservoirs[m].net.input_size)
             Y_module = Y[:, self.reservoirs[m].net.output_dimensions].reshape(-1, self.reservoirs[m].net.output_size)
-            self.reservoirs[m].fit(U_module, Y_module, washout)
+            self.reservoirs[m].fit(U_module, Y_module, washout, use_h2=self.use_h2)
 
 
     
@@ -483,10 +492,12 @@ class DeepReservoir(torch.nn.Module):
         # Initial prediction
         for m in range(self.n_modules):
             dims = self.reservoirs[m].net.output_dimensions
+            activations = self.reservoirs[m].activations[-1].reshape(1, -1)
+            if self.use_h2:
+                h2_activations = np.power(activations, 2)
+                activations = np.concatenate([activations, h2_activations], axis=1)
             pred = self.reservoirs[m].classifier.predict(
-                self.reservoirs[m].scaler.transform(
-                    self.reservoirs[m].activations[-1].reshape(1, -1)
-                )
+                self.reservoirs[m].scaler.transform(activations)
             )[0]
             ot[dims, 0, 0, 0] = torch.tensor(pred, dtype=torch.float32)
 
@@ -511,9 +522,15 @@ class DeepReservoir(torch.nn.Module):
                 self.reservoirs[m].activations = np.concatenate(
                     [self.reservoirs[m].activations, new_activation.detach().numpy()], axis=0
                 )
+                activations = self.reservoirs[m].activations[-1].reshape(1, -1)
+                if self.use_h2:
+                    h2_activations = np.power(self.reservoirs[m].activations[-1], 2)
+                    activations = np.concatenate(
+                        [self.reservoirs[m].activations[-1], h2_activations], axis=0
+                    )
 
                 pred = self.reservoirs[m].classifier.predict(
-                    self.reservoirs[m].scaler.transform(new_activation.detach().numpy().reshape(1, -1))
+                    self.reservoirs[m].scaler.transform(activations.reshape(1, -1))
                 )[0]
                 ot[self.reservoirs[m].net.output_dimensions, 0, 0, 0] = torch.tensor(pred, dtype=torch.float32)
 

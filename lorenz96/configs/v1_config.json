@@ -1,4 +1,5 @@
 {
+    "use_h2": false,
     "total_dimensions": 4,
     "lag": 1,
     "bigger_dataset": false,
@@ -17,11 +18,11 @@
             "output_size": 4,
             "input_dimensions": [0, 1, 2, 3],
             "output_dimensions": [0, 1, 2, 3],
-            "leaky": 0.055,
-            "inp_scaling": 0.02,
-            "regul": 2,
-            "units": 770,
-            "rho": 1.1,
+            "leaky": 0.02,
+            "inp_scaling": 0.24,
+            "regul": 10,
+            "units": 515,
+            "rho": 0.96,
             "solver": null
         }
     ]
