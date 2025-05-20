@@ -386,10 +386,10 @@ def plot_train_test_prediction_and_target(train_predictions, train_target, test_
     fig, axs = plt.subplots(inp_dim, sharex=True, figsize=(10, 6))
 
     for i in range(inp_dim):
-        axs[i].plot(range(split_index), train_predictions[:, i], label='Train Predictions', linestyle='dashed', color="red")
-        axs[i].plot(range(split_index), train_target[:, i], label='Train Targets', linestyle='solid', color="blue")
-        axs[i].plot(range(split_index, split_index + len(test_predictions)), test_predictions[:, i], label='Test Predictions', linestyle='dashed', color="red")
-        axs[i].plot(range(split_index, split_index + len(test_target)), test_target[:, i], label='Test Targets', linestyle='solid', color="blue")
+        axs[i].plot(range(split_index), train_predictions[:, i], label='Predictions' if i == 0 else None, linestyle='dashed', color="red")
+        axs[i].plot(range(split_index), train_target[:, i], label='Targets' if i == 0 else None, linestyle='solid', color="blue")
+        axs[i].plot(range(split_index, split_index + len(test_predictions)), test_predictions[:, i], linestyle='dashed', color="red")
+        axs[i].plot(range(split_index, split_index + len(test_target)), test_target[:, i], linestyle='solid', color="blue")
         axs[i].axvline(x=split_index, color='black', linestyle='dotted', linewidth=1)
         axs[i].set_title(f"Variable {labels[i]}")
 

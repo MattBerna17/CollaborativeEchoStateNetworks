@@ -4,7 +4,7 @@ This project explores **modular Echo State Networks (ESNs)** to forecast multipl
 
 ---
 
-## 🧠 Supported Dynamical Chaotic Systems
+## 🧠 Supported Dynamical Systems
 
 You can simulate and forecast three well-known chaotic systems:
 
