@@ -1,0 +1,44 @@
+{
+    "use_h2": false,
+    "total_dimensions": 6,
+    "lag": 1,
+    "bigger_dataset": false,
+    "test_trials": 1,
+    "n_modules": 1,
+    "use_self_loop": true,
+    "washout": 200,
+    "rescale_input": false,
+    "show_plot": true,
+    "input_size": 6,
+    "output_size": 6,
+    "concat": false,
+    "reservoirs": [
+        {
+            "input_size": 6,
+            "output_size": 6,
+            "input_dimensions": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5
+            ],
+            "output_dimensions": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5
+            ],
+            "leaky": 0.04,
+            "inp_scaling": 0.7,
+            "regul": 50,
+            "units": 550,
+            "rho": 1.0,
+            "solver": null
+        }
+    ],
+    "error": 1.3465408086776733
+}

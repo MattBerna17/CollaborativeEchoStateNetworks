@@ -484,7 +484,7 @@ class DeepReservoir(torch.nn.Module):
         Function to predict the next n_iter timesteps
 
         :param n_iter: number of iterations to predict.
-        :param y_init: possible initial values to start predicting from.
+        :param Y: ground truth target values.
         """
         predictions = torch.tensor([], dtype=torch.float32)
         ot = torch.zeros(self.tot_dims, 1, 1, 1)  # Initialize with zeros
@@ -514,6 +514,81 @@ class DeepReservoir(torch.nn.Module):
             for m in range(self.n_modules):
                 inp_dims = self.reservoirs[m].net.input_dimensions
                 module_input = past_prediction[inp_dims].reshape(1, 1, -1)
+
+                new_activation = self.reservoirs[m](
+                    module_input,
+                    torch.tensor(self.reservoirs[m].activations[-1], dtype=torch.float32).reshape(1, -1)
+                )[0][0]
+                self.reservoirs[m].activations = np.concatenate(
+                    [self.reservoirs[m].activations, new_activation.detach().numpy()], axis=0
+                )
+                activations = self.reservoirs[m].activations[-1].reshape(1, -1)
+                if self.use_h2:
+                    h2_activations = np.power(self.reservoirs[m].activations[-1], 2)
+                    activations = np.concatenate(
+                        [self.reservoirs[m].activations[-1], h2_activations], axis=0
+                    )
+
+                pred = self.reservoirs[m].classifier.predict(
+                    self.reservoirs[m].scaler.transform(activations.reshape(1, -1))
+                )[0]
+                ot[self.reservoirs[m].net.output_dimensions, 0, 0, 0] = torch.tensor(pred, dtype=torch.float32)
+
+            # Fill in remaining dimensions with Y if not predicted
+            for dim in range(self.tot_dims):
+                if torch.all(ot[dim] == 0) and Y is not None:
+                    ot[dim] = Y[i, dim].reshape(1, 1, 1)
+
+            predictions = torch.cat([predictions, ot.reshape(1, self.tot_dims)], dim=0)
+            past_prediction = ot
+
+        return predictions
+    
+    def teacher_forcing_predict(self, n_iter, u_init=None, Y=None):
+        """
+        Function to predict the next n_iter timesteps using teacher forcing
+
+        :param n_iter: number of iterations to predict.
+        :param u_init: initial input values.
+        :param Y: ground truth target values.
+        """
+        predictions = torch.tensor([], dtype=torch.float32)
+        ot = torch.zeros(self.tot_dims, 1, 1, 1)  # Initialize with zeros
+
+        # Initial prediction
+        for m in range(self.n_modules):
+            activation = self.reservoirs[m](u_init[0, 0, self.reservoirs[m].net.input_dimensions].reshape(1, 1, -1),
+                                            torch.tensor(self.reservoirs[m].activations[-1], dtype=torch.float32).reshape(1, -1)
+                        )[0][0] # take the activation after the first input
+            self.reservoirs[m].activations = np.concatenate(
+                [self.reservoirs[m].activations, activation.detach().numpy()], axis=0
+            )
+            activations = self.reservoirs[m].activations[-1].reshape(1, -1)
+            if self.use_h2:
+                h2_activations = np.power(activations, 2)
+                activations = np.concatenate([activations, h2_activations], axis=1)
+            pred = self.reservoirs[m].classifier.predict(
+                self.reservoirs[m].scaler.transform(activations)
+            )[0]
+            ot[self.reservoirs[m].net.output_dimensions, 0, 0, 0] = torch.tensor(pred, dtype=torch.float32)
+        
+        predictions = torch.cat([predictions, ot.reshape(1, self.tot_dims)], dim=0)
+            
+
+
+        # Fill in remaining dimensions with Y if not predicted
+        for dim in range(self.tot_dims):
+            if torch.all(ot[dim] == 0) and Y is not None:
+                ot[dim] = Y[0, dim].reshape(1, 1, 1)
+
+        predictions = torch.cat([predictions, ot.reshape(1, self.tot_dims)], dim=0)
+        past_prediction = ot
+
+        for i in range(1, n_iter-1):
+            ot = torch.zeros(self.tot_dims, 1, 1, 1)
+            for m in range(self.n_modules):
+                inp_dims = self.reservoirs[m].net.input_dimensions
+                module_input = Y[i-1, inp_dims].reshape(1, 1, -1)
 
                 new_activation = self.reservoirs[m](
                     module_input,

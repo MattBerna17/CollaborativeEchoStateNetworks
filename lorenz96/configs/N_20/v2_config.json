@@ -1,0 +1,338 @@
+{
+    "use_h2": true,
+    "total_dimensions": 20,
+    "lag": 1,
+    "bigger_dataset": false,
+    "test_trials": 1,
+    "n_modules": 20,
+    "use_self_loop": false,
+    "washout": 200,
+    "rescale_input": false,
+    "show_plot": true,
+    "input_size": 20,
+    "output_size": 20,
+    "concat": false,
+    "reservoirs": [
+        {
+            "input_size": 1,
+            "output_size": 1,
+            "input_dimensions": [
+                0
+            ],
+            "output_dimensions": [
+                1
+            ],
+            "leaky": 0.05,
+            "inp_scaling": 0.24,
+            "regul": 7,
+            "units": 210,
+            "rho": 1.0,
+            "solver": null
+        },
+        {
+            "input_size": 1,
+            "output_size": 1,
+            "input_dimensions": [
+                1
+            ],
+            "output_dimensions": [
+                2
+            ],
+            "leaky": 0.05,
+            "inp_scaling": 0.24,
+            "regul": 10,
+            "units": 210,
+            "rho": 1.0,
+            "solver": null
+        },
+        {
+            "input_size": 1,
+            "output_size": 1,
+            "input_dimensions": [
+                2
+            ],
+            "output_dimensions": [
+                3
+            ],
+            "leaky": 0.05,
+            "inp_scaling": 0.24,
+            "regul": 10,
+            "units": 210,
+            "rho": 1.0,
+            "solver": null
+        },
+        {
+            "input_size": 1,
+            "output_size": 1,
+            "input_dimensions": [
+                3
+            ],
+            "output_dimensions": [
+                4
+            ],
+            "leaky": 0.05,
+            "inp_scaling": 0.6,
+            "regul": 5,
+            "units": 200,
+            "rho": 0.99,
+            "solver": null
+        },
+        {
+            "input_size": 1,
+            "output_size": 1,
+            "input_dimensions": [
+                4
+            ],
+            "output_dimensions": [
+                5
+            ],
+            "leaky": 0.05,
+            "inp_scaling": 0.2,
+            "regul": 10,
+            "units": 200,
+            "rho": 1.0,
+            "solver": null
+        },
+        {
+            "input_size": 1,
+            "output_size": 1,
+            "input_dimensions": [
+                5
+            ],
+            "output_dimensions": [
+                6
+            ],
+            "leaky": 0.05,
+            "inp_scaling": 0.5,
+            "regul": 10,
+            "units": 200,
+            "rho": 1.0,
+            "solver": null
+        },
+        {
+            "input_size": 1,
+            "output_size": 1,
+            "input_dimensions": [
+                6
+            ],
+            "output_dimensions": [
+                7
+            ],
+            "leaky": 0.05,
+            "inp_scaling": 0.6,
+            "regul": 5,
+            "units": 210,
+            "rho": 1.0,
+            "solver": null
+        },
+        {
+            "input_size": 1,
+            "output_size": 1,
+            "input_dimensions": [
+                7
+            ],
+            "output_dimensions": [
+                8
+            ],
+            "leaky": 0.05,
+            "inp_scaling": 0.25,
+            "regul": 10,
+            "units": 210,
+            "rho": 1.1,
+            "solver": null
+        },
+        {
+            "input_size": 1,
+            "output_size": 1,
+            "input_dimensions": [
+                8
+            ],
+            "output_dimensions": [
+                9
+            ],
+            "leaky": 0.05,
+            "inp_scaling": 0.4,
+            "regul": 10,
+            "units": 210,
+            "rho": 1.1,
+            "solver": null
+        },
+        {
+            "input_size": 1,
+            "output_size": 1,
+            "input_dimensions": [
+                9
+            ],
+            "output_dimensions": [
+                10
+            ],
+            "leaky": 0.05,
+            "inp_scaling": 0.7,
+            "regul": 20,
+            "units": 210,
+            "rho": 1.0,
+            "solver": null
+        },
+        {
+            "input_size": 1,
+            "output_size": 1,
+            "input_dimensions": [
+                10
+            ],
+            "output_dimensions": [
+                11
+            ],
+            "leaky": 0.05,
+            "inp_scaling": 0.8,
+            "regul": 25,
+            "units": 200,
+            "rho": 1.0,
+            "solver": null
+        },
+        {
+            "input_size": 1,
+            "output_size": 1,
+            "input_dimensions": [
+                11
+            ],
+            "output_dimensions": [
+                12
+            ],
+            "leaky": 0.05,
+            "inp_scaling": 0.6,
+            "regul": 10,
+            "units": 200,
+            "rho": 1.0,
+            "solver": null
+        },
+        {
+            "input_size": 1,
+            "output_size": 1,
+            "input_dimensions": [
+                12
+            ],
+            "output_dimensions": [
+                13
+            ],
+            "leaky": 0.05,
+            "inp_scaling": 0.6,
+            "regul": 10,
+            "units": 200,
+            "rho": 1.0,
+            "solver": null
+        },
+        {
+            "input_size": 1,
+            "output_size": 1,
+            "input_dimensions": [
+                13
+            ],
+            "output_dimensions": [
+                14
+            ],
+            "leaky": 0.05,
+            "inp_scaling": 0.7,
+            "regul": 25,
+            "units": 200,
+            "rho": 1.05,
+            "solver": null
+        },
+        {
+            "input_size": 1,
+            "output_size": 1,
+            "input_dimensions": [
+                14
+            ],
+            "output_dimensions": [
+                15
+            ],
+            "leaky": 0.05,
+            "inp_scaling": 0.5,
+            "regul": 20,
+            "units": 200,
+            "rho": 1.1,
+            "solver": null
+        },
+        {
+            "input_size": 1,
+            "output_size": 1,
+            "input_dimensions": [
+                15
+            ],
+            "output_dimensions": [
+                16
+            ],
+            "leaky": 0.05,
+            "inp_scaling": 0.6,
+            "regul": 20,
+            "units": 210,
+            "rho": 1.0,
+            "solver": null
+        },
+        {
+            "input_size": 1,
+            "output_size": 1,
+            "input_dimensions": [
+                16
+            ],
+            "output_dimensions": [
+                17
+            ],
+            "leaky": 0.06,
+            "inp_scaling": 0.6,
+            "regul": 20,
+            "units": 210,
+            "rho": 1.0,
+            "solver": null
+        },
+        {
+            "input_size": 1,
+            "output_size": 1,
+            "input_dimensions": [
+                17
+            ],
+            "output_dimensions": [
+                18
+            ],
+            "leaky": 0.05,
+            "inp_scaling": 0.6,
+            "regul": 15,
+            "units": 210,
+            "rho": 1.05,
+            "solver": null
+        },
+        {
+            "input_size": 1,
+            "output_size": 1,
+            "input_dimensions": [
+                18
+            ],
+            "output_dimensions": [
+                19
+            ],
+            "leaky": 0.06,
+            "inp_scaling": 0.6,
+            "regul": 13,
+            "units": 210,
+            "rho": 1.02,
+            "solver": null
+        },
+        {
+            "input_size": 1,
+            "output_size": 1,
+            "input_dimensions": [
+                19
+            ],
+            "output_dimensions": [
+                0
+            ],
+            "leaky": 0.05,
+            "inp_scaling": 0.6,
+            "regul": 10,
+            "units": 210,
+            "rho": 1.1,
+            "solver": null
+        }
+    ],
+    "error": 1.2441644668579102
+}

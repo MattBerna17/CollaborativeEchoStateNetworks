@@ -1,3 +1,4 @@
+import argparse
 import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
@@ -28,7 +29,7 @@ def lorenz96_generator(N, F, num_batch=128, lag=1, washout=200, window_size=0):
 
     # Save to CSV
     num_total = dataset.shape[0]
-    with open("lorenz96.csv", "w") as f:
+    with open(f"lorenz96_N_{N}.csv", "w") as f:
         f.write("batch,time," + ",".join([f"x{i}" for i in range(N)]) + "\n")
         for b in range(num_total):
             for ti, row in enumerate(dataset[b]):
@@ -46,7 +47,10 @@ def lorenz96_generator(N, F, num_batch=128, lag=1, washout=200, window_size=0):
 
 
 if __name__ == "__main__":
-    N = 4         # Number of dimensions (typical for Lorenz96)
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--N', type=int, default=4, help='Number of dimensions')
+    args = parser.parse_args()
+    N = args.N
     F = 8.0       # Forcing term (commonly used for chaotic behavior)
     num_batch = 128  # Number of trajectories to generate
     lag = 1
@@ -55,4 +59,4 @@ if __name__ == "__main__":
 
     print(f"Generating Lorenz96 data with N={N}, F={F}, lag={lag}, batches={num_batch}")
     dataset = lorenz96_generator(N, F, num_batch=num_batch, lag=lag, washout=washout, window_size=window_size)
-    print("✅ Dataset saved to 'lorenz96.csv'")
+    print(f"✅ Dataset saved to 'lorenz96_N_{N}.csv'")

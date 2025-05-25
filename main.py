@@ -2,7 +2,7 @@ import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from esn_alternative import DeepReservoir
-from utils import get_lorenz_attractor, get_lorenz96, get_rossler_attractor, compute_nrmse, plot_train_test_prediction_and_target, plot_prediction_distribution, plot_error, plot_prediction_3d, plot_variable_correlations
+from utils import get_lorenz_attractor, get_lorenz96, get_rossler_attractor, compute_nrmse, plot_train_test_prediction_and_target, plot_prediction_distribution, plot_error, plot_prediction_3d, plot_variable_correlations, plot_prediction_2d
 import numpy as np
 import argparse
 from sklearn import preprocessing
@@ -27,7 +27,7 @@ SYSTEM = args.system
 
 # If JSON file is provided, override args
 if args.config_file is not None:
-    with open(args.config_file, 'r') as f:
+    with open(SYSTEM + "/" + args.config_file, 'r') as f:
         config = json.load(f)
     for key, value in config.items():
         if hasattr(args, key):
@@ -62,7 +62,7 @@ predicted_dims = sorted(list(set(predicted_dims)))
 if SYSTEM == "lorenz":
     (train_dataset, train_target), (valid_dataset, valid_target), (test_dataset, test_target) = get_lorenz_attractor(washout=washout, bigger_dataset=config["bigger_dataset"])
 elif SYSTEM == "lorenz96":
-    (train_dataset, train_target), (valid_dataset, valid_target), (test_dataset, test_target) = get_lorenz96(washout=washout)
+    (train_dataset, train_target), (valid_dataset, valid_target), (test_dataset, test_target) = get_lorenz96(N=tot_dims, washout=washout)
 elif SYSTEM == "rossler":
     (train_dataset, train_target), (valid_dataset, valid_target), (test_dataset, test_target) = get_rossler_attractor(washout=washout)
 
@@ -115,16 +115,30 @@ for guess in range(config["test_trials"]):
     n = test_target.shape[0]
     test_target = torch.tensor(test_dataset[0:n], dtype=torch.float32).reshape(-1, tot_dims) # reshape element to torch.Size([rows=len(train_target), columns=3])
 
-    test_predictions = np.array(model.predict(n, Y=test_target)).reshape(-1, tot_dims) # get the model's prediction for n iterations
+    if config["use_self_loop"]:
+        test_predictions = np.array(model.predict(n, Y=test_target)).reshape(-1, tot_dims) # get the model's prediction for n iterations
+    else:
+        test_predictions = np.array(model.teacher_forcing_predict(n, u_init=train_dataset[-1, :].reshape(1, 1, -1), Y=test_target)).reshape(-1, tot_dims)
     
     test_target = test_target.numpy()
     NRMSE = [compute_nrmse(test_predictions, test_target)] # compute nrmse for each prediction
+
+    config["error"] = float(np.mean(NRMSE))
+
+    # Overwrite the config file with updated content
+    with open(SYSTEM + "/" + args.config_file, 'w') as f:
+        json.dump(config, f, indent=4)
+
+        
 
 
     # train_predictions = train_predictions[:, predicted_dims]
     test_predictions = test_predictions[:, predicted_dims]
     train_target = train_target[:, predicted_dims]
     test_target = test_target[:, predicted_dims]
+
+    print(f"test predictions shape: {test_predictions.shape}")
+    print(f"test target shape: {test_target.shape}")
 
     labels = [f"x{i}" for i in predicted_dims] if SYSTEM == "lorenz96" else ["x", "y", "z"]
 
@@ -134,6 +148,7 @@ for guess in range(config["test_trials"]):
     plot_prediction_distribution(train_predictions, train_target, "Train", labels=labels) if config["show_plot"] else None
     plot_prediction_distribution(test_predictions, test_target, "Test", labels=labels) if config["show_plot"] else None
     plot_prediction_3d(test_predictions, test_target, title=f"{SYSTEM.capitalize()} Attractor", labels=labels) if config["show_plot"] and len(predicted_dims) == 3 else None
+    plot_prediction_2d(test_predictions, test_target, title=f"{SYSTEM.capitalize()} Attractor", labels=[labels[i] for i in predicted_dims]) if config["show_plot"] and len(predicted_dims) == 2 else None
 
 
 

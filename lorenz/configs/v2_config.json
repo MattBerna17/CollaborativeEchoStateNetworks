@@ -16,8 +16,12 @@
         {
             "input_size": 1,
             "output_size": 1,
-            "input_dimensions": [0],
-            "output_dimensions": [1],
+            "input_dimensions": [
+                0
+            ],
+            "output_dimensions": [
+                1
+            ],
             "leaky": 0.2,
             "inp_scaling": 0.05,
             "regul": 100,
@@ -28,8 +32,12 @@
         {
             "input_size": 1,
             "output_size": 1,
-            "input_dimensions": [1],
-            "output_dimensions": [2],
+            "input_dimensions": [
+                1
+            ],
+            "output_dimensions": [
+                2
+            ],
             "leaky": 0.2,
             "inp_scaling": 0.181,
             "regul": 1,
@@ -40,8 +48,12 @@
         {
             "input_size": 1,
             "output_size": 1,
-            "input_dimensions": [2],
-            "output_dimensions": [0],
+            "input_dimensions": [
+                2
+            ],
+            "output_dimensions": [
+                0
+            ],
             "leaky": 0.0515,
             "inp_scaling": 0.0765,
             "regul": 100,
@@ -49,5 +61,6 @@
             "rho": 1.1,
             "solver": null
         }
-    ]
-  }
+    ],
+    "error": 0.7310100197792053
+}

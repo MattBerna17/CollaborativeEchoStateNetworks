@@ -209,8 +209,8 @@ def get_rossler_attractor(lag=1, washout=200):
     return (train_dataset, train_target), (val_dataset, val_target), (test_dataset, test_target)
 
 
-def get_lorenz96(lag=1, washout=200):
-    dataset = pd.read_csv("lorenz96/data/lorenz96.csv")
+def get_lorenz96(N=4, lag=1, washout=200):
+    dataset = pd.read_csv(f"lorenz96/data/lorenz96_N_{N}.csv")
     # Drop metadata columns like batch and time if present
     dataset = dataset.drop(columns=["batch", "time"], errors="ignore")
     dataset = torch.tensor(dataset.values).float()
@@ -410,7 +410,7 @@ def plot_train_test_prediction_and_target(train_predictions, train_target, test_
     axs[inp_dim//2].set(ylabel='Values')
     axs[inp_dim-1].set(xlabel='Time steps')
     fig.legend(loc="upper right")
-    plt.tight_layout()
+    # plt.tight_layout()
     plt.show()
 
 
@@ -599,6 +599,40 @@ def plot_prediction_3d(predictions, targets, title, labels=["x", "y", "z"]):
     ax2.set_xlabel(labels[0])
     ax2.set_ylabel(labels[1])
     ax2.set_zlabel(labels[2])
+    ax2.legend()
+
+    plt.suptitle(title)
+    plt.tight_layout()
+    plt.show()
+
+
+def plot_prediction_2d(predictions, target, title, labels=["x", "y"]):
+    """
+    Plots 2D trajectories for predictions and targets in side-by-side subplots.
+
+    :param predictions: np.ndarray or tensor of shape [T, 2]
+    :param target: np.ndarray or tensor of shape [T, 2]
+    :param title: Title for the plot
+    """
+    predictions = np.array(predictions)
+    target = np.array(target)
+
+    fig = plt.figure(figsize=(12, 5))
+
+    # Ground truth
+    ax1 = fig.add_subplot(1, 2, 1)
+    ax1.plot(target[:, 0], target[:, 1], color='blue', label='Target')
+    ax1.set_title('Ground Truth')
+    ax1.set_xlabel(labels[0])
+    ax1.set_ylabel(labels[1])
+    ax1.legend()
+
+    # Prediction
+    ax2 = fig.add_subplot(1, 2, 2)
+    ax2.plot(predictions[:, 0], predictions[:, 1], color='red', label='Prediction')
+    ax2.set_title('Prediction')
+    ax2.set_xlabel(labels[0])
+    ax2.set_ylabel(labels[1])
     ax2.legend()
 
     plt.suptitle(title)
