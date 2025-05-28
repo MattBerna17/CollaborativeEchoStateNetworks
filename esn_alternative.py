@@ -13,7 +13,7 @@ https://doi.org/10.1016/j.neucom.2016.12.08924.
 from sklearn import preprocessing
 from sklearn.linear_model import Ridge
 import torch
-from torch import nn
+from torch import mean, nn
 import numpy as np
 from utils import create_sparse_connection_matrix
 
@@ -618,3 +618,83 @@ class DeepReservoir(torch.nn.Module):
             past_prediction = ot
 
         return predictions
+    
+
+    def mean_predict(self, n_iter, weights=None, Y=None):
+        """
+        Predicts the next n_iter timesteps by averaging predictions from each reservoir.
+        Uses weights per module if provided.
+        
+        :param n_iter: number of iterations to predict
+        :param weights: [n_modules, 1] numpy array of weights for each module
+        :param Y: ground truth values (optional)
+        :return: ndarray of shape [n_iter, tot_dims]
+        """
+        predictions = []
+        ot = np.zeros((self.tot_dims, 1, 1, 1))
+        res = np.zeros((self.n_modules, self.tot_dims))
+
+        # Initial prediction
+        for m in range(self.n_modules):
+            activations = self.reservoirs[m].activations[-1].reshape(1, -1)
+            if self.use_h2:
+                h2_activations = np.power(activations, 2)
+                activations = np.concatenate([activations, h2_activations], axis=1)
+            pred = self.reservoirs[m].classifier.predict(
+                self.reservoirs[m].scaler.transform(activations)
+            )[0]
+            res[m, :len(pred)] = pred
+
+        if weights is not None:
+            ot = np.average(res, axis=0, weights=weights.flatten()).reshape(self.tot_dims, 1, 1, 1)
+        else:
+            ot = np.mean(res, axis=0).reshape(self.tot_dims, 1, 1, 1)
+
+        if Y is not None:
+            for dim in range(self.tot_dims):
+                if np.all(ot[dim] == 0):
+                    ot[dim] = Y[0, dim].reshape(1, 1, 1)
+
+        predictions.append(ot.reshape(self.tot_dims))
+
+        past_prediction = ot
+
+        for i in range(1, n_iter):
+            res = np.zeros((self.n_modules, self.tot_dims))
+            for m in range(self.n_modules):
+                inp_dims = self.reservoirs[m].net.input_dimensions
+                module_input = past_prediction[inp_dims].reshape(1, 1, -1)
+
+                new_activation = self.reservoirs[m](
+                    torch.tensor(module_input, dtype=torch.float32),
+                    torch.tensor(self.reservoirs[m].activations[-1], dtype=torch.float32).reshape(1, -1)
+                )[0][0]
+
+                self.reservoirs[m].activations = np.concatenate(
+                    [self.reservoirs[m].activations, new_activation.detach().numpy()], axis=0
+                )
+
+                activations = self.reservoirs[m].activations[-1].reshape(1, -1)
+                if self.use_h2:
+                    h2_activations = np.power(activations, 2)
+                    activations = np.concatenate([activations, h2_activations], axis=1)
+
+                pred = self.reservoirs[m].classifier.predict(
+                    self.reservoirs[m].scaler.transform(activations)
+                )[0]
+                res[m, :len(pred)] = pred
+
+            if weights is not None:
+                ot = np.average(res, axis=0, weights=weights.flatten()).reshape(self.tot_dims, 1, 1, 1)
+            else:
+                ot = np.mean(res, axis=0).reshape(self.tot_dims, 1, 1, 1)
+
+            if Y is not None:
+                for dim in range(self.tot_dims):
+                    if np.all(ot[dim] == 0):
+                        ot[dim] = Y[i, dim].reshape(1, 1, 1)
+
+            predictions.append(ot.reshape(self.tot_dims))
+            past_prediction = ot
+
+        return np.stack(predictions)

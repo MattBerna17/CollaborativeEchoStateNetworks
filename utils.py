@@ -297,6 +297,51 @@ def compute_nrmse(predictions, target):
     nrmse = rmse / (norm + 1e-9)
     return nrmse
 
+
+def compute_nrmse_matrix(predictions_list, target):
+    """
+    Computes a NRMSE matrix of shape (tot_dims, n_modules).
+    
+    Each column contains the NRMSE of a module over all output dimensions.
+
+    :param predictions_list: list of np.ndarray, each of shape (n_samples, tot_dims)
+                              with the predictions from a module
+    :param target: np.ndarray of shape (n_samples, tot_dims), the ground truth
+    :return: np.ndarray of shape (tot_dims, n_modules), the NRMSE matrix
+    """
+    tot_dims = target.shape[1]
+    n_modules = len(predictions_list)
+    nrmse_matrix = np.zeros((tot_dims, n_modules))
+
+    for m, preds in enumerate(predictions_list):
+        for d in range(tot_dims):
+            pred_d = preds[:, d]
+            target_d = target[:, d]
+            mse = np.mean((pred_d - target_d) ** 2)
+            rmse = np.sqrt(mse)
+            norm = np.sqrt(np.mean(target_d ** 2)) + 1e-9
+            nrmse = rmse / norm
+            nrmse_matrix[d, m] = nrmse
+
+    return nrmse_matrix
+
+
+def compute_dimwise_weights(nrmse_matrix):
+    """
+    Create weights of shape [tot_dims, n_modules] based on inverse NRMSE.
+
+    :param nrmse_matrix: ndarray of shape [n_modules, tot_dims], where each entry
+                         represents the training NRMSE of module m on dimension d.
+    :return: weights of shape [tot_dims, n_modules] where each row sums to 1.
+    """
+    nrmse_matrix = np.array(nrmse_matrix)
+    # Avoid division by zero
+    nrmse_matrix[nrmse_matrix == 0] = 1e-8
+    inv_nrmse = 1.0 / nrmse_matrix  # shape: [n_modules, tot_dims]
+    weights = inv_nrmse / inv_nrmse.sum(axis=0, keepdims=True)  # Normalize per dimension
+    return weights.T  # shape: [tot_dims, n_modules]
+
+
 def plot_error(predictions, target, n_dim=3, labels=None):
     """
     Function to plot the error of the predictions
