@@ -1,84 +1,96 @@
-# 🌪️ Echo State Networks for Chaotic System Forecasting
+# 🤖 Collaborative Echo State Networks
 
-This project explores **modular Echo State Networks (ESNs)** to forecast multiple chaotic systems with varying prediction topologies and reservoir configurations. It is designed to be flexible, scalable, and well-suited for comparative analysis across different coupling strategies and datasets.
-
----
-
-## 🧠 Supported Dynamical Systems
-
-You can simulate and forecast three well-known chaotic systems:
-
-- **lorenz** → 3D Lorenz attractor
-- **rossler** → 3D Rössler system
-- **lorenz96** → 4D Lorenz96 model
+**Collaborative Echo State Networks** is a framework for predicting chaotic dynamical systems using distributed Echo State Networks (ESNs). Each ESN receives only partial (local) information about the system and collaborates with others to reconstruct the full system's behavior. The architecture supports different modes of interaction and collaboration between ESNs, with both teacher forcing (during training) and generative inference (during prediction).
 
 ---
 
-## 🔮 Prediction Architectures
+## 🌪️ Objective
 
-Each system can be used with the following four architectures:
+The goal is to forecast the evolution of **chaotic attractors** by modeling them through multiple interconnected ESNs, each observing only a subset of the full state space.
 
-- **UNIMODE** 🧱  
-  A single reservoir receives and predicts all dimensions together.
+Given a dynamical system:
+- \( \mathbf{x}(t) = [x_0(t), x_1(t), ..., x_{N-1}(t)] \)
+- The ESNs aim to predict \( \mathbf{x}(t+1) \) from partial information about \( \mathbf{x}(t) \)
 
-- **CHAIN** 🔗  
-  A modular chain of reservoirs where each reservoir $i$ receives dimension $i$ and predicts dimension $i+1$.
+---
 
-- **CROSS** 🔁  
-  Two or more reservoirs, each receiving different input dimensions and predicting complementary outputs.
+## 🧠 Training and Inference
 
-- **CROSS+STAB** 🧭  
-  Same as **CROSS**, but each reservoir also receives one stabilizing ground truth dimension (e.g., $z$ or $x_3$) as additional input.
+Each ESN follows a standard Echo State Network structure:
 
-These names generalize across systems with different dimensionalities.
+**Training (Teacher Forcing):**
+\[
+h(t) = \tanh(W_{in} u(t) + W h(t-1))
+\]
+\[
+o(t) = W_{out} h(t) \approx u(t+1)
+\]
+
+**Inference (Generative Mode):**
+\[
+u(t+1) = o(t)
+\]
+
+---
+
+## 🏗️ Architectures
+
+### 🧱 Monolithic
+
+One ESN takes all dimensions \( x_0, ..., x_{N-1} \) as input and predicts all dimensions.
+
+### 🔗 Chain
+
+Each ESN \( i \) predicts \( x_{i+1}(t+1) \) from \( x_i(t) \). Sequential dependency during inference.
+
+### ✂️ Cross
+
+Like Chain, but one dimension is removed (e.g., \( x_j \)) and not predicted. Remaining \( N-1 \) reservoirs are used.
+
+### 🔧 CrossStab
+
+Extension of Cross: all reservoirs also receive \( x_j(t) \) (the removed dimension) as input to improve stability.
+
+### 🧮 Mean
+
+Each reservoir \( i \) takes \( x_i(t) \) and predicts all \( N \) dimensions. At inference, the predicted value for dimension \( j \) is the **mean** of the predictions from all ESNs:
+\[
+x_j(t+1) = \frac{1}{N} \sum_{i=0}^{N-1} x_j^{(i)}(t+1)
+\]
+
+### ⚖️ WeightedMean
+
+Similar to Mean, but applies a **weighted average** based on training NRMSE:
+\[
+w_i = \frac{1 / \text{NRMSE}_i}{\sum_j 1 / \text{NRMSE}_j}
+\]
+
+Each ESN's contribution to each dimension is proportional to its accuracy during training.
+
+---
+
+## 🧪 Systems Supported
+
+- **Lorenz Attractor**
+- **Rössler Attractor**
+- **Lorenz-96 System** with customizable dimensions
 
 ---
 
 ## 🚀 How to Run
 
-Use the following command to launch a simulation:
-
-```
-python3 main.py --system=s --config_file=path/to/config.json**
-```
-
-Replace:
-
-- **s** with one of: `lorenz`, `rossler`, or `lorenz96`
-- **path/to/config.json** with the actual path to your configuration file
-
-Example:
-
 ```bash
-python3 main.py --system=lorenz --config_file=configs/lorenz_config.json
+python3 main.py --system={system} --config_file=path/to/config.json
 ```
----
+Valid options for `system` are: `lorenz`, `rossler`, `lorenz96`.
 
-## 📁 Configuration
-
-The model behavior and reservoir parameters are entirely driven by JSON config files. You can define:
-
-- Number of reservoirs and their connections
-- Input/output dimensions per module
-- Stabilizing signals
-- Activation units, spectral radius, regularization, etc.
-
-See example config files in the `configs/` directory.
+(e.g. `python3 main.py --system=lorenz --config_file=configs/v1_config.json`)
 
 ---
 
-## 📊 Visualization
-
-Plots for prediction vs target can be displayed depending on config settings.
-
----
-
-## 🧪 Citation & Credits
-
-Gallicchio,  C.,  Micheli,  A.,  Pedrelli,  L.: Deep  reservoir  computing:
-A  critical  experimental  analysis.    Neurocomputing268,  87–99  (2017).
-https://doi.org/10.1016/j.neucom.2016.12.08924.
-
-Developed by Matthew Bernardi, a Computer Science student, as part of a bachelor thesis project on modular ESNs and robust forecasting.
-
----
+## 📁 Structure
+- `main.py`: Main entrypoint
+- `esn_alternative.py`: ESN implementation
+- `utils.py`: Utility functions
+- `configs/`: Contains configuration files in JSON format
+- `results/`: Contains results and logs
