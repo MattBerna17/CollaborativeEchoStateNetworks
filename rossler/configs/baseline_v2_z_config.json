@@ -9,16 +9,14 @@
     "washout": 200,
     "rescale_input": false,
     "show_plot": true,
-    "input_size": 3,
+    "input_size": 1,
     "output_size": 3,
     "concat": false,
     "reservoirs": [
         {
-            "input_size": 3,
+            "input_size": 1,
             "output_size": 3,
             "input_dimensions": [
-                0,
-                1,
                 2
             ],
             "output_dimensions": [
@@ -26,13 +24,13 @@
                 1,
                 2
             ],
-            "leaky": 0.9,
-            "inp_scaling": 0.014,
-            "regul": 3e-06,
-            "units": 256,
-            "rho": 0.9,
+            "leaky": 0.07,
+            "inp_scaling": 0.95,
+            "regul": 0.1,
+            "units": 310,
+            "rho": 1.09,
             "solver": null
         }
     ],
-    "error": 0.009221484884619713
+    "error": 2.010045289993286
 }

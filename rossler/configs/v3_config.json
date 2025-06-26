@@ -1,6 +1,6 @@
 {
-  "use_h2": true,
-  "total_dimensions": 3,
+    "use_h2": true,
+    "total_dimensions": 3,
     "lag": 1,
     "bigger_dataset": false,
     "test_trials": 1,
@@ -13,29 +13,38 @@
     "output_size": 2,
     "concat": false,
     "reservoirs": [
-      {
-        "input_size": 1,
-        "output_size": 1,
-        "input_dimensions": [0],
-        "output_dimensions": [1],
-        "leaky": 0.023,
-        "inp_scaling": 0.95,
-        "regul": 2,
-        "units": 500,
-        "rho": 1.09,
-        "solver": null
-      },
-      {
-        "input_size": 1,
-        "output_size": 1,
-        "input_dimensions": [1],
-        "output_dimensions": [0],
-        "leaky": 0.023,
-        "inp_scaling": 0.95,
-        "regul": 2,
-        "units": 500,
-        "rho": 1.09,
-        "solver": null
-      }
-    ]
-  }
+        {
+            "input_size": 1,
+            "output_size": 1,
+            "input_dimensions": [
+                0
+            ],
+            "output_dimensions": [
+                1
+            ],
+            "leaky": 0.023,
+            "inp_scaling": 0.95,
+            "regul": 2,
+            "units": 500,
+            "rho": 1.09,
+            "solver": null
+        },
+        {
+            "input_size": 1,
+            "output_size": 1,
+            "input_dimensions": [
+                1
+            ],
+            "output_dimensions": [
+                0
+            ],
+            "leaky": 0.023,
+            "inp_scaling": 0.95,
+            "regul": 2,
+            "units": 500,
+            "rho": 1.09,
+            "solver": null
+        }
+    ],
+    "error": 0.8476800918579102
+}

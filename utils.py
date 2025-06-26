@@ -11,6 +11,9 @@ import pandas as pd
 from mpl_toolkits import mplot3d
 import matplotlib.pyplot as plt
 import random
+from matplotlib.backends.backend_pdf import PdfPages
+
+plt.rcParams.update({'font.size': 18}) # make fontsize bigger
 
 
 def count_parameters(model):
@@ -226,7 +229,7 @@ def get_lorenz96(N=4, lag=1, washout=200):
 
 import matplotlib.pyplot as plt
 
-def plot_prediction_distribution(predictions, targets, title_prefix="", labels=["x", "y", "z"]):
+def plot_prediction_distribution(predictions, targets, title_prefix="", labels=["x", "y", "z"], filename_to_save=None):
     """
     Plots the distribution of predicted and target values for each dimension.
 
@@ -250,7 +253,8 @@ def plot_prediction_distribution(predictions, targets, title_prefix="", labels=[
         axes[d].legend()
 
     plt.tight_layout()
-    plt.show()
+    plt.savefig(filename_to_save, format="pdf") if filename_to_save is not None else None
+    # plt.show()
 
 import matplotlib.pyplot as plt
 import torch
@@ -281,7 +285,7 @@ def plot_variable_correlations(train_dataset, labels=None):
     sns.pairplot(df, corner=True, plot_kws={'alpha': 0.5, 's': 10})
     plt.suptitle("Pairwise Variable Correlations", y=1.02)
     plt.tight_layout()
-    plt.show()
+    # plt.show()
 
 def compute_nrmse(predictions, target):
     """
@@ -342,7 +346,7 @@ def compute_dimwise_weights(nrmse_matrix):
     return weights.T  # shape: [tot_dims, n_modules]
 
 
-def plot_error(predictions, target, n_dim=3, labels=None):
+def plot_error(predictions, target, n_dim=3, labels=None, filename_to_save=None):
     """
     Function to plot the error of the predictions
 
@@ -369,6 +373,9 @@ def plot_error(predictions, target, n_dim=3, labels=None):
 
     plt.xlabel("Time Steps")
     plt.tight_layout()
+
+    plt.savefig(filename_to_save, format="pdf") if filename_to_save is not None else None
+
     plt.show()
 
 def plot_prediction(predictions):
@@ -385,7 +392,7 @@ def plot_prediction(predictions):
     plt.xticks(fontsize=12)
     plt.yticks(fontsize=12)
     mplcursors.cursor(hover=True)  # Enables hover effect showing values
-    plt.show()
+    # plt.show()
 
 def plot_prediction_and_target(predictions, target, inp_dim=3):
     """
@@ -402,12 +409,12 @@ def plot_prediction_and_target(predictions, target, inp_dim=3):
         axs[i].plot(range(len(target)), target[:, i], label='Targets', color="blue")
         axs[i].set_title(f'Variable {i+1}')
     fig.legend()
-    plt.show()
+    # plt.show()
 
 
 def plot_train_test_prediction_and_target(train_predictions, train_target, test_predictions, test_target,
                                           train_activations_list=None, test_activations_list=None,
-                                          feature_index=200, inp_dim=3, labels=["x", "y", "z"]):
+                                          feature_index=200, inp_dim=3, labels=["x", "y", "z"], filename_to_save=None):
     """
     Plot predictions vs targets for 3 reservoirs with optional activations as overlay per subplot.
     
@@ -436,26 +443,29 @@ def plot_train_test_prediction_and_target(train_predictions, train_target, test_
         axs[i].plot(range(split_index, split_index + len(test_predictions)), test_predictions[:, i], linestyle='dashed', color="red")
         axs[i].plot(range(split_index, split_index + len(test_target)), test_target[:, i], linestyle='solid', color="blue")
         axs[i].axvline(x=split_index, color='black', linestyle='dotted', linewidth=1)
-        axs[i].set_title(f"Variable {labels[i]}")
+        axs[i].set_title(f"{labels[i]}")
 
         # Overlay per-reservoir feature activation
         if train_activations_list is not None and i < len(train_activations_list):
             ta = train_activations_list[(i+1) % inp_dim]
             if ta.shape[1] > feature_index:
                 axs[i].scatter(range(split_index), ta[:split_index, feature_index],
-                               s=5, c='blue', alpha=0.3, label=f'Res {i} Feat {feature_index} (Train)')
+                            s=5, c='blue', alpha=0.3, label=f'Res {i} Feat {feature_index} (Train)')
 
         if test_activations_list is not None and i < len(test_activations_list):
             tta = test_activations_list[(i+1) % inp_dim]
             if tta.shape[1] > feature_index:
                 axs[i].scatter(range(split_index, split_index + len(tta)),
-                               tta[:, feature_index],
-                               s=5, c='red', alpha=0.3, label=f'Res {i} Feat {feature_index} (Test)')
+                            tta[:, feature_index],
+                            s=5, c='red', alpha=0.3, label=f'Res {i} Feat {feature_index} (Test)')
 
     axs[inp_dim//2].set(ylabel='Values')
     axs[inp_dim-1].set(xlabel='Time steps')
     fig.legend(loc="upper right")
     # plt.tight_layout()
+    
+    plt.savefig(filename_to_save, format="pdf") if filename_to_save is not None else None
+    
     plt.show()
 
 
@@ -484,7 +494,7 @@ def plot_reservoir_state_2d(train_activations, test_activations, reservoir_index
     plt.legend()
     plt.grid(True)
     plt.tight_layout()
-    plt.show()
+    # plt.show()
 
 
 def plot_reservoirs_states(train_activations: list, test_activations: list, seed=42):
@@ -517,7 +527,7 @@ def plot_reservoirs_states(train_activations: list, test_activations: list, seed
         axs[i].set_ylabel(f'Feature {j}')
 
     plt.tight_layout()
-    plt.show()
+    # plt.show()
 
 
 
@@ -613,11 +623,9 @@ def save_matrix_to_file(matrix: torch.Tensor, filename):
             f.write('\n')
 
 
-
-
-def plot_prediction_3d(predictions, targets, title, labels=["x", "y", "z"]):
+def plot_prediction_3d(predictions, targets, title, labels=["x", "y", "z"], filename_to_save=None):
     """
-    Plots 3D trajectories for predictions and targets in side-by-side subplots.
+    Plots 3D trajectories for predictions and targets on the same plot.
 
     :param predictions: np.ndarray or tensor of shape [T, 3]
     :param targets: np.ndarray or tensor of shape [T, 3]
@@ -626,34 +634,29 @@ def plot_prediction_3d(predictions, targets, title, labels=["x", "y", "z"]):
     predictions = np.array(predictions)
     targets = np.array(targets)
 
-    fig = plt.figure(figsize=(12, 5))
+    fig = plt.figure(figsize=(10, 7))
+    ax = fig.add_subplot(111, projection='3d')
 
-    # Ground truth
-    ax1 = fig.add_subplot(1, 2, 1, projection='3d')
-    ax1.plot(targets[:, 0], targets[:, 1], targets[:, 2], color='blue', label='Target')
-    ax1.set_title('Ground Truth')
-    ax1.set_xlabel(labels[0])
-    ax1.set_ylabel(labels[1])
-    ax1.set_zlabel(labels[2])
-    ax1.legend()
+    ax.plot(targets[:, 0], targets[:, 1], targets[:, 2],
+            color='blue', label='Target', linewidth=2.5)
+    ax.plot(predictions[:, 0], predictions[:, 1], predictions[:, 2],
+            color='red', label='Prediction', linewidth=1.5)
 
-    # Prediction
-    ax2 = fig.add_subplot(1, 2, 2, projection='3d')
-    ax2.plot(predictions[:, 0], predictions[:, 1], predictions[:, 2], color='red', label='Prediction')
-    ax2.set_title('Prediction')
-    ax2.set_xlabel(labels[0])
-    ax2.set_ylabel(labels[1])
-    ax2.set_zlabel(labels[2])
-    ax2.legend()
+    ax.set_title(title)
+    ax.set_xlabel(labels[0])
+    ax.set_ylabel(labels[1])
+    ax.set_zlabel(labels[2])
+    ax.legend()
 
-    plt.suptitle(title)
     plt.tight_layout()
+
+    plt.savefig(filename_to_save, format="pdf") if filename_to_save is not None else None
+    
     plt.show()
 
-
-def plot_prediction_2d(predictions, target, title, labels=["x", "y"]):
+def plot_prediction_2d(predictions, target, title, labels=["x", "y"], filename_to_save=None):
     """
-    Plots 2D trajectories for predictions and targets in side-by-side subplots.
+    Plots 2D trajectories for predictions and targets on the same plot.
 
     :param predictions: np.ndarray or tensor of shape [T, 2]
     :param target: np.ndarray or tensor of shape [T, 2]
@@ -662,27 +665,24 @@ def plot_prediction_2d(predictions, target, title, labels=["x", "y"]):
     predictions = np.array(predictions)
     target = np.array(target)
 
-    fig = plt.figure(figsize=(12, 5))
+    fig = plt.figure(figsize=(10, 6))
+    ax = fig.add_subplot(111)
 
-    # Ground truth
-    ax1 = fig.add_subplot(1, 2, 1)
-    ax1.plot(target[:, 0], target[:, 1], color='blue', label='Target')
-    ax1.set_title('Ground Truth')
-    ax1.set_xlabel(labels[0])
-    ax1.set_ylabel(labels[1])
-    ax1.legend()
+    ax.plot(target[:, 0], target[:, 1],
+            color='blue', label='Target', linewidth=2.5)
+    ax.plot(predictions[:, 0], predictions[:, 1],
+            color='red', label='Prediction', linewidth=1.5)
 
-    # Prediction
-    ax2 = fig.add_subplot(1, 2, 2)
-    ax2.plot(predictions[:, 0], predictions[:, 1], color='red', label='Prediction')
-    ax2.set_title('Prediction')
-    ax2.set_xlabel(labels[0])
-    ax2.set_ylabel(labels[1])
-    ax2.legend()
+    ax.set_title(title)
+    ax.set_xlabel(labels[0])
+    ax.set_ylabel(labels[1])
+    ax.legend()
 
-    plt.suptitle(title)
     plt.tight_layout()
-    plt.show()
+
+    plt.savefig(filename_to_save, format="pdf") if filename_to_save is not None else None
+    
+    # plt.show()
 
 
 def get_mackey_glass(lag=1, washout=200, window_size=0):

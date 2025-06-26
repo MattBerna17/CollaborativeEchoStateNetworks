@@ -16,8 +16,13 @@
         {
             "input_size": 2,
             "output_size": 1,
-            "input_dimensions": [3, 0],
-            "output_dimensions": [1],
+            "input_dimensions": [
+                3,
+                0
+            ],
+            "output_dimensions": [
+                1
+            ],
             "leaky": 0.05,
             "inp_scaling": 0.24,
             "regul": 100,
@@ -28,8 +33,13 @@
         {
             "input_size": 2,
             "output_size": 1,
-            "input_dimensions": [3, 1],
-            "output_dimensions": [2],
+            "input_dimensions": [
+                3,
+                1
+            ],
+            "output_dimensions": [
+                2
+            ],
             "leaky": 0.05,
             "inp_scaling": 0.25,
             "regul": 100,
@@ -40,14 +50,20 @@
         {
             "input_size": 2,
             "output_size": 1,
-            "input_dimensions": [3, 2],
-            "output_dimensions": [0],
+            "input_dimensions": [
+                3,
+                2
+            ],
+            "output_dimensions": [
+                0
+            ],
             "leaky": 0.05,
-            "inp_scaling": 0.20,
+            "inp_scaling": 0.2,
             "regul": 100,
             "units": 200,
             "rho": 1.0,
             "solver": null
         }
-    ]
-  }
+    ],
+    "error": 0.1046227514743805
+}

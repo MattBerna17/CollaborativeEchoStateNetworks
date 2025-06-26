@@ -16,11 +16,16 @@
         {
             "input_size": 2,
             "output_size": 1,
-            "input_dimensions": [2, 0],
-            "output_dimensions": [1],
+            "input_dimensions": [
+                2,
+                0
+            ],
+            "output_dimensions": [
+                1
+            ],
             "leaky": 0.2,
             "inp_scaling": 0.181,
-            "regul": 8e-2,
+            "regul": 0.08,
             "units": 400,
             "rho": 1.1,
             "solver": null
@@ -28,14 +33,20 @@
         {
             "input_size": 2,
             "output_size": 1,
-            "input_dimensions": [2, 1],
-            "output_dimensions": [0],
+            "input_dimensions": [
+                2,
+                1
+            ],
+            "output_dimensions": [
+                0
+            ],
             "leaky": 0.2,
             "inp_scaling": 0.121,
-            "regul": 2e-3,
+            "regul": 0.002,
             "units": 400,
             "rho": 1.1,
             "solver": null
         }
-    ]
-  }
+    ],
+    "error": 0.06388325989246368
+}

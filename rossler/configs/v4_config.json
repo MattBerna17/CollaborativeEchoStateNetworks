@@ -14,28 +14,39 @@
     "concat": false,
     "reservoirs": [
         {
-          "input_size": 2,
-          "output_size": 1,
-          "input_dimensions": [2, 0],
-          "output_dimensions": [1],
-          "leaky": 0.023,
-          "inp_scaling": 0.95,
-          "regul": 1,
-          "units": 500,
-          "rho": 1.09,
-          "solver": null
+            "input_size": 2,
+            "output_size": 1,
+            "input_dimensions": [
+                2,
+                0
+            ],
+            "output_dimensions": [
+                1
+            ],
+            "leaky": 0.023,
+            "inp_scaling": 0.95,
+            "regul": 1,
+            "units": 500,
+            "rho": 1.09,
+            "solver": null
         },
         {
-          "input_size": 2,
-          "output_size": 1,
-          "input_dimensions": [2, 1],
-          "output_dimensions": [0],
-          "leaky": 0.023,
-          "inp_scaling": 0.95,
-          "regul": 1,
-          "units": 500,
-          "rho": 1.09,
-          "solver": null
+            "input_size": 2,
+            "output_size": 1,
+            "input_dimensions": [
+                2,
+                1
+            ],
+            "output_dimensions": [
+                0
+            ],
+            "leaky": 0.023,
+            "inp_scaling": 0.95,
+            "regul": 1,
+            "units": 500,
+            "rho": 1.09,
+            "solver": null
         }
-    ]
-  }
+    ],
+    "error": 0.5014721155166626
+}
