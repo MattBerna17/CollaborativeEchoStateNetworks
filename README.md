@@ -19,17 +19,21 @@ Given a dynamical system:
 Each ESN follows a standard Echo State Network structure:
 
 **Training (Teacher Forcing):**
+
 $$
 h(t) = \tanh(W_{in} u(t) + W h(t-1))
 $$
+
 $$
 o(t) = W_{out} h(t) \approx u(t+1)
 $$
 
 **Inference (Generative Mode):**
+
 $$
 u(t+1) = o(t)
 $$
+
 ---
 
 ## 🏗️ Architectures
@@ -44,17 +48,18 @@ Each ESN $i$ predicts $x_{i+1}(t+1)$ from $x_i(t)$. Sequential dependency during
 
 ### ✂️ Gap
 
-Like Chain, but one dimension is removed (e.g., \( x_j \)) and not predicted. Remaining \( N-1 \) reservoirs are used.
+Like Chain, but one dimension is removed (e.g., $x_j$) and not predicted. Remaining $N-1$ reservoirs are used.
 
 ### 🔧 GapStab
 
-Extension of Cross: all reservoirs also receive \( x_j(t) \) (the removed dimension) as input to improve stability.
+Extension of Cross: all reservoirs also receive $x_j(t)$ (the removed dimension) as input to improve stability.
 
 ### 🧮 Mean
 
 Each reservoir $i$ takes $x_i(t)$ and predicts all $N$ dimensions. At inference, the predicted value for dimension $j$ is the **mean** of the predictions from all ESNs:
+
 $$
-\bar{x}_j(t+1) = \frac{1}{N} \sum_{i=0}^{N-1} x_j^{(i)}(t+1)
+x_j(t+1) = \frac{1}{N} \sum_{i=0}^{N-1} x_j^{(i)}(t+1)
 $$
 
 ### ⚖️ WeightedMean
