@@ -2,7 +2,7 @@ import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from esn_alternative import DeepReservoir
-from utils import get_lorenz_attractor, get_lorenz96, get_rossler_attractor, compute_nrmse, plot_train_test_prediction_and_target, plot_prediction_distribution, plot_error, plot_prediction_3d, plot_variable_correlations, plot_prediction_2d, compute_dimwise_weights, compute_nrmse_matrix
+from utils import get_lorenz_attractor, get_lorenz96, get_rossler_attractor, compute_nrmse, plot_train_test_prediction_and_target, plot_prediction_distribution, plot_error, plot_prediction_3d, plot_variable_correlations, plot_prediction_2d, compute_dimwise_weights, compute_nrmse_matrix, compute_ks_distances
 import numpy as np
 import argparse
 from sklearn import preprocessing
@@ -169,13 +169,6 @@ for guess in range(config["test_trials"]):
 
     config["error"] = float(np.mean(NRMSE))
 
-    # Overwrite the config file with updated content
-    with open(SYSTEM + "/" + args.config_file, 'w') as f:
-        json.dump(config, f, indent=4)
-
-        
-
-
     # train_predictions = train_predictions[:, predicted_dims]
     test_predictions = test_predictions[:, predicted_dims]
     train_target = train_target[:, predicted_dims]
@@ -186,13 +179,20 @@ for guess in range(config["test_trials"]):
 
     labels = [f"x{i}" for i in predicted_dims] if SYSTEM == "lorenz96" else ["x", "y", "z"]
 
+    ks_distances = compute_ks_distances(test_predictions, test_target)
+    print(f"\n\n\nKolmogorov-Smirnov distances per dimensione: {ks_distances}\n\n\n")
+    config["ks_distance"] = {labels[i]: ks_distances[i] for i in range(len(predicted_dims))}
 
-    plot_train_test_prediction_and_target(train_predictions, train_target, test_predictions, test_target, inp_dim=len(predicted_dims), labels=labels) if config["show_plot"] else None
-    plot_error(test_predictions, test_target, n_dim=len(predicted_dims), labels=labels) if config["show_plot"] else None
-    plot_prediction_distribution(train_predictions, train_target, "Train", labels=labels) if config["show_plot"] else None
-    plot_prediction_distribution(test_predictions, test_target, "Test", labels=labels) if config["show_plot"] else None
-    plot_prediction_3d(test_predictions, test_target, title=f"{SYSTEM.capitalize()} Attractor", labels=labels) if config["show_plot"] and len(predicted_dims) == 3 else None
-    plot_prediction_2d(test_predictions, test_target, title=f"{SYSTEM.capitalize()} Attractor", labels=[labels[i] for i in predicted_dims]) if config["show_plot"] and len(predicted_dims) == 2 else None
+    # Overwrite the config file with updated content
+    with open(SYSTEM + "/" + args.config_file, 'w') as f:
+        json.dump(config, f, indent=4)
+
+    # plot_train_test_prediction_and_target(train_predictions, train_target, test_predictions, test_target, inp_dim=len(predicted_dims), labels=labels, filename_to_save="/Users/matt/Desktop/1.pdf") if config["show_plot"] else None
+    # plot_error(test_predictions, test_target, n_dim=len(predicted_dims), labels=labels, filename_to_save="/Users/matt/Desktop/2.pdf") if config["show_plot"] else None
+    # plot_prediction_distribution(train_predictions, train_target, "Train", labels=labels, filename_to_save="/Users/matt/Desktop/3.pdf") if config["show_plot"] else None
+    # plot_prediction_distribution(test_predictions, test_target, "Test", labels=labels, filename_to_save="/Users/matt/Desktop/4.pdf") if config["show_plot"] else None
+    # plot_prediction_3d(test_predictions, test_target, title=f"{SYSTEM.capitalize()} Attractor", labels=labels, filename_to_save="/Users/matt/Desktop/5.pdf") if config["show_plot"] and len(predicted_dims) == 3 else None
+    # plot_prediction_2d(test_predictions, test_target, title=f"{SYSTEM.capitalize()} Attractor", labels=[labels[i] for i in predicted_dims], filename_to_save="/Users/matt/Desktop/5.pdf") if config["show_plot"] and len(predicted_dims) == 2 else None
 
 
 

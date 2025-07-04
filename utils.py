@@ -12,9 +12,26 @@ from mpl_toolkits import mplot3d
 import matplotlib.pyplot as plt
 import random
 from matplotlib.backends.backend_pdf import PdfPages
+from scipy.stats import ks_2samp
 
-plt.rcParams.update({'font.size': 18}) # make fontsize bigger
+plt.rcParams.update({'font.size': 25}) # make fontsize bigger
 
+
+def compute_ks_distances(predictions, ground_truth):
+    """
+    Calcola la Kolmogorov-Smirnov distance per ogni dimensione.
+    
+    :param predictions: np.ndarray di shape [T, D]
+    :param ground_truth: np.ndarray di shape [T, D]
+    :return: lista di KS distances per ogni dimensione
+    """
+    assert predictions.shape == ground_truth.shape, "Shape mismatch tra predictions e ground truth"
+    D = predictions.shape[1]
+    distances = []
+    for i in range(D):
+        stat, _ = ks_2samp(predictions[:, i], ground_truth[:, i])
+        distances.append(stat)
+    return distances
 
 def count_parameters(model):
     """Return total number of parameters and
@@ -241,7 +258,7 @@ def plot_prediction_distribution(predictions, targets, title_prefix="", labels=[
     targets = np.array(targets)
     num_dims = predictions.shape[1]
 
-    fig, axes = plt.subplots(1, num_dims, figsize=(5 * num_dims, 4))
+    fig, axes = plt.subplots(1, num_dims, figsize=(8 * num_dims, 10))
 
     if num_dims == 1:
         axes = [axes]
@@ -249,10 +266,10 @@ def plot_prediction_distribution(predictions, targets, title_prefix="", labels=[
     for d in range(num_dims):
         axes[d].hist(targets[:, d], bins=50, alpha=0.5, label="Ground Truth", color='blue', density=True)
         axes[d].hist(predictions[:, d], bins=50, alpha=0.5, label="Prediction", color='red', density=True)
-        axes[d].set_title(f"{title_prefix} Variable {labels[d]}")
+        axes[d].set_title(f"{title_prefix} - {labels[d]}")
         axes[d].legend()
 
-    plt.tight_layout()
+    # plt.tight_layout()
     plt.savefig(filename_to_save, format="pdf") if filename_to_save is not None else None
     # plt.show()
 
@@ -362,7 +379,7 @@ def plot_error(predictions, target, n_dim=3, labels=None, filename_to_save=None)
 
     indexes = range(target.shape[0])
 
-    fig, axs = plt.subplots(n_dim, 1, figsize=(10, 8), sharex=True)
+    fig, axs = plt.subplots(n_dim, 1, figsize=(18, 10), sharex=True)
 
     labels = ['Error in x', 'Error in y', 'Error in z'] if labels is None else labels
     for i, ax in enumerate(axs):
@@ -372,11 +389,11 @@ def plot_error(predictions, target, n_dim=3, labels=None, filename_to_save=None)
         ax.grid()
 
     plt.xlabel("Time Steps")
-    plt.tight_layout()
+    # plt.tight_layout()
 
     plt.savefig(filename_to_save, format="pdf") if filename_to_save is not None else None
 
-    plt.show()
+    # plt.show()
 
 def plot_prediction(predictions):
     """
@@ -435,7 +452,7 @@ def plot_train_test_prediction_and_target(train_predictions, train_target, test_
     # assert len(labels) == inp_dim
 
     split_index = len(train_predictions)
-    fig, axs = plt.subplots(inp_dim, sharex=True, figsize=(10, 6))
+    fig, axs = plt.subplots(inp_dim, sharex=True, figsize=(18, 10))
 
     for i in range(inp_dim):
         axs[i].plot(range(split_index), train_predictions[:, i], label='Predictions' if i == 0 else None, linestyle='dashed', color="red")
@@ -466,7 +483,7 @@ def plot_train_test_prediction_and_target(train_predictions, train_target, test_
     
     plt.savefig(filename_to_save, format="pdf") if filename_to_save is not None else None
     
-    plt.show()
+    # plt.show()
 
 
 def plot_reservoir_state_2d(train_activations, test_activations, reservoir_index=0, seed=42):
@@ -682,7 +699,7 @@ def plot_prediction_2d(predictions, target, title, labels=["x", "y"], filename_t
 
     plt.savefig(filename_to_save, format="pdf") if filename_to_save is not None else None
     
-    # plt.show()
+    plt.show()
 
 
 def get_mackey_glass(lag=1, washout=200, window_size=0):

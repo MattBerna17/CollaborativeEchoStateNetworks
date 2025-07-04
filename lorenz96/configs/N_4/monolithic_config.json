@@ -1,5 +1,5 @@
 {
-    "use_h2": true,
+    "use_h2": false,
     "total_dimensions": 4,
     "lag": 1,
     "bigger_dataset": false,
@@ -9,15 +9,18 @@
     "washout": 200,
     "rescale_input": false,
     "show_plot": true,
-    "input_size": 1,
+    "input_size": 4,
     "output_size": 4,
     "concat": false,
     "reservoirs": [
         {
-            "input_size": 1,
+            "input_size": 4,
             "output_size": 4,
             "input_dimensions": [
-                0
+                0,
+                1,
+                2,
+                3
             ],
             "output_dimensions": [
                 0,
@@ -25,13 +28,19 @@
                 2,
                 3
             ],
-            "leaky": 0.05,
+            "leaky": 0.02,
             "inp_scaling": 0.24,
-            "regul": 7,
-            "units": 250,
-            "rho": 1.0,
+            "regul": 10,
+            "units": 515,
+            "rho": 0.96,
             "solver": null
         }
     ],
-    "error": 0.7194907665252686
+    "error": 1.060400128364563,
+    "ks_distance": {
+        "x0": 0.1188,
+        "x1": 0.106,
+        "x2": 0.1632,
+        "x3": 0.128
+    }
 }

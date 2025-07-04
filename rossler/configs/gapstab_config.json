@@ -1,5 +1,5 @@
 {
-    "use_h2": false,
+    "use_h2": true,
     "total_dimensions": 3,
     "lag": 1,
     "bigger_dataset": false,
@@ -23,11 +23,11 @@
             "output_dimensions": [
                 1
             ],
-            "leaky": 0.2,
-            "inp_scaling": 0.181,
-            "regul": 0.08,
-            "units": 400,
-            "rho": 1.1,
+            "leaky": 0.023,
+            "inp_scaling": 0.95,
+            "regul": 1,
+            "units": 500,
+            "rho": 1.09,
             "solver": null
         },
         {
@@ -40,13 +40,17 @@
             "output_dimensions": [
                 0
             ],
-            "leaky": 0.2,
-            "inp_scaling": 0.121,
-            "regul": 0.002,
-            "units": 400,
-            "rho": 1.1,
+            "leaky": 0.023,
+            "inp_scaling": 0.95,
+            "regul": 1,
+            "units": 500,
+            "rho": 1.09,
             "solver": null
         }
     ],
-    "error": 0.06388325989246368
+    "error": 0.5014721155166626,
+    "ks_distance": {
+        "x": 0.064,
+        "y": 0.0628
+    }
 }
