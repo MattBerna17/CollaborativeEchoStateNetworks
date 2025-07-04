@@ -89,7 +89,7 @@ python3 main.py --system={system} --config_file=path/to/config.json
 ```
 Valid options for `system` are: `lorenz`, `rossler`, `lorenz96`.
 
-(e.g. `python3 main.py --system=lorenz --config_file=configs/v1_config.json`)
+(e.g. `python3 main.py --system=lorenz --config_file=configs/monolithic_config.json`)
 
 ---
 
