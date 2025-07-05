@@ -187,12 +187,12 @@ for guess in range(config["test_trials"]):
     with open(SYSTEM + "/" + args.config_file, 'w') as f:
         json.dump(config, f, indent=4)
 
-    # plot_train_test_prediction_and_target(train_predictions, train_target, test_predictions, test_target, inp_dim=len(predicted_dims), labels=labels, filename_to_save="/Users/matt/Desktop/1.pdf") if config["show_plot"] else None
-    # plot_error(test_predictions, test_target, n_dim=len(predicted_dims), labels=labels, filename_to_save="/Users/matt/Desktop/2.pdf") if config["show_plot"] else None
-    # plot_prediction_distribution(train_predictions, train_target, "Train", labels=labels, filename_to_save="/Users/matt/Desktop/3.pdf") if config["show_plot"] else None
-    # plot_prediction_distribution(test_predictions, test_target, "Test", labels=labels, filename_to_save="/Users/matt/Desktop/4.pdf") if config["show_plot"] else None
-    # plot_prediction_3d(test_predictions, test_target, title=f"{SYSTEM.capitalize()} Attractor", labels=labels, filename_to_save="/Users/matt/Desktop/5.pdf") if config["show_plot"] and len(predicted_dims) == 3 else None
-    # plot_prediction_2d(test_predictions, test_target, title=f"{SYSTEM.capitalize()} Attractor", labels=[labels[i] for i in predicted_dims], filename_to_save="/Users/matt/Desktop/5.pdf") if config["show_plot"] and len(predicted_dims) == 2 else None
+    plot_train_test_prediction_and_target(train_predictions, train_target, test_predictions, test_target, inp_dim=len(predicted_dims), labels=labels) if config["show_plot"] else None
+    plot_error(test_predictions, test_target, n_dim=len(predicted_dims), labels=labels) if config["show_plot"] else None
+    plot_prediction_distribution(train_predictions, train_target, "Train", labels=labels) if config["show_plot"] else None
+    plot_prediction_distribution(test_predictions, test_target, "Test", labels=labels) if config["show_plot"] else None
+    plot_prediction_3d(test_predictions, test_target, title=f"{SYSTEM.capitalize()} Attractor", labels=labels) if config["show_plot"] and len(predicted_dims) == 3 else None
+    plot_prediction_2d(test_predictions, test_target, title=f"{SYSTEM.capitalize()} Attractor", labels=[labels[i] for i in predicted_dims]) if config["show_plot"] and len(predicted_dims) == 2 else None
 
 
 
